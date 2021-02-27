@@ -11,7 +11,7 @@ visualisation.get_geometry()
 
 # %%
 
-#visualisation.plot_Geometry()
+visualisation.plot_Geometry()
 
 # %%
 
