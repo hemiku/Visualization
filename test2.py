@@ -1,35 +1,69 @@
 # %%
 
-import visualisation.visualisation as v
+import visualization.visualization as v
 
 # %%
 
-visualisation = v.Visualization(input_type='Dalton', input_sub_type='tar', input_name='tests/GVB_AB_AB_restart_1.000')
+visualization = v.Visualization(input_type='Dalton', input_sub_type='tar', input_name='tests/GVB_AB_AB_restart_1.000')
 
 # %%
-visualisation.get_geometry()
-
-# %%
-
-visualisation.plot_Geometry()
+visualization.get_geometry()
 
 # %%
 
-visualisation.get_orbital_data()
+#visualization.plot_Geometry()
+
 # %%
 
+visualization.get_orbital_data()
+visualization.orbital_generator.init_grid( )
 
-import visualisation.orbital_generator as og
+# %%
 
- # %%
+visualization.orbital_generator.init_AOs()
+visualization.generate_AO_orbitals()
+visualization.generate_MO_orbitals()
+
+# %% 
+
+
+visualization.plot_Orbitals(orbital_number=27)
+
+
+
+
+
+
+
+
+# %%
+
+visualization.orbital_generator.calc_AOs( AO= visualization.orbital_generator.AOs )
+
+
+# %%
+
+visualization.orbital_generator.AOs
+
+# %% 
+
+print(visualization.molecular_system.nb )
+
+
+
+# %%
+
+import visualization.orbital_generator as og
+
+# %%
 AO_parameter = og.AOParameters.sqrt15
 print(AO_parameter)
 # %%
 OrbitalsGenrator = og.OrbitalsGenrator()
 # %%
-visualisation.molecular_system.get_Atoms_Name()
+visualization.molecular_system.get_Atoms_Name()
 # %%
-A = visualisation.molecular_system.get_Atoms_Name()
+A = visualization.molecular_system.get_Atoms_Name()
 
 # %%
 A
@@ -38,7 +72,7 @@ A[1]='ffff'
 # %%
 
 
-import visualisation.inputs as inputs
+import visualization.inputs as inputs
 
 # %%
 inputs.INPUT_TYPES
@@ -52,7 +86,7 @@ data_input.__class__ = inputs.DaltonInput
 
 # %%
 
-visualisation.data_input.__class__
+visualization.data_input.__class__
 # %%
 data_input.get_nb()
 # %%

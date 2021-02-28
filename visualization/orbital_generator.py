@@ -1,5 +1,5 @@
 
-from visualisation.grid import Grid
+#from visualisation.grid import Grid
 
 
 class AOParameters():
@@ -18,16 +18,19 @@ class AOParameters():
     sqrt50p16 = np.sqrt(50.0 / 16.0)
 
 
-class OrbitalsGenrator( ):
+class OrbitalsGenerator( ):
 
     import numpy as np
-    import visualisation.grid
+    import visualization.grid
 
     grid = None
-    spherical = None
+
     nAtoms = None
     atoms_R = None
+
+    spherical = None
     nb = None
+    coeff = None
     basis = None
     basis_norm = None
 
@@ -35,15 +38,25 @@ class OrbitalsGenrator( ):
     MOs = None
 
 
-    def __init__(self, spherical=None, nAtoms = None, atoms_R = None, basis = None, basis_norm = None ):
+    def __init__(self, nAtoms = None, atoms_R = None, spherical=None, nb = None, coeff = None, basis = None, basis_norm = None, grid = None ):
+
+        self.nAtoms = nAtoms
+        self.atoms_R = atoms_R    
 
         self.spherical=spherical
-        self.nAtoms = nAtoms
-        self.atoms_R = atoms_R
+        self.nb = nb
+        self.coeff = coeff
         self.basis = basis
         self.basis_norm = basis_norm
 
-        self.grid = self.visualisation.grid.Grid()
+        if grid is None:
+    
+            self.grid = self.visualization.grid.Grid()
+
+        else:
+
+            self.grid = grid
+
 
     def set_Atoms_R( self, Atoms_R):
 
@@ -65,7 +78,16 @@ class OrbitalsGenrator( ):
 
         self.MOs = self.np.zeros([self.nb, self.np.shape(X)[0], self.np.shape(Y)[1], self.np.shape(Z)[2]], dtype=self.np.float64)
 
+    def calc_MOs(self, start = None, stop = None):
 
+        X, Y, Z = self.grid.return_grid_arrays()
+
+        self.MOs = self.np.zeros( [self.nb, self.np.shape(X)[0], self.np.shape(Y)[1], self.np.shape(Z)[2]], dtype=self.np.float64)
+
+#        for i in range(self.inactive + 2 * self.nGeminal):
+        for i in range(self.nb):
+            for j in range(self.nb):
+                self.MOs[i, :, :, :] += self.coeff[i, j] * self.AOs[j, :, :, :]
 
     def calc_AOs(self, AO, grid=None):
 
@@ -85,9 +107,9 @@ class OrbitalsGenrator( ):
 
         for n in range( self.nAtoms ):
 
-            x = X - self.Atoms_R[n, 0]
-            y = Y - self.Atoms_R[n, 1]
-            z = Z - self.Atoms_R[n, 2]
+            x = X - self.atoms_R[n, 0]
+            y = Y - self.atoms_R[n, 1]
+            z = Z - self.atoms_R[n, 2]
 
             RR = x * x + y * y + z * z
 

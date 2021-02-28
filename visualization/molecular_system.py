@@ -8,18 +8,20 @@ class Molecular_System:
     electrons = None
     Occ = None
     Coeff = None
-    Atoms_R = None
-    Atoms_Charge = None
-    Atoms_Name = None
+    atoms_R = None
+    atoms_Charge = None
+    atoms_Name = None
     Bonds = None
 
-
+    basis = None
+    basis_norm = None
+    basis_norm2 = None
 
     AOs = None
     MOs = None
     geminals = None
 
-    def __init__(self, Spherical=None, nb=None, nAtoms=None, inactive=None, electrons=None, Occ=None, Coeff=None, Atoms_R=None, Atoms_Charge=None, Atoms_Name=None, Bonds=None):
+    def __init__(self, Spherical=None, nb=None, nAtoms=None, inactive=None, electrons=None, Occ=None, Coeff=None, atoms_R=None, atoms_Charge=None, atoms_Name=None, Bonds=None):
 
         if Spherical is not None:
             self.Spherical = Spherical
@@ -42,14 +44,14 @@ class Molecular_System:
         if Coeff is not None:
             self.Coeff = Coeff
 
-        if Atoms_R is not None:
-            self.Atoms_R = Atoms_R
+        if atoms_R is not None:
+            self.atoms_R = atoms_R
 
-        if Atoms_Charge is not None:
-            self.Atoms_Charge = Atoms_Charge
+        if atoms_Charge is not None:
+            self.atoms_Charge = atoms_Charge
 
-        if Atoms_Name is not None:
-            self.Atoms_Name = Atoms_Name
+        if atoms_Name is not None:
+            self.atoms_Name = atoms_Name
 
         if Bonds  is not None:
             self.Bonds  = Bonds
@@ -76,20 +78,20 @@ class Molecular_System:
     def set_Coeff(self, Coeff):
         self.Coeff = Coeff
 
-    def set_Atoms_R(self, Atoms_R):
-        self.Atoms_R = Atoms_R
+    def set_atoms_R(self, atoms_R):
+        self.atoms_R = atoms_R
 
-    def set_Atoms_Charge(self, Atoms_Charge):
-        self.Atoms_Charge = Atoms_Charge
+    def set_atoms_Charge(self, atoms_Charge):
+        self.atoms_Charge = atoms_Charge
 
-    def set_Atoms_Name(self, Atoms_Name):
-        self.Atoms_Name = Atoms_Name
+    def set_atoms_Name(self, atoms_Name):
+        self.atoms_Name = atoms_Name
 
-    def set_Atoms(self, Atoms_R, Atoms_Charge, Atoms_Name):
+    def set_atoms(self, atoms_R, atoms_Charge, atoms_Name):
 
-        self.set_Atoms_R(Atoms_R)
-        self.set_Atoms_Charge(Atoms_Charge)
-        self.set_Atoms_Name(Atoms_Name)
+        self.set_atoms_R(atoms_R)
+        self.set_atoms_Charge(atoms_Charge)
+        self.set_atoms_Name(atoms_Name)
 
     def set_Bonds(self, Bonds):
         self.Bonds = Bonds
@@ -112,22 +114,26 @@ class Molecular_System:
     def get_Occ(self):
         return self.Occ
 
-    def get_Coeff(self):
+    def get_coeff(self):
         return self.Coeff
 
-    def get_Atoms_R(self):
-        return self.Atoms_R
+    def get_atoms_R(self):
+        return self.atoms_R
 
-    def get_Atoms_Charge(self):
-        return self.Atoms_Charge
+    def get_atoms_Charge(self):
+        return self.atoms_Charge
 
-    def get_Atoms_Name(self):
-        return self.Atoms_Name
+    def get_atoms_Name(self):
+        return self.atoms_Name
 
     def get_Bonds(self):
         return self.Bonds
 
+    def get_basis(self):
+        return self.basis
 
+    def get_basis_norm(self):
+        return self.basis_norm
 
     def set_basis_and_norms(self, input):
 

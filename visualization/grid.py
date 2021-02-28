@@ -18,7 +18,7 @@ class Grid():
     z_n = None
 
 
-    def __init__(self, R_max_multip=12.0, x_min=None, x_max=None, x_n=None, y_min=None, y_max=None, y_n=None, z_min=None, z_max=None, z_n=None):
+    def __init__(self, R_max_multip=12.0, x_min=None, x_max=None, x_n= 80, y_min=None, y_max=None, y_n=80, z_min=None, z_max=None, z_n=80):
 
         self.R_max_multip = R_max_multip
 
@@ -44,7 +44,6 @@ class Grid():
                 Basis_max.append(1.64526336574595 / self.np.sqrt(( basis[i][j] ).max()))
 
         R_max = self.R_max_multip * self.np.max(Basis_max)
-
 
         self.x_max = self.np.max( atoms_R[:, 0]) + R_max
         self.x_min = self.np.min( atoms_R[:, 0]) - R_max

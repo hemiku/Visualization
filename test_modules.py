@@ -1,14 +1,14 @@
 # %%
-import visualisation.utils
+import visualization.utils
 
 
 
 # %%
-visualisation.utils.letters('dddd323')
+visualization.utils.letters('dddd323')
 
 # %%
-import visualisation.visualisation.utils
-import visualisation.visualisation.visualisation as visualisation
+import visualization.visualization.utils
+import visualization.visualization.visualization as visualization
 
 # %%
 
