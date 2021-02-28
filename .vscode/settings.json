@@ -1,3 +1,29 @@
 {
-    "python.pythonPath": "/home/hemik/anaconda3/bin/python"
+    "python.pythonPath": "/home/hemik/anaconda3/bin/python",
+    "cSpell.ignoreWords": [
+        "ao",
+        "calc",
+        "coeff",
+        "def",
+        "dtype",
+        "float",
+        "for",
+        "geminal",
+        "i",
+        "in",
+        "inactive",
+        "init",
+        "j",
+        "mo",
+        "n",
+        "nb",
+        "np",
+        "range",
+        "self",
+        "shape",
+        "x",
+        "y",
+        "z",
+        "zeros"
+    ]
 }

@@ -4,7 +4,7 @@ import visualisation.visualisation as v
 
 # %%
 
-visualisation = v.Visualisation(input_type='Dalton', input_sub_type='tar', input_name='tests/GVB_AB_AB_restart_1.000')
+visualisation = v.Visualization(input_type='Dalton', input_sub_type='tar', input_name='tests/GVB_AB_AB_restart_1.000')
 
 # %%
 visualisation.get_geometry()
@@ -35,4 +35,24 @@ A = visualisation.molecular_system.get_Atoms_Name()
 A
 # %%
 A[1]='ffff'
+# %%
+
+
+import visualisation.inputs as inputs
+
+# %%
+inputs.INPUT_TYPES
+# %%
+data_input = inputs.get_input(input_type='Dalton', input_sub_type='tar', input_name='tests/GVB_AB_AB_restart_1.000')
+# %%
+print(data_input.__class__ )
+# %%
+data_input.__class__ = inputs.DaltonInput
+
+
+# %%
+
+visualisation.data_input.__class__
+# %%
+data_input.get_nb()
 # %%

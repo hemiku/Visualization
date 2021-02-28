@@ -3,6 +3,21 @@ class Grid():
 
     import numpy as np
 
+    initail = None
+
+    R_max_multip = None
+
+    x_min = None
+    x_max = None
+    x_n = None
+    y_min = None
+    y_max = None
+    y_n = None
+    z_min = None
+    z_max = None
+    z_n = None
+
+
     def __init__(self, R_max_multip=12.0, x_min=None, x_max=None, x_n=None, y_min=None, y_max=None, y_n=None, z_min=None, z_max=None, z_n=None):
 
         self.R_max_multip = R_max_multip

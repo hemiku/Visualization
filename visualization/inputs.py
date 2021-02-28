@@ -1,8 +1,19 @@
 
+
+
+#dddd = DaltonInput( )
+#INPUT_TYPES = {'Dalton': DaltonInput() }
+
 class Input( ):
 
     import tarfile
     import numpy as np
+
+    #dalton = DaltonInput()
+
+    #input_types = {'Dalton': DaltonInput }
+
+
 
     input_type = None
     input_type = None
@@ -28,6 +39,7 @@ class Input( ):
 
     def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):
 
+
         if input_type is not None:
             self.input_type = input_type
 
@@ -45,6 +57,30 @@ class Input( ):
 
         if data_source is not None:
             self.data_source = data_source
+    
+#    @staticmethod
+#    def get_input( input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):#
+#
+#        try:
+#            #data_input = Input.input_types[input_type]
+#            data_input = Input( input_type=input_type, input_sub_type=input_sub_type, input_name=input_name, file_string=file_string, BAS_filename=BAS_filename, data_source=data_source )
+#            data_input.__class__ = Input.input_types[input_type]
+#        except KeyError:
+#            Exception(f"Input_type: {input_type} not found")
+
+#        print(data_input)
+#        return data_input
+
+        #return type(data_input, (data_input,), {'input_type' : input_type, 'input_sub_type':input_sub_type, 'input_name':input_name, 
+#'file_string':file_string, 'BAS_filename':BAS_filename, 'data_source':data_source})
+        #return data_input( input_type = input_type, input_sub_type=input_sub_type, input_name=input_name, file_string=file_string, BAS_filename=BAS_filename, data_source=data_source)
+        #if input_type in Input.input_types:
+        #    pass
+
+        #else:
+
+
+    
 
     def set_input_type(self, input_type):
         pass
@@ -90,6 +126,8 @@ class Input( ):
 
 
 class DaltonInput(Input):
+
+    input_name = 'Dalton'
 
     dalton_output = None
 
@@ -498,7 +536,7 @@ class DaltonInput(Input):
 
 
 
-    def normalization_sumation(self, Data, pow_val):
+    def normalization_summation(self, Data, pow_val):
 
         if (len(self.np.shape(Data)) == 2):
 
@@ -521,7 +559,7 @@ class DaltonInput(Input):
         pow_val = 3.0 / 2.0
         fact = 1.0
 
-        Norm =  self.normalization_sumation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -531,7 +569,7 @@ class DaltonInput(Input):
         pow_val = 5.0 / 2.0
         fact = 1.0 / 2.0
 
-        Norm =  self.normalization_sumation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -541,7 +579,7 @@ class DaltonInput(Input):
         pow_val = 7.0 / 2.0
         fact = 3.0 / 4.0
 
-        Norm =  self.normalization_sumation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
 
         Norm = 1 / self.np.sqrt(Norm)
 
@@ -552,7 +590,7 @@ class DaltonInput(Input):
         pow_val = 9.0 / 2.0
         fact = 15.0 / 8.0
 
-        Norm =  self.normalization_sumation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -562,7 +600,7 @@ class DaltonInput(Input):
         pow_val = 11.0 / 2.0
         fact = 105.0 / 16.0
 
-        Norm =  self.normalization_sumation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact       
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact       
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -572,8 +610,23 @@ class DaltonInput(Input):
         pow_val = 13.0 / 2.0
         fact = 945.0 / 32.0
 
-        Norm =  self.normalization_sumation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
+
+INPUT_TYPES = {'Dalton': DaltonInput}
+
+def get_input( input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):
+
+    try:
+        data_input = INPUT_TYPES[input_type](   input_type=input_sub_type, 
+                                                input_name=input_name, 
+                                                file_string=file_string, 
+                                                BAS_filename=BAS_filename, 
+                                                data_source=data_source )
+    except KeyError:
+        Exception(f"Input_type: {input_type} not found")
+
+    return data_input
 

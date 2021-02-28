@@ -1,11 +1,10 @@
-class Visualisation():
+class Visualization():
 
     from mayavi import mlab
     import numpy as np
 
-    import visualisation.visualisation_data as vd
-    import visualisation.utils as u
-    #import visualisation.inputs
+    import visualization.visualization_data as vd
+    import visualization.utils as u
 
     input_type = None
     input_sub_type = None
@@ -17,10 +16,10 @@ class Visualisation():
     data_input = None
     molecular_system = None
     
-    visualisation_data = vd.VisualisationData()
+    visualization_data = vd.VisualizationData()
 
-    def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None,
-                 data_source=None):
+
+    def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None):
 
         if input_type is not None:
             self.input_type = input_type
@@ -69,12 +68,8 @@ class Visualisation():
 
         import visualisation.inputs
 
-        if self.input_type == 'Dalton':
-            self.data_input = visualisation.inputs.DaltonInput(input_type=self.input_sub_type,
-                                                               input_name=self.input_name)
+        self.data_input = visualisation.inputs.get_input(input_type='Dalton', input_sub_type='tar', input_name='tests/GVB_AB_AB_restart_1.000')
 
-        if self.input_type == 'Molpro':
-            pass
 
     def plot_Geometry(self, Plot_Atoms=1, Atom_Names=1, Plot_Bonds=1):
 
@@ -86,10 +81,10 @@ class Visualisation():
                 self.mlab.points3d(self.molecular_system.Atoms_R[i, 0],
                                    self.molecular_system.Atoms_R[i, 1],
                                    self.molecular_system.Atoms_R[i, 2],
-                                   scale_factor=self.visualisation_data.Atoms_Scale[
+                                   scale_factor=self.visualization_data.Atoms_Scale[
                                        self.u.letters(self.molecular_system.Atoms_Name[i])],
                                    resolution=20,
-                                   color=self.visualisation_data.Atoms_Color[
+                                   color=self.visualization_data.Atoms_Color[
                                        self.u.letters(self.molecular_system.Atoms_Name[i])],
                                    scale_mode='none')
 

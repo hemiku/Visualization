@@ -1,7 +1,7 @@
 
 
 
-class VisualisationData( ):
+class VisualizationData( ):
     
     Atoms_Color = {
             "H": (1, 1, 1),

@@ -27,8 +27,12 @@ class OrbitalsGenrator( ):
     spherical = None
     nAtoms = None
     atoms_R = None
+    nb = None
     basis = None
     basis_norm = None
+
+    AOs = None
+    MOs = None
 
 
     def __init__(self, spherical=None, nAtoms = None, atoms_R = None, basis = None, basis_norm = None ):
@@ -48,6 +52,20 @@ class OrbitalsGenrator( ):
     def init_grid(self):
 
         self.grid.generate_grid_boundaries( atoms_R= self.atoms_R, basis= self.basis )
+
+    def init_AOs(self):
+
+        X, Y, Z = self.grid.return_grid_arrays()
+
+        self.AOs = self.np.zeros([self.nb, self.np.shape(X)[0], self.np.shape(Y)[1], self.np.shape(Z)[2]], dtype=self.np.float64)
+
+    def init_MOs(self):
+
+        X, Y, Z = self.grid.return_grid_arrays()
+
+        self.MOs = self.np.zeros([self.nb, self.np.shape(X)[0], self.np.shape(Y)[1], self.np.shape(Z)[2]], dtype=self.np.float64)
+
+
 
     def calc_AOs(self, AO, grid=None):
 
