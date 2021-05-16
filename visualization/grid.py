@@ -7,18 +7,18 @@ class Grid():
 
     R_max_multip = None
 
-    x_min = None
-    x_max = None
-    x_n = None
-    y_min = None
-    y_max = None
-    y_n = None
-    z_min = None
-    z_max = None
-    z_n = None
+    x_min:np.float64 = None
+    x_max:np.float64 = None
+    x_n: int = None
+    y_min:np.float64 = None
+    y_max:np.float64 = None
+    y_n: int = None
+    z_min:np.float64 = None
+    z_max:np.float64 = None
+    z_n: int = None
 
 
-    def __init__(self, R_max_multip=12.0, x_min=None, x_max=None, x_n= 80, y_min=None, y_max=None, y_n=80, z_min=None, z_max=None, z_n=80):
+    def __init__(self, R_max_multip=12.0, x_min=None, x_max=None, x_n= 100, y_min=None, y_max=None, y_n=100, z_min=None, z_max=None, z_n=100):
 
         self.R_max_multip = R_max_multip
 

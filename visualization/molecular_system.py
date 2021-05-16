@@ -1,7 +1,7 @@
 
 class Molecular_System:
 
-    Spherical = None
+    spherical = None
     nb = None
     nAtoms = None
     inactive = None
@@ -11,20 +11,24 @@ class Molecular_System:
     atoms_R = None
     atoms_Charge = None
     atoms_Name = None
-    Bonds = None
+    bonds = None
 
     basis = None
     basis_norm = None
     basis_norm2 = None
 
+    G_coeff = None
+    Orb2Gem = None
+    n_geminals = None
+
     AOs = None
     MOs = None
     geminals = None
 
-    def __init__(self, Spherical=None, nb=None, nAtoms=None, inactive=None, electrons=None, Occ=None, Coeff=None, atoms_R=None, atoms_Charge=None, atoms_Name=None, Bonds=None):
+    def __init__(self, spherical=None, nb=None, nAtoms=None, inactive=None, electrons=None, Occ=None, Coeff=None, atoms_R=None, atoms_Charge=None, atoms_Name=None, bonds=None):
 
-        if Spherical is not None:
-            self.Spherical = Spherical
+        if spherical is not None:
+            self.spherical = spherical
 
         if nb is not None:
             self.nb = nb
@@ -53,12 +57,12 @@ class Molecular_System:
         if atoms_Name is not None:
             self.atoms_Name = atoms_Name
 
-        if Bonds  is not None:
-            self.Bonds  = Bonds
+        if bonds  is not None:
+            self.bonds  = bonds
 
 
-    def set_Spherical(self, Spherical):
-        self.Spherical = Spherical
+    def set_spherical(self, spherical):
+        self.spherical = spherical
 
     def set_nb(self, nb):
         self.nb = nb
@@ -93,11 +97,11 @@ class Molecular_System:
         self.set_atoms_Charge(atoms_Charge)
         self.set_atoms_Name(atoms_Name)
 
-    def set_Bonds(self, Bonds):
-        self.Bonds = Bonds
+    def set_bonds(self, bonds):
+        self.bonds = bonds
 
-    def get_Spherical(self):
-        return self.Spherical
+    def get_spherical(self):
+        return self.spherical
 
     def get_nb(self):
         return self.nb
@@ -126,8 +130,8 @@ class Molecular_System:
     def get_atoms_Name(self):
         return self.atoms_Name
 
-    def get_Bonds(self):
-        return self.Bonds
+    def get_bonds(self):
+        return self.bonds
 
     def get_basis(self):
         return self.basis

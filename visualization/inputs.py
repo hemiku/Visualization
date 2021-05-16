@@ -21,8 +21,8 @@ class Input( ):
     file_string = None
     BAS_filename = None
     data_source = None
-
-    Spherical = None
+    
+    spherical = None
     nb = None
     nAtoms = None
     inactive = None
@@ -121,15 +121,12 @@ class Input( ):
     def get_Bonds(self):
         pass
 
-
-
-
-
 class DaltonInput(Input):
 
     input_name = 'Dalton'
 
     dalton_output = None
+    F_BAS = None
 
     def set_source(self, source):
 
@@ -151,14 +148,16 @@ class DaltonInput(Input):
 
             return self.dalton_output
 
-    def get_harmonic(self):
+    def get_spherical(self):
 
         Out = self.get_Dalton_Output()
 
         if (Out.find("Spherical harmonic basis used.") > 0):
-            self.Spherical = 1
+            self.spherical = 1
         else:
-            self.Spherical = 0
+            self.spherical = 0
+
+        return self.spherical
 
     def get_nb(self):
 
@@ -207,7 +206,7 @@ class DaltonInput(Input):
     def get_Occ(self):
 
         if self.Occ is not None:
-            return self.self.Occ
+            return self.Occ
 
         self.Occ = self.np.zeros([self.nb], dtype=self.np.float64)
 
@@ -225,6 +224,8 @@ class DaltonInput(Input):
         return self.Occ
 
     def get_Coeff(self):
+
+        F_MOPUN = None
 
         if self.Coeff is not None:
             return self.Coeff
@@ -251,17 +252,20 @@ class DaltonInput(Input):
 
     def get_Basis_File(self):
 
+        if self.F_BAS is not None:
+            return self.F_BAS
+
         if self.input_type == 'MOPUN':
             with open("DALTON.BAS", 'r') as f:
-                F_BAS = f.read()
+                self.F_BAS = f.read()
 
         if self.input_type == 'tar':
             tar = self.tarfile.open(self.input_name + ".tar.gz")
             f = tar.extractfile(tar.getmember("DALTON.BAS"))
-            F_BAS = f.read().decode(encoding='utf-8')
+            self.F_BAS = f.read().decode(encoding='utf-8')
             tar.close()
 
-        return F_BAS
+        return self.F_BAS
 
     def get_Atoms(self):
 
@@ -317,8 +321,8 @@ class DaltonInput(Input):
         F_BAS_split_lines = F_BAS.splitlines()
 
         Atom_header_pattern = ' {1,9}\d{1,9}\. '
-        Atom_Geometrie_pattern = '^\w{1,6} \D \D \D'
-        Basis_header_pattern = '^H  {1,3}\d {1,4}\d$'
+        Atom_Geometries_pattern = '^\w{1,6} \D \D \D'
+        Basis_header_pattern = '^H {1,3}\d{1,3} {1,4}\d{1,3}$'
 
         Atoms_Gropus = []
 
@@ -326,17 +330,17 @@ class DaltonInput(Input):
 
             if re.match(Atom_header_pattern, line):
 
-                Atoms_Gropu = {'headerLine': line, 'Geometries': [], 'Basis': []}
-                Atoms_Gropus.append(Atoms_Gropu)
+                Atoms_Group = {'headerLine': line, 'Geometries': [], 'Basis': []}
+                Atoms_Gropus.append(Atoms_Group)
 
-            elif re.match(Atom_Geometrie_pattern, line):
+            elif re.match(Atom_Geometries_pattern, line):
 
-                Atoms_Gropu['Geometries'].append(line)
+                Atoms_Group['Geometries'].append(line)
 
             elif re.match(Basis_header_pattern, line):
 
                 basis_part = {'header': line, 'data': []}
-                Atoms_Gropu['Basis'].append(basis_part)
+                Atoms_Group['Basis'].append(basis_part)
 
             else:
                 basis_part['data'].append(line)
@@ -357,22 +361,21 @@ class DaltonInput(Input):
 
         i = 0
 
-        for Atoms_Gropu in Atoms_Gropus:
+        for Atoms_Group in Atoms_Gropus:
 
             # TODO basis
             Orbitals = []
 
-            for Orbital in Atoms_Gropu['Basis']:
+            for Orbital in Atoms_Group['Basis']:
                 dim = self.np.fromstring(Orbital['header'][1:], dtype=self.np.int64, sep=' ')
                 dim[1] += 1
 
-                Orbital = self.np.reshape(self.np.fromstring(''.join(Orbital['data']), dtype=self.np.float64, sep=' '),
-                                          dim)
+                Orbital = self.np.reshape(self.np.fromstring(''.join(Orbital['data']), dtype=self.np.float64, sep=' '), dim)
                 Orbitals.append(Orbital)
 
-            Atom_Charge = int(Atoms_Gropu['headerLine'][:Atoms_Gropu['headerLine'].find('.')])
+            Atom_Charge = int(Atoms_Group['headerLine'][:Atoms_Group['headerLine'].find('.')])
 
-            for Atom in Atoms_Gropu['Geometries']:
+            for Atom in Atoms_Group['Geometries']:
                 Atom_split = Atom.split()
 
                 Atom_name = Atom_split[0]
@@ -614,6 +617,31 @@ class DaltonInput(Input):
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
+
+    def get_G_coeff(self):
+
+        self.G_coeff = self.np.zeros([self.electrons], dtype=self.np.float64)
+
+        Out = self.get_Dalton_Output()
+        Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
+                          Out.rfind('NEWORB " orbitals punched.')].split(
+            "====================================================================")[1].split("\n")[1:-1]
+
+        for i in range(self.electrons):
+            self.G_coeff[i] = float(Geminal_buf[i].split()[5])
+
+    def get_Orb2Gem(self):
+        self.Orb2Gem = self.np.zeros([self.electrons], dtype=self.np.int64)
+
+        Out = self.get_Dalton_Output()
+        Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
+                          Out.rfind('NEWORB " orbitals punched.')].split(
+            "====================================================================")[1].split("\n")[1:-1]
+
+        for i in range(self.electrons):
+            self.Orb2Gem[i] = int(Geminal_buf[i].split()[3]) - 1
+
+        self.nGeminal = int(len(self.Orb2Gem) / 2)
 
 INPUT_TYPES = {'Dalton': DaltonInput}
 

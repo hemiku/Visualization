@@ -3,10 +3,16 @@
 
 class VisualizationData( ):
     
+    background_colors = {
+        'Gaussian': (.5, .5, .75),
+        'White': (1., 1., 1.)
+    }
+
     Atoms_Color = {
             "H": (1, 1, 1),
             "He": (0.5, 0.5, 0.5),
             "O": (1, 0, 0),
+            "Ar": (0, 1, 0),
             "B": (233.0 / 255, 165.0 / 255, 165.0 / 255),
             "N": (0, 0, 1),
             "C": (0, 0, 0),
@@ -22,7 +28,8 @@ class VisualizationData( ):
             "N": 1.4,
             "C": 1.4,
             "F": 1.4,
-            "Ne": 1.4
+            "Ne": 1.4,
+            "Ar": 1.4
         }
 
     Atoms_Mass = {

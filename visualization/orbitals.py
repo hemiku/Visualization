@@ -25,7 +25,7 @@ class OrbitalsGenerator( ):
 
     grid = None
 
-    nAtoms = None
+    nAtoms: int = None
     atoms_R = None
 
     spherical = None
