@@ -160,16 +160,31 @@ class DispersionPlot(visualization.visualization.Visualization):
                                  self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
         
         if plot_bonds:        
-            for i in range(len(self.molecular_system.bonds)):
+            for i, bond in enumerate( self.molecular_system.bonds ) :
+
+                bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
+                bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
+
+                bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
+
                 self.mlab.plot3d(
-                    self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 0] , 
-                                   self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 0]]),
-                    self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 1] , 
-                                   self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 1]]), 
-                    self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 2] , 
-                                   self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 2]]),
-                    tube_radius=0.2 * bond_scaling , color=(233.0/255, 165.0/255, 165.0/255))
+                    self.np.array([bond_begin[0] , bond_half[0]]),
+                    self.np.array([bond_begin[1] , bond_half[1]]),
+                    self.np.array([bond_begin[2] , bond_half[2]]),
+                    tube_radius=0.2 * bond_scaling , 
+                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
+
+                self.mlab.plot3d(
+                    self.np.array([bond_end[0] , bond_half[0]]),
+                    self.np.array([bond_end[1] , bond_half[1]]),
+                    self.np.array([bond_end[2] , bond_half[2]]),
+                    tube_radius=0.2 * bond_scaling , 
+                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
+
         
+
+
+
         X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
         self.mlab.contour3d(X, Y, Z, (self.D_AB) ,contours=contours,opacity=0.5) 

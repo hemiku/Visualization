@@ -9,12 +9,6 @@ class Input( ):
     import tarfile
     import numpy as np
 
-    #dalton = DaltonInput()
-
-    #input_types = {'Dalton': DaltonInput }
-
-
-
     input_type = None
     input_type = None
     input_name = None
@@ -299,12 +293,12 @@ class DaltonInput(Input):
         Bonds_str = Bonds_str[Bonds_str.find("bond"):]
         if 1:
             for i in range(len(Bonds_str.split("\n")) - 3):
-                self.Bonds.append([(Bonds_str.split("\n")[i]).split()[2], (Bonds_str.split("\n")[i]).split()[3],
-                                   float((Bonds_str.split("\n")[i]).split()[4])])
+                self.Bonds.append(  [(Bonds_str.split("\n")[i]).split()[2], (Bonds_str.split("\n")[i]).split()[3],
+                                    float((Bonds_str.split("\n")[i]).split()[4])])
         else:
             for i in range(len(Bonds_str.split("\n")) - 3):
-                self.Bonds.append([(Bonds_str.split("\n")[i]).split()[2], (Bonds_str.split("\n")[i]).split()[4],
-                                   float((Bonds_str.split("\n")[i]).split()[6])])
+                self.Bonds.append(  [(Bonds_str.split("\n")[i]).split()[2], (Bonds_str.split("\n")[i]).split()[4],
+                                    float((Bonds_str.split("\n")[i]).split()[6])])
 
         return self.Bonds
 
