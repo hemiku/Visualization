@@ -1,6 +1,7 @@
 
 import visualization.visualization
 
+
 class DispersionPlot(visualization.visualization.Visualization):
 
     GAMMCOR_output_filename = None
@@ -117,7 +118,7 @@ class DispersionPlot(visualization.visualization.Visualization):
         self.D_AB = D_AB
         
 
-    def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None ):  
+    def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False ):  
         
         #from mayavi import mlab
 
@@ -181,14 +182,16 @@ class DispersionPlot(visualization.visualization.Visualization):
                     tube_radius=0.2 * bond_scaling , 
                     color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
 
-        
-
 
 
         X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-        self.mlab.contour3d(X, Y, Z, (self.D_AB) ,contours=contours,opacity=0.5) 
+        D_AB_contur = self.mlab.contour3d(X, Y, Z, (self.D_AB) ,contours=contours,opacity=0.5) 
     
+        if sclalarbar:
+
+            _scalarbar = self.mlab.scalarbar(object=D_AB_contur, title='D^{AB}' ,orientation='vertical' )
+
         self.mlab.show()
 
     def Plot_D_AB_log(self, Plot_Atoms = 1, Atom_Names = 1, Plot_Bonds = 1 , Atom_Scaling = 1.0, Bond_Scaling = 1.0, contours = 6 ):  

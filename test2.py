@@ -15,7 +15,7 @@ visualization.get_dispersion_index(  )
 
 # %%
 
-visualization.Plot_D_AB(atom_names= 1, atom_scaling= 0.3 , bond_scaling = 0.3 , contours = 10 )
+visualization.Plot_D_AB(atom_names= 1, atom_scaling= 0.3 , bond_scaling = 0.3 , contours = 10, sclalarbar=True)
 
 # %%
 
@@ -70,5 +70,15 @@ visualization.Monomers
 Monomers_set = set(visualization.Monomers )
 visualization.Calc_D( Monomer_A= Monomers_set.pop(), Monomer_B=Monomers_set.pop() )
 # %%
-visualization.Plot_D_AB(atom_names= 1, atom_scaling= 0.3 , bond_scaling = 0.3 , contours = 10 )
+visualization.Plot_D_AB(atom_names= 1, atom_scaling= 0.3 , bond_scaling = 0.3 , contours = 10, sclalarbar=True )
 # %%
+
+
+## TODO  ustawić ile geminalu ma być pod powierzchnią, 
+# dobrać odpowiedznio legendę  
+# Geminal jedna powierzchnia 
+# dyspersja kontury
+# sprawdzić mayavi latex
+
+
+
