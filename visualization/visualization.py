@@ -185,21 +185,25 @@ class Visualization():
             nAtoms=self.data_input.get_nAtoms()
             self.molecular_system.set_nAtoms(nAtoms=nAtoms)
             
-            atoms_R=self.data_input.get_Atoms()[0]
+            atoms_R, atoms_Charge, atoms_Name =self.data_input.get_Atoms()
+
             self.molecular_system.set_atoms_R(atoms_R = atoms_R )
-            
-            atoms_Charge=self.data_input.get_Atoms()[1]
             self.molecular_system.set_atoms_Charge(atoms_Charge=atoms_Charge)
+            self.molecular_system.set_atoms_Name(atoms_Name=atoms_Name)   
+
+            #atoms_Charge=self.data_input.get_Atoms()[1]
+
+
+            #atoms_Name=self.data_input.get_Atoms()[2]
+
             
-            atoms_Name=self.data_input.get_Atoms()[2]
-            self.molecular_system.set_atoms_Name(atoms_Name=atoms_Name)
             
             if get_bonds:
                 bonds=self.data_input.get_Bonds()
                 self.molecular_system.set_bonds(bonds=bonds )
 
 
-    def get_orbital_data(self):
+    def get_orbital_data(self, get_bonds = True ):
 
         if self.data_input is None or self.molecular_system is None:
 
@@ -209,7 +213,7 @@ class Visualization():
 
             from visualization.orbitals import OrbitalsGenerator
 
-            self.get_geometry()
+            self.get_geometry( get_bonds = get_bonds)
 
             self.molecular_system.set_spherical( spherical=self.data_input.get_spherical())
 
@@ -324,8 +328,8 @@ class Visualization():
 
         for number in orbital_numbers:
             
-            X, Y, Z = self.molecular_system.grid.return_grid_arrays()
-
+            #X, Y, Z = self.molecular_system.grid.return_grid_arrays()
+            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
             self.mlab.contour3d( X, Y, Z, (self.molecular_system.MOs[number]), contours=12, opacity=0.5)
 
 
@@ -374,21 +378,51 @@ class Visualization():
 
         for number in orbital_numbers:
             
-            X, Y, Z = self.molecular_system.grid.return_grid_arrays()
-
+            #X, Y, Z = self.molecular_system.grid.return_grid_arrays()
+            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
+            
             self.mlab.contour3d( X, Y, Z, (self.molecular_system.AOs[number]), contours=12, opacity=0.5)
 
 
         self.mlab.show()
 
-
-    def plot_Geminals(self, geminal_numbers, plot_atoms=1, atom_names=1, plot_bonds=1):
-
+    def plot_Geminals(self, geminal_numbers = [0],  
+                            plot_atoms = True, 
+                            atom_names =True, 
+                            plot_bonds = True , 
+                            atom_scaling = 1.0, 
+                            bond_scaling = 1.0, 
+                            contours = 6, 
+                            background_color = None, 
+                            sclalarbar = False, 
+                            auto_show = True, 
+                            figure = None ):  
+        
         #self.mlab.figure("Geminal", bgcolor=(.5, .5, .75), size=(1000, 1000))
-        fig1 = self.mlab.figure("Geminals_" + str(geminal_numbers), bgcolor=(.5, .5, .75), size=(1000, 1000))
-        fig1.scene.parallel_projection = False
+        # fig1 = self.mlab.figure("Geminals_" + str(geminal_numbers), bgcolor=(.5, .5, .75), size=(1000, 1000))
+        # fig1.scene.parallel_projection = False
 
-        self.mlab.clf()
+        # self.mlab.clf()
+
+
+        if background_color is None:
+            _background_color = self.visualization_data.background_colors['White']
+        else:
+            _background_color = background_color
+
+        if figure is None:
+            _figure = self.mlab.figure(   "Dispersion", 
+                            bgcolor=_background_color,
+                            size=(600, 600) )
+
+            self.mlab.clf()
+
+        else:
+
+            _figure = figure
+
+
+
 
         if plot_atoms:
             for i in range(self.molecular_system.nAtoms):
@@ -430,7 +464,9 @@ class Visualization():
 
         for number in geminal_numbers:
 
-            X, Y, Z = self.molecular_system.grid.return_grid_arrays()
+            #X, Y, Z = self.molecular_system.grid.return_grid_arrays()
+            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
+
             #          exec(self.Geminnals[i].g)
             #self.mlab.contour3d(X, Y, Z, (self.Geminnals[number].v), contours=12, opacity=0.5)
             self.mlab.contour3d( X, Y, Z, (self.molecular_system.geminals[number]), contours=12, opacity=0.5)

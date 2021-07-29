@@ -118,7 +118,7 @@ class DispersionPlot(visualization.visualization.Visualization):
         self.D_AB = D_AB
         
 
-    def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False ):  
+    def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False, auto_show = True, figure = None ):  
         
         #from mayavi import mlab
 
@@ -126,14 +126,18 @@ class DispersionPlot(visualization.visualization.Visualization):
             _background_color = self.visualization_data.background_colors['White']
         else:
             _background_color = background_color
-  
-        self.mlab.figure(   "Dispersion", 
+
+        if figure is None:
+            _figure = self.mlab.figure(   "Dispersion", 
                             bgcolor=_background_color,
-                            size=(1000, 1000) )
+                            size=(600, 400) )
 
+            self.mlab.clf()
 
-        self.mlab.clf()
-        
+        else:
+
+            _figure = figure
+
         #if Plot_Atoms:
         #    for i in range(self.molecular_system.nAtoms):
         #        self.mlab.points3d(self.molecular_system.atoms_R[i,0], self.molecular_system.atoms_R[i,1], self.molecular_system.atoms_R[i,2], 
@@ -144,7 +148,7 @@ class DispersionPlot(visualization.visualization.Visualization):
                 self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
                                    self.molecular_system.atoms_R[i, 1],
                                    self.molecular_system.atoms_R[i, 2],
-                                   scale_factor=self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
+                                   scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
                                    resolution=20,
                                    color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
                                    scale_mode='none')
@@ -153,8 +157,9 @@ class DispersionPlot(visualization.visualization.Visualization):
         #    for i in range(self.molecular_system.nAtoms):
         #        self.mlab.text3d(self.molecular_system.atoms_R[i,0], self.molecular_system.atoms_R[i,1], self.molecular_system.atoms_R[i,2], 
         #                    self.molecular_system.atoms_Name[i],scale=(.2, .2, .2))
+        
         if atom_names:
-            for i in range(self.molecular_system.nAtoms):
+            for i in range( self.molecular_system.nAtoms ):
                 self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
                                  self.molecular_system.atoms_R[i, 1],
                                  self.molecular_system.atoms_R[i, 2],
@@ -191,8 +196,22 @@ class DispersionPlot(visualization.visualization.Visualization):
         if sclalarbar:
 
             _scalarbar = self.mlab.scalarbar(object=D_AB_contur, title='D^{AB}' ,orientation='vertical' )
+            _scalarbar.scalar_bar.unconstrained_font_size = True
+            _scalarbar.scalar_bar.label_text_property.color = (0.0, 0.0, 0.0) 
+            _scalarbar.scalar_bar.label_text_property.italic = False
+            _scalarbar.scalar_bar.label_text_property.bold = False 
+            _scalarbar.scalar_bar.number_of_labels = contours
+            _scalarbar.scalar_bar.label_text_property.font_size = 14
 
-        self.mlab.show()
+            _scalarbar.scalar_bar.position = self.np.array([0.01      , 0.01])
+            _scalarbar.scalar_bar.position2 = self.np.array([0.2       , 0.95])
+
+
+
+        if auto_show:
+            self.mlab.show()
+
+        return _figure
 
     def Plot_D_AB_log(self, Plot_Atoms = 1, Atom_Names = 1, Plot_Bonds = 1 , Atom_Scaling = 1.0, Bond_Scaling = 1.0, contours = 6 ):  
         
@@ -249,12 +268,16 @@ class DispersionPlot(visualization.visualization.Visualization):
         self.get_geminal_data()
         self.get_generate_geminals()
 
-    def get_dispersion_index(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50 ):
+    def get_dispersion_index(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50, monomer_A=None, monomer_B=None):
 
         self.get_geminals( R_max_multip = R_max_multip, x_n= x_n, y_n= y_n, z_n= z_n)
 
         self.get_NumberOfFragments()
         self.get_Fragments()
         self.get_Epsilons()
-        Monomers_set = set(self.Monomers )
-        self.Calc_D( Monomer_A= Monomers_set.pop(), Monomer_B=Monomers_set.pop() )
+        Monomers_set = set( self.Monomers )
+
+        if monomer_A is None and monomer_B is None: 
+            self.Calc_D( Monomer_A= Monomers_set.pop(), Monomer_B=Monomers_set.pop() )
+        else:
+            self.Calc_D( Monomer_A= monomer_A, Monomer_B=monomer_B )

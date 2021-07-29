@@ -261,25 +261,55 @@ class DaltonInput(Input):
 
         return self.F_BAS
 
+
+    def find_header_end_line(self, lines , Atom_header_pattern = ' {1,9}\d{1,9}\. ' ):
+
+        import re
+
+        for i, line in enumerate(lines):
+            if re.match(Atom_header_pattern, line):
+                return i
+
     def get_Atoms(self):
+
+        import re
 
         self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
         self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
         self.Atoms_Name = []
 
         F_BAS = self.get_Basis_File()
+        F_BAS_split_lines = F_BAS.splitlines()
 
-        BASIS = F_BAS[F_BAS[F_BAS.find("ATOMBASIS"):].find("\n") + F_BAS.find("ATOMBASIS") + 1:]
-        BAS_split = BASIS.split("\n")[:-1]
-        n = 0
-        for i in range(len(BAS_split)):
+        Atom_header_pattern = ' {1,9}\d{1,9}\. '
+        Atom_Geometries_pattern = '^\w{1,6} \D \D \D'
+        Basis_header_pattern = '^H {1,3}\d{1,3} {1,4}\d{1,3}$'
 
-            if (BAS_split[i][0] != " " and len(BAS_split[i].split()) == 4):
-                self.Atoms_Name += [BAS_split[i].split()[0]]
-                self.Atoms_Charge[n] = float(BAS_split[i - 1].split()[0])
-                self.Atoms_R[n] = self.np.array(
-                    [float(BAS_split[i].split()[1]), float(BAS_split[i].split()[2]), float(BAS_split[i].split()[3])])
-                n += 1
+        Atoms_Gropus = []
+
+        header_end_line = self.find_header_end_line( lines = F_BAS_split_lines, Atom_header_pattern = Atom_header_pattern )
+
+        for line in F_BAS_split_lines[header_end_line:]:
+
+            if re.match(Atom_header_pattern, line):
+
+                Atoms_Group = {'headerLine': line, 'Geometries': [], 'Basis': []}
+                Atoms_Gropus.append(Atoms_Group)
+
+            elif re.match(Atom_Geometries_pattern, line):
+
+                Atoms_Group['Geometries'].append(line)
+
+            elif re.match(Basis_header_pattern, line):
+
+                basis_part = {'header': line, 'data': []}
+                Atoms_Group['Basis'].append(basis_part)
+
+            else:
+                pass
+                #basis_part['data'].append(line)
+
+        self.map_atoms_geometry_from_BAS_file( Atoms_Gropus )
 
         return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
@@ -289,29 +319,34 @@ class DaltonInput(Input):
 
         Out = self.get_Dalton_Output()
 
-        Bonds_str = Out[Out.find("Bond distances (Angstrom):"):Out.find("Bond angles (degrees)")]
+        Bonds_str = Out[Out.find("Bond distances (Angstrom):"):Out.find("Output from **INTEGRALS input processing (HERMIT)")]
         Bonds_str = Bonds_str[Bonds_str.find("bond"):]
-        if 1:
-            for i in range(len(Bonds_str.split("\n")) - 3):
-                self.Bonds.append(  [(Bonds_str.split("\n")[i]).split()[2], (Bonds_str.split("\n")[i]).split()[3],
-                                    float((Bonds_str.split("\n")[i]).split()[4])])
-        else:
-            for i in range(len(Bonds_str.split("\n")) - 3):
-                self.Bonds.append(  [(Bonds_str.split("\n")[i]).split()[2], (Bonds_str.split("\n")[i]).split()[4],
-                                    float((Bonds_str.split("\n")[i]).split()[6])])
+        Bonds_str_split = Bonds_str.split("\n")
+
+        for bond_str in Bonds_str_split:
+            bond_str_split = bond_str.split()
+
+            try:
+                self.Bonds.append( [ ( bond_str_split[2], bond_str_split[3], float(bond_str_split[4]) ) ] )
+            except:
+                pass
+
+            try:
+                self.Bonds.append( [ ( bond_str_split[2], bond_str_split[4], float(bond_str_split[6]) ) ] )
+            except:
+                pass
 
         return self.Bonds
 
     def get_Basis(self):
+
+        import re
 
         self.basis = []
         self.basis_norm = []
         self.basis_norm2 = []
 
         F_BAS = self.get_Basis_File()
-
-        import re
-
         F_BAS_split_lines = F_BAS.splitlines()
 
         Atom_header_pattern = ' {1,9}\d{1,9}\. '
@@ -320,7 +355,9 @@ class DaltonInput(Input):
 
         Atoms_Gropus = []
 
-        for line in F_BAS_split_lines[7:]:
+        header_end_line = self.find_header_end_line( lines = F_BAS_split_lines, Atom_header_pattern = Atom_header_pattern )
+
+        for line in F_BAS_split_lines[header_end_line:]:
 
             if re.match(Atom_header_pattern, line):
 
@@ -344,10 +381,13 @@ class DaltonInput(Input):
 
         return self.basis, self.basis_norm, self.basis_norm2
 
-    def map_atoms_from_BAS_file(self, Atoms_Gropus):
+
+
+    def map_atoms_geometry_from_BAS_file(self, Atoms_Gropus):
         """
         docstring
         """
+
 
         self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
         self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
@@ -356,16 +396,6 @@ class DaltonInput(Input):
         i = 0
 
         for Atoms_Group in Atoms_Gropus:
-
-            # TODO basis
-            Orbitals = []
-
-            for Orbital in Atoms_Group['Basis']:
-                dim = self.np.fromstring(Orbital['header'][1:], dtype=self.np.int64, sep=' ')
-                dim[1] += 1
-
-                Orbital = self.np.reshape(self.np.fromstring(''.join(Orbital['data']), dtype=self.np.float64, sep=' '), dim)
-                Orbitals.append(Orbital)
 
             Atom_Charge = int(Atoms_Group['headerLine'][:Atoms_Group['headerLine'].find('.')])
 
@@ -379,61 +409,151 @@ class DaltonInput(Input):
                 self.Atoms_Charge[i] = Atom_Charge
                 self.Atoms_R[i] = Atom_R
 
-                self.basis.append(Orbitals)
+                i += 1
+
+    def map_atoms_from_BAS_file(self, Atoms_Gropus):
+        """
+        docstring
+        """
+
+
+        self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
+        self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
+        self.Atoms_Name = []
+
+        self.basis = []
+        self.basis_norm = []
+        self.basis_norm2 = []
+
+        i = 0
+
+        for Atoms_Group in Atoms_Gropus:
+
+            # TODO basis
+            Orbitals = []
+
+            for Orbital in Atoms_Group['Basis']:
+                dim = self.np.fromstring(Orbital['header'][1:], dtype=self.np.int64, sep=' ')
+                dim[1] += 1
+
+                if len( Orbital['data'] ):
+                    Orbital = self.np.reshape(self.np.fromstring(''.join(Orbital['data']), dtype=self.np.float64, sep=' '), dim)
+                    Orbitals.append(Orbital)
+
+            Atom_Charge = int(Atoms_Group['headerLine'][:Atoms_Group['headerLine'].find('.')])
+
+            for Atom in Atoms_Group['Geometries']:
+                Atom_split = Atom.split()
+
+                Atom_name = Atom_split[0]
+                Atom_R = self.np.array([float(Atom_split[1]), float(Atom_split[2]), float(Atom_split[3])])
+
+                self.Atoms_Name.append(Atom_name)
+                self.Atoms_Charge[i] = Atom_Charge
+                self.Atoms_R[i] = Atom_R
+
+                if len( Orbitals ):
+                    self.basis.append(Orbitals)
 
                 i += 1
 
-        for n in range(self.nAtoms):
+        if( len( self.basis )):
+            for n in range(self.nAtoms):
+                
+                self.basis_norm.append([])
+                
+                for j in range(len(self.basis[n])):
+                    if (j == 0):
+                        self.basis_norm[n].append(self.Norm_S2(self.basis[n][j]))
+                    if (j == 1):
+                        self.basis_norm[n].append(self.Norm_P2(self.basis[n][j]))
+                    if (j == 2):
+                        self.basis_norm[n].append(self.Norm_D2(self.basis[n][j]))
+                    if (j == 3):
+                        self.basis_norm[n].append(self.Norm_F2(self.basis[n][j]))
+                    if (j == 4):
+                        self.basis_norm[n].append(self.Norm_G2(self.basis[n][j]))
 
-            self.basis_norm.append([])
-            self.basis_norm2.append([])
-            # print(n, self.basis[n])
-            for j in range(len(self.basis[n])):
-                # self.basis_norm2[n].append(self.Norm_2(self.basis[n][j] , j))
-                if (j == 0):
-                    # self.basis_norm[n].append(self.Norm_1(self.basis[n][j] , j))
-                    self.basis_norm[n].append(self.Norm_S(self.basis[n][j]))
-                    self.basis_norm2[n].append(self.Norm_S2(self.basis[n][j]))
-                if (j == 1):
-                    self.basis_norm[n].append(self.Norm_P(self.basis[n][j]))
-                    self.basis_norm2[n].append(self.Norm_P2(self.basis[n][j]))
-                if (j == 2):
-                    self.basis_norm[n].append(self.Norm_D(self.basis[n][j]))
-                    self.basis_norm2[n].append(self.Norm_D2(self.basis[n][j]))
-                if (j == 3):
-                    # self.basis_norm[n].append(self.Norm_F(self.basis[n][j]))
-                    self.basis_norm2[n].append(self.Norm_F2(self.basis[n][j]))
-                if (j == 4):
-                    # self.basis_norm[n].append(self.Norm_G(self.basis[n][j]))
-                    self.basis_norm2[n].append(self.Norm_G2(self.basis[n][j]))
+
+
+#        if( len( self.basis )):
+#            for n in range(self.nAtoms):
+#                
+#                self.basis_norm.append([])
+#                self.basis_norm2.append([])
+#                # print(n, self.basis[n])
+#                for j in range(len(self.basis[n])):
+#                    # self.basis_norm2[n].append(self.Norm_2(self.basis[n][j] , j))
+#                    if (j == 0):
+#                        # self.basis_norm[n].append(self.Norm_1(self.basis[n][j] , j))
+#                        self.basis_norm[n].append(self.Norm_S(self.basis[n][j]))
+#                        self.basis_norm2[n].append(self.Norm_S2(self.basis[n][j]))
+#                    if (j == 1):
+#                        self.basis_norm[n].append(self.Norm_P(self.basis[n][j]))
+#                        self.basis_norm2[n].append(self.Norm_P2(self.basis[n][j]))
+#                    if (j == 2):
+#                        self.basis_norm[n].append(self.Norm_D(self.basis[n][j]))
+#                        self.basis_norm2[n].append(self.Norm_D2(self.basis[n][j]))
+#                    if (j == 3):
+#                        # self.basis_norm[n].append(self.Norm_F(self.basis[n][j]))
+#                        self.basis_norm2[n].append(self.Norm_F2(self.basis[n][j]))
+#                    if (j == 4):
+#                        # self.basis_norm[n].append(self.Norm_G(self.basis[n][j]))
+#                        self.basis_norm2[n].append(self.Norm_G2(self.basis[n][j]))
+
+    def get_Printout_of_final_geminals(self, dalton_output ):
+
+        GEMINAL_PART_START = "Printout of final geminals"
+        WAWE_FUNCTION_SECTION_END = "| End of Wave Function Section (SIRIUS) |"
+
+        _geminal_part = dalton_output[  dalton_output.find( GEMINAL_PART_START ) : 
+                                        dalton_output.find( WAWE_FUNCTION_SECTION_END )  ]
+
+        return _geminal_part
 
     def get_G_coeff(self):
 
-        self.G_coeff = self.np.zeros([self.electrons], dtype=self.np.float64)
-
+        Coeff_separator = "===================================================================="
         Out = self.get_Dalton_Output()
-        Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
-                          Out.rfind('NEWORB " orbitals punched.')].split(
-            "====================================================================")[1].split("\n")[1:-1]
+        Geminal_buf = self.get_Printout_of_final_geminals( dalton_output = Out )
+        coeff_buf = Geminal_buf.split( Coeff_separator )[1].split("\n")[1:-1]
 
-        for i in range(self.electrons):
-            self.G_coeff[i] = float(Geminal_buf[i].split()[5])
+        G_coeff = []
+
+        for coeff in coeff_buf:
+            G_coeff.append( float(coeff.split()[5]) )
+
+        self.G_coeff = self.np.array( G_coeff, dtype=self.np.float32)
 
         return self.G_coeff
 
     def get_Orb2Gem(self):
 
-        self.Orb2Gem = self.np.zeros([self.electrons], dtype=self.np.int64)
-
+        Coeff_separator = "===================================================================="
         Out = self.get_Dalton_Output()
-        Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
-                          Out.rfind('NEWORB " orbitals punched.')].split(
-            "====================================================================")[1].split("\n")[1:-1]
+        Geminal_buf = self.get_Printout_of_final_geminals( dalton_output = Out )
+        coeff_buf = Geminal_buf.split( Coeff_separator )[1].split("\n")[1:-1]
 
-        for i in range(self.electrons):
-            self.Orb2Gem[i] = int(Geminal_buf[i].split()[3]) - 1
+        Orb2Gem = []
 
-        self.nGeminal = int(len(self.Orb2Gem) / 2)
+        for coeff in coeff_buf:
+            Orb2Gem.append( int(coeff.split()[3]) - 1)
+
+        
+        self.Orb2Gem = self.np.array( Orb2Gem, dtype=self.np.int32)
+        self.nGeminal = int( self.np.max(self.Orb2Gem) ) + 1 
+
+        # self.Orb2Gem = self.np.zeros([self.electrons], dtype=self.np.int64)
+
+        # Out = self.get_Dalton_Output()
+        # Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
+        #                   Out.rfind('NEWORB " orbitals punched.')].split(
+        #     "====================================================================")[1].split("\n")[1:-1]
+
+        # for i in range(self.electrons):
+        #     self.Orb2Gem[i] = int(Geminal_buf[i].split()[3]) - 1
+
+        # self.nGeminal = int(len(self.Orb2Gem) / 2)
 
         return self.Orb2Gem, self.nGeminal
 
@@ -612,30 +732,30 @@ class DaltonInput(Input):
 
         return Norm
 
-    def get_G_coeff(self):
+    # def get_G_coeff(self):
 
-        self.G_coeff = self.np.zeros([self.electrons], dtype=self.np.float64)
+    #     self.G_coeff = self.np.zeros([self.electrons], dtype=self.np.float64)
 
-        Out = self.get_Dalton_Output()
-        Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
-                          Out.rfind('NEWORB " orbitals punched.')].split(
-            "====================================================================")[1].split("\n")[1:-1]
+    #     Out = self.get_Dalton_Output()
+    #     Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
+    #                       Out.rfind('NEWORB " orbitals punched.')].split(
+    #         "====================================================================")[1].split("\n")[1:-1]
 
-        for i in range(self.electrons):
-            self.G_coeff[i] = float(Geminal_buf[i].split()[5])
+    #     for i in range(self.electrons):
+    #         self.G_coeff[i] = float(Geminal_buf[i].split()[5])
 
-    def get_Orb2Gem(self):
-        self.Orb2Gem = self.np.zeros([self.electrons], dtype=self.np.int64)
+    # def get_Orb2Gem(self):
+    #     self.Orb2Gem = self.np.zeros([self.electrons], dtype=self.np.int64)
 
-        Out = self.get_Dalton_Output()
-        Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
-                          Out.rfind('NEWORB " orbitals punched.')].split(
-            "====================================================================")[1].split("\n")[1:-1]
+    #     Out = self.get_Dalton_Output()
+    #     Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
+    #                       Out.rfind('NEWORB " orbitals punched.')].split(
+    #         "====================================================================")[1].split("\n")[1:-1]
 
-        for i in range(self.electrons):
-            self.Orb2Gem[i] = int(Geminal_buf[i].split()[3]) - 1
+    #     for i in range(self.electrons):
+    #         self.Orb2Gem[i] = int(Geminal_buf[i].split()[3]) - 1
 
-        self.nGeminal = int(len(self.Orb2Gem) / 2)
+    #     self.nGeminal = int(len(self.Orb2Gem) / 2)
 
 INPUT_TYPES = {'Dalton': DaltonInput}
 
