@@ -182,7 +182,7 @@ class DaltonInput(Input):
 
         Out = self.get_Dalton_Output()
 
-        self.inactive = int(Out[Out.find(".INACTIVE"):Out.find("Number of basis functions") + 100].split()[1])
+        self.inactive = int(Out[Out.find("@    Inactive orbitals"):Out.find("@    Inactive orbitals") + 100].split()[3] )
 
         return self.inactive
 
