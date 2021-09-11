@@ -7,12 +7,29 @@ import visualization.dispersion_plot as disp
 # %%
 
 
-/SN7500_pool/Plot_dispersion/C2H4_C2H4/Piotr/frozen_4
-visualization = disp.DispersionPlot(input_type='Dalton', input_sub_type='tar', input_name='/SN7500_pool/Plot_dispersion/C2H4_C2H4/Piotr/frozen_4/test')
-visualization.set_GAMMCOR_filename(filename= '/SN7500_pool/Plot_dispersion/C2H4_C2H4/Piotr/frozen_4/eerpa.out')
+#path = "/SN7500_pool/Plot_dispersion/H2O_H20"
+#visualization = disp.DispersionPlot(input_type='Dalton', input_sub_type='tar', input_name='/SN7500_pool/Plot_dispersion/C2H4_C2H4/Piotr/frozen_4/test')
+#visualization.set_GAMMCOR_filename(filename= '/SN7500_pool/Plot_dispersion/H2O_H20/Piotr/frozen_4/eerpa.out')
+#test.out', eerpa_path='eerpa.out'
+
+path = "/SN7500_pool/Plot_dispersion/H2O_H2O/"
+visualization = disp.DispersionPlot(input_type='Dalton', input_sub_type='tar', input_name= path + 'test')
+visualization.set_GAMMCOR_filename(filename= path + 'eerpa.out')
+
+
 # %%
 
-visualization.get_dispersion_index( x_n= 80, y_n= 80, z_n= 80, monomer_A=2, monomer_B=3 )
+visualization.get_dispersion_index( x_n= 120, y_n= 120, z_n= 120, monomer_A=2, monomer_B=3 )
+
+
+# %%
+
+
+visualization.plot_Geometry()
+
+# %%
+
+visualization.molecular_system.bonds
 
 
 # %%
@@ -31,14 +48,19 @@ figure = visualization.mlab.figure(   "Dispersion",
 #figure.scene.camera.view_up = [0.0, 0.0, 1.0]
 
 # %%
-figure = visualization.Plot_D_AB(atom_names= 0, atom_scaling= 0.3 ,plot_bonds=False, bond_scaling = 0.3 , contours = 10, sclalarbar=True, auto_show=False, figure= figure)
+figure = visualization.mlab.figure(   "Dispersion", 
+                            bgcolor= visualization.visualization_data.background_colors['White'],
+                            size=(600, 400) )
+
+figure = visualization.Plot_D_AB(atom_names= 0, atom_scaling= 0.5 ,plot_bonds=True, bond_scaling = 0.3 , contours = 10, sclalarbar=False, auto_show=False, figure= figure)
 
 
-view = visualization.mlab.view()
-print( view )
+#view = visualization.mlab.view()
+#print( view )
 # %%
 #visualization.mlab.view(azimuth=90.0, elevation=-90.0, distance=11, focalpoint=[-3.8573824125626173, -0.011676371097564697, 0.3456050871419716] )
-visualization.mlab.view(azimuth=90.0, elevation=-90.0, distance=11, focalpoint=[-3.9, 0.0, 0.3] )
+#visualization.mlab.view(azimuth=90.0, elevation=-90.0, distance=11, focalpoint=[-3.9, 0.0, 0.3] )
+visualization.mlab.view(azimuth=90.0, elevation=-90.0, distance=10, focalpoint=[-3.1846836507320404, -0.007247805595397949, 0.3928297162055969] )
 visualization.mlab.savefig(filename='H2O.pdf')
 visualization.mlab.show()
 

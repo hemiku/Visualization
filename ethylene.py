@@ -38,14 +38,14 @@ figure = visualization.mlab.figure(   "Dispersion",
                             size=(600, 400) )
 
 
-figure = visualization.Plot_D_AB(atom_names= 0, atom_scaling= 0.3 ,plot_bonds=False, bond_scaling = 0.3 , contours = 10, sclalarbar=True, auto_show=False, figure= figure)
+figure = visualization.Plot_D_AB(atom_names= 0, atom_scaling= 0.3 ,plot_bonds=False, bond_scaling = 0.3 , contours = 10, sclalarbar=False, auto_show=False, figure= figure)
 
 
 view = visualization.mlab.view()
 print( view )
 # %%
 #visualization.mlab.view(azimuth=90.0, elevation=-90.0, distance=11, focalpoint=[-3.8573824125626173, -0.011676371097564697, 0.3456050871419716] )
-visualization.mlab.view(azimuth=90.0, elevation=45.0, distance=18, focalpoint=[-3.0, -0.0, -0.32] )
+visualization.mlab.view(azimuth=90.0, elevation=135.0, distance=18, focalpoint=[-3.85, 0.0, 0.0] )
 visualization.mlab.savefig(filename='ethylene_1.pdf')
 visualization.mlab.show()
 
@@ -56,10 +56,11 @@ figure = visualization.mlab.figure(   "Dispersion",
                             bgcolor= visualization.visualization_data.background_colors['White'],
                             size=(600, 400) )
 
-figure = visualization.Plot_D_AB(atom_names= 0, atom_scaling= 0.3 ,plot_bonds=False, bond_scaling = 0.3 , contours = 10, sclalarbar=True, auto_show=False, figure= figure)
+figure = visualization.Plot_D_AB(atom_names= 0, atom_scaling= 0.3 ,plot_bonds=False, bond_scaling = 0.3 , contours = 10, sclalarbar=False, auto_show=False, figure= figure)
 
 #visualization.mlab.view(azimuth=90.0, elevation=-90.0, distance=11, focalpoint=[-3.8573824125626173, -0.011676371097564697, 0.3456050871419716] )
-visualization.mlab.view(azimuth=90.0, elevation=135.0, distance=18, focalpoint=[-3.0, -0.0, -0.32] )
+#visualization.mlab.view(azimuth=90.0, elevation=135.0, distance=18, focalpoint=[-3.0, -0.0, -0.32] )
+visualization.mlab.view(azimuth=90.0, elevation=135.0, distance=18, focalpoint=[-3.85, 0.0, 0.0] )
 visualization.mlab.savefig(filename='ethylene_2.pdf')
 visualization.mlab.show()
 
@@ -71,14 +72,36 @@ view = visualization.mlab.view()
 
 # %%
 
-print( view )
+# [0.002029361172288052]
 
 
-visualization.plot_Geminals( geminal_numbers=[11], atom_names= 0, atom_scaling= 0.3 ,plot_bonds=False )
+figure = visualization.mlab.figure(  "Geminal", 
+                            bgcolor= visualization.visualization_data.background_colors['White'],
+                            size=(600, 400) )
+
+visualization.plot_Geminals( geminal_numbers=[5], atom_names= 0, contours=[0.002029361172288052],  atom_scaling= 0.3 ,plot_bonds=False, auto_show=False, figure=figure )
+visualization.mlab.view(azimuth=90.0, elevation=135.0, distance=18, focalpoint=[-3.85, -0.0, -0.0] )
+visualization.mlab.savefig(filename='ethylene_geminal.pdf')
+visualization.mlab.show()
 
 
 # %%
 
+
+
+figure = visualization.mlab.figure(  "Geminal", 
+                            bgcolor= visualization.visualization_data.background_colors['White'],
+                            size=(600, 400) )
+
+visualization.plot_Geminals( geminal_numbers=[5], atom_names= 0, contours=[0.002029361172288052],  atom_scaling= 0.3 ,plot_bonds=False, auto_show=False, figure=figure )
+visualization.mlab.view(azimuth=90.0, elevation=45.0, distance=18, focalpoint=[-3.85, -0.0, -0.0] )
+visualization.mlab.savefig(filename='ethylene_geminal_2.pdf')
+visualization.mlab.show()
+
+
+
+
+#%%
 
 
 ## TODO  ustawić ile geminalu ma być pod powierzchnią, 
