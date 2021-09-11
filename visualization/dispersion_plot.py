@@ -249,24 +249,7 @@ class DispersionPlot(visualization.visualization.Visualization):
         self.mlab.show()
     
 
-    def get_geminals(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50):
-
-
-        self.get_geometry()
-
-        self.get_orbital_data()
-        self.orbital_generator.grid.R_max_multip = R_max_multip
-        self.orbital_generator.grid.x_n= x_n 
-        self.orbital_generator.grid.y_n= y_n
-        self.orbital_generator.grid.z_n= z_n
-        self.orbital_generator.init_grid( )
-
-        self.orbital_generator.init_AOs()
-        self.generate_AO_orbitals()
-        self.generate_MO_orbitals()
-
-        self.get_geminal_data()
-        self.get_generate_geminals()
+    
 
     def get_dispersion_index(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50, monomer_A=None, monomer_B=None):
 

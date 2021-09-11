@@ -1,5 +1,4 @@
 from visualization.geminals import GeminalGenerator
-import numba 
 
 class VisualizationData( ):
     
@@ -125,12 +124,12 @@ class Visualization():
         self.data_input = visualization.inputs.get_input(input_type='Dalton', input_sub_type=self.input_sub_type, input_name=self.input_name)
 
 
-    def plot_Geometry(self, Plot_Atoms=1, Atom_Names=1, Plot_Bonds=1):
+    def plot_Geometry(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False, auto_show = True, figure = None ):
 
         self.mlab.figure("Geometria", bgcolor=(.5, .5, .75), size=(1000, 1000))
         self.mlab.clf()
 
-        if Plot_Atoms:
+        if plot_atoms:
             for i in range(self.molecular_system.nAtoms):
                 self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
                                    self.molecular_system.atoms_R[i, 1],
@@ -142,29 +141,34 @@ class Visualization():
                                        self.u.letters(self.molecular_system.atoms_Name[i])],
                                    scale_mode='none')
 
-        if Atom_Names:
+        if atom_names:
             for i in range(self.molecular_system.nAtoms):
                 self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
                                  self.molecular_system.atoms_R[i, 1],
                                  self.molecular_system.atoms_R[i, 2],
                                  self.molecular_system.atoms_Name[i], scale=(.9, .9, .9))
 
-        if Plot_Bonds:
-            for i in range(len(self.molecular_system.bonds)):
+        if plot_bonds:
+            for i, bond in enumerate( self.molecular_system.bonds ) :
+
+                bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
+                bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
+
+                bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
+
                 self.mlab.plot3d(
-                    self.np.array([self.molecular_system.atoms_R[
-                                       self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 0],
-                                   self.molecular_system.atoms_R[
-                                       self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 0]]),
-                    self.np.array([self.molecular_system.atoms_R[
-                                       self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 1],
-                                   self.molecular_system.atoms_R[
-                                       self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 1]]),
-                    self.np.array([self.molecular_system.atoms_R[
-                                       self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 2],
-                                   self.molecular_system.atoms_R[
-                                       self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 2]]),
-                    tube_radius=0.2, color=(233.0 / 255, 165.0 / 255, 165.0 / 255))
+                    self.np.array([bond_begin[0] , bond_half[0]]),
+                    self.np.array([bond_begin[1] , bond_half[1]]),
+                    self.np.array([bond_begin[2] , bond_half[2]]),
+                    tube_radius=0.2 * bond_scaling , 
+                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
+
+                self.mlab.plot3d(
+                    self.np.array([bond_end[0] , bond_half[0]]),
+                    self.np.array([bond_end[1] , bond_half[1]]),
+                    self.np.array([bond_end[2] , bond_half[2]]),
+                    tube_radius=0.2 * bond_scaling , 
+                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
 
         self.mlab.show()
 
@@ -469,17 +473,49 @@ class Visualization():
 
             #          exec(self.Geminnals[i].g)
             #self.mlab.contour3d(X, Y, Z, (self.Geminnals[number].v), contours=12, opacity=0.5)
-            self.mlab.contour3d( X, Y, Z, (self.molecular_system.geminals[number]), contours=12, opacity=0.5)
+            self.mlab.contour3d( X, Y, Z, (self.molecular_system.geminals[number]), contours=contours, opacity=0.5)
 
 
 
-
-        self.mlab.show()
-
-
+        if auto_show:
+            self.mlab.show()
 
 
+    def contur_process( contur, cube ):
+        
+        if type( contur ) == str:
+            if contur[-1] == '%':
+
+            
+            return contur
+
+        else: 
+            return contur
+
+        #if type( contur ) == int:
+        #    return contur
+
+        #if type( contur ) == list:
+        #    return contur
 
 
+        
+
+
+    def get_geminals(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50):
+
+        self.get_orbital_data()
+        self.orbital_generator.grid.R_max_multip = R_max_multip
+        self.orbital_generator.grid.x_n= x_n 
+        self.orbital_generator.grid.y_n= y_n
+        self.orbital_generator.grid.z_n= z_n
+        self.orbital_generator.init_grid( )
+
+        self.orbital_generator.init_AOs()
+        self.generate_AO_orbitals()
+        self.generate_MO_orbitals()
+
+        self.get_geminal_data()
+        self.get_generate_geminals()
 
 

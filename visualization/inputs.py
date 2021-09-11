@@ -319,22 +319,32 @@ class DaltonInput(Input):
 
         Out = self.get_Dalton_Output()
 
-        Bonds_str = Out[Out.find("Bond distances (Angstrom):"):Out.find("Output from **INTEGRALS input processing (HERMIT)")]
-        Bonds_str = Bonds_str[Bonds_str.find("bond"):]
-        Bonds_str_split = Bonds_str.split("\n")
+        start_bond_section = "Bond distances "
+        start_next_section = "| Starting in Integral Section (HERMIT) |"
 
-        for bond_str in Bonds_str_split:
+        Bonds_str = Out[Out.find( start_bond_section ):Out.find(start_next_section)]
+        Bonds_str = Bonds_str[Bonds_str.find("bond"):]
+        Bonds_str_lines = Bonds_str.splitlines()
+
+        for bond_str in Bonds_str_lines:
             bond_str_split = bond_str.split()
 
             try:
-                self.Bonds.append( [ ( bond_str_split[2], bond_str_split[3], float(bond_str_split[4]) ) ] )
+                self.Bonds.append(  [ bond_str_split[2], bond_str_split[3], float(bond_str_split[4]) ] )
+                continue
             except:
                 pass
 
             try:
-                self.Bonds.append( [ ( bond_str_split[2], bond_str_split[4], float(bond_str_split[6]) ) ] )
+                self.Bonds.append( [  bond_str_split[2], bond_str_split[4], float(bond_str_split[6])  ] )
+                continue
             except:
                 pass
+
+            if bond_str == "" :
+                break
+
+
 
         return self.Bonds
 
