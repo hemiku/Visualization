@@ -474,7 +474,7 @@ class DaltonInput(Input):
                 
                 for j in range(len(self.basis[n])):
                     if (j == 0):
-                        self.basis_norm[n].append(self.Norm_S2(self.basis[n][j]))
+                        self.basis_norm[n].append( self.Norm_S2(self.basis[n][j]) )
                     if (j == 1):
                         self.basis_norm[n].append(self.Norm_P2(self.basis[n][j]))
                     if (j == 2):
@@ -673,7 +673,7 @@ class DaltonInput(Input):
 
             for i in range(NExpans):
                 for j in range(i + 1):
-                    Norm += Data[i, 1:] * Data[j, 1:] / (Data[i, 0] + Data[j, 0]) ** pow_val
+                    Norm += Data[i, 1:] **2  / (Data[i, 0] + Data[j, 0]) ** pow_val
 
         else:
 
@@ -681,12 +681,37 @@ class DaltonInput(Input):
 
         return Norm
 
+
+    def normalization_summation_2(self, Data, pow_val):
+
+        if (len(self.np.shape(Data)) == 2):
+
+            NOrb = self.np.shape(Data)[-1] - 1
+            NExpans = self.np.shape(Data)[0]
+            Norm = self.np.zeros(NOrb, dtype=self.np.float64)
+
+            exponents = Data[:,0]
+            coefficents =  Data[:,1:]
+
+            for i in range(NExpans):
+                for j in range(i + 1):
+                    Norm += Data[i, 1:] **2  / (Data[i, 0] + Data[j, 0]) ** pow_val
+
+        else:
+
+            Norm += Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
+
+        return Norm
+
+
+
     def Norm_S2(self, Data):
 
         pow_val = 3.0 / 2.0
-        fact = 1.0
-
-        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        fact = self.np.sqrt(2)/4
+        fact = 1.0 
+        
+        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -696,7 +721,7 @@ class DaltonInput(Input):
         pow_val = 5.0 / 2.0
         fact = 1.0 / 2.0
 
-        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -706,7 +731,7 @@ class DaltonInput(Input):
         pow_val = 7.0 / 2.0
         fact = 3.0 / 4.0
 
-        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
 
         Norm = 1 / self.np.sqrt(Norm)
 
