@@ -92,18 +92,23 @@ class OrbitalsGenerator( ):
 
     def calc_AOs(self, AO, grid=None):
 
+        from scipy.special import sph_harm        
+
         if grid is None:
-            X, Y, Z = self.grid.return_grid_arrays()
-        else:
-            X, Y, Z = grid.return_grid_arrays()
+            grid = self.grid
+
+        X, Y, Z = self.grid.return_grid_arrays()
+
+        dx = ( grid.x_max - grid.x_min )/ ( grid.x_n -1 )
+        dy = ( grid.y_max - grid.y_min )/ ( grid.y_n -1 )
+        dz = ( grid.z_max - grid.z_min )/ ( grid.z_n -1 )
 
         #if self.spherical:
-        dx = X[1, 0, 0] - X[0, 0, 0]
-        dy = Y[0, 1, 0] - Y[0, 0, 0]
-        dz = Z[0, 0, 1] - Z[0, 0, 0]
+        #dx = ( x_max - x_min )/ x_n
+        #dy = ( y_max - y_min )/ y_n
+        #dz = ( z_max - z_min )/ z_n
 
         dv = dx * dy * dz
-        sqrt_dv = self.np.sqrt(dv)
 
         nOrb = 0
 
@@ -126,11 +131,12 @@ class OrbitalsGenerator( ):
                     for k in range(self.np.shape(self.basis[n][j])[1] - 1):
 
                         for l in range(self.np.shape(self.basis[n][j])[0]):
-                            AO[nOrb, :, :, :] +=  AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4)  * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) 
+                    
+                            alpha = (self.basis[n][j])[l, 0]
+                            norm = 2*2**(3/4)*alpha**(3/4)/self.np.pi**(1/4)
+                            norm = 2**(3/4)*alpha**(3/4)/self.np.pi**(3/4)
 
-                        #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :]  * sqrt_dv
-
-                        #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+                            AO[nOrb, :, :, :] +=   norm * (self.basis[n][j])[l, k + 1] * self.np.exp( -alpha * RR ) 
 
                         nOrb += 1
 
@@ -141,68 +147,144 @@ class OrbitalsGenerator( ):
                             if (m == 'x'):
 
                                 for l in range(self.np.shape(self.basis[n][j])[0]):
-                                    AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * ( self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (x)
-                                #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+
+                                    alpha = (self.basis[n][j])[l, 0]
+                                    norm = 2*2**(3/4)*alpha**(5/4)/np.pi**(3/4)
+                                    AO[nOrb, :, :, :] += norm  * self.np.exp( -alpha * RR) * (x)
+                                
                                 nOrb += 1
 
                             if (m == 'y'):
 
-                                for l in range(self.np.shape(self.basis[n][j])[0]):
-                                    AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) *(self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (y)
-                                #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+
+                                    alpha = (self.basis[n][j])[l, 0]
+                                    norm = 2*2**(3/4)*alpha**(5/4)/np.pi**(3/4)
+                                    AO[nOrb, :, :, :] += norm  * self.np.exp( -alpha * RR) * (y)
+                                
                                 nOrb += 1
 
                             if (m == 'z'):
 
-                                for l in range(self.np.shape(self.basis[n][j])[0]):
-                                    AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) *(self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (z)
-                                #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+                                    alpha = (self.basis[n][j])[l, 0]
+                                    norm = 2*2**(3/4)*alpha**(5/4)/np.pi**(3/4)
+                                    AO[nOrb, :, :, :] += norm  * self.np.exp( -alpha * RR) * (z)
+                                
                                 nOrb += 1
+
+                        #for m in self.np.arange(-j,j+1):
+#
+#                            if (m == 0):
+#
+#                                for l in range(self.np.shape(self.basis[n][j])[0]):
+#
+#                                    alpha = (self.basis[n][j])[l, 0]
+#                                    norm = 4*2**(3/4)*self.np.sqrt(3)*alpha**(5/4)/(3*self.np.pi**(1/4)) 
+#
+#                                    AO[nOrb, :, :, :] += norm * r**j * sph_harm(m, j, theta, phi).real * (self.basis[n][j])[l, k + 1] * self.np.exp( -alpha * RR ) 
+#
+#                            else:
+#
+#                                for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                    
+#                                    alpha = (self.basis[n][j])[l, 0]
+#                                    norm = 2**(3/4)*alpha**(3/4)*exp(-alpha*(x**2 + y**2 + z**2))/pi**(3/4)
+#                                    norm = 4*2**(3/4)*self.np.sqrt(3)*alpha**(5/4)/(3*self.np.pi**(1/4)) * self.np.sqrt(2)
+#                                    #norm = 2*2**(3/4)*alpha**(5/4)*Abs(z)/pi**(3/4)*exp(-alpha*(x**2 + y**2 + z**2))
+#
+#                                    AO[nOrb, :, :, :] += norm * r**j * sph_harm(m, j, theta, phi).real * (self.basis[n][j])[l, k + 1] * self.np.exp( -alpha * RR ) 
+#                                
+#                            nOrb += 1
+
+
+
+
+
+
+#                       for m in ['x', 'y', 'z']:
+#                            if (m == 'x'):
+
+#                                for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                    AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * ( self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (x)
+#                                
+#                                
+#                                
+#                                #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+#                                #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+#                                nOrb += 1
+#
+#                            if (m == 'y'):
+#
+#                                for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                    AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) *(self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (y)
+#                                #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+#                                #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+#                                nOrb += 1
+#
+#                            if (m == 'z'):
+#
+#                                for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                    AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) *(self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (z)
+#                                #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+#                                #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
+#                                nOrb += 1
+
+
                 if (j == 2):
                     if (self.spherical == 1):
+#
+#                        if (len(self.np.shape(self.basis[n][j])) == 2):
+#                            for k in range(self.np.shape(self.basis[n][j])[1] - 1):
+#                                for m in self.np.arange(-j,j+1):
+#
+#                                    if (m == 0):
+#
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#
+#                                            alpha = (self.basis[n][j])[l, 0]
+#                                            norm = 8*self.np.sqrt(15)*2**(3/4)*alpha**(7/4)/(15*self.np.pi**(1/4))
+#
+#                                            AO[nOrb, :, :, :] += norm * r**j * sph_harm(m, j, theta, phi).real * (self.basis[n][j])[l, k + 1] * self.np.exp( -alpha * RR ) 
+#
+#                                    else:
+#
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                                
+#                                            alpha = (self.basis[n][j])[l, 0]
+#                                            norm = 8*self.np.sqrt(15)*2**(3/4)*alpha**(7/4)/(15*self.np.pi**(1/4))* self.np.sqrt(2)
+#                                                    
+#                                            AO[nOrb, :, :, :] += norm * r**j * sph_harm(m, j, theta, phi).real * (self.basis[n][j])[l, k + 1] * self.np.exp( -alpha * RR ) 
+#
+#                                    nOrb += 1
 
-                        if (len(self.np.shape(self.basis[n][j])) == 2):
-                            for k in range(self.np.shape(self.basis[n][j])[1] - 1):
-                                for m in range(-j, j + 1, 1):
-
-                                    if (m == -2):
-                                        for l in range(self.np.shape(self.basis[n][j])[0]):
-                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt3 * x * y)
-                                        #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :]  * sqrt_dv 
-                                        #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-                                        nOrb += 1
-
-                                    if (m == -1):
-                                        for l in range(self.np.shape(self.basis[n][j])[0]):
-                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt3 * y * z)
-                                        #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                        #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-                                        nOrb += 1
-
-                                    if (m == 0):
-                                        for l in range(self.np.shape(self.basis[n][j])[0]):
-                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (-0.5 * (x * x + y * y) + z * z)
-                                        #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                        #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-                                        nOrb += 1
-
-                                    if (m == 1):
-                                        for l in range(self.np.shape(self.basis[n][j])[0]):
-                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt3 * x * z)
-                                        #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                        #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-                                        nOrb += 1
-
-                                    if (m == 2):
-                                        for l in range(self.np.shape(self.basis[n][j])[0]):
-                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (
-                                                                             AOParameters.sqrt3p4 * (x * x - y * y))
-                                        #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
-                                        #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-                                        nOrb += 1
+#                                    if (m == -2):
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt3 * x * y)
+#
+#                                        nOrb += 1
+#
+#                                    if (m == -1):
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt3 * y * z)
+#
+#                                        nOrb += 1
+#
+#                                    if (m == 0):
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (-0.5 * (x * x + y * y) + z * z)
+#                                        nOrb += 1
+#
+#                                    if (m == 1):
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt3 * x * z)
+#
+#                                        nOrb += 1
+#
+#                                    if (m == 2):
+#                                        for l in range(self.np.shape(self.basis[n][j])[0]):
+#                                            AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (
+#                                                                             AOParameters.sqrt3p4 * (x * x - y * y))
+#
+#                                        nOrb += 1
                     else:
                         if (len(self.np.shape(self.basis[n][j])) == 2):
                             for k in range(self.np.shape(self.basis[n][j])[1] - 1):
@@ -380,6 +462,6 @@ class OrbitalsGenerator( ):
                                         #AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
                                         #AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
                                         nOrb += 1
-        for n in range( self.nb ):
-            AO[n, :, :, :] = AO[n, :, :, :] / self.np.sqrt( self.np.sum(AO[n, :, :, :] ** 2 ) )
+        #for n in range( self.nb ):
+        #    AO[n, :, :, :] = AO[n, :, :, :] / self.np.sqrt( self.np.sum(AO[n, :, :, :] ** 2 * dv ) )
 
