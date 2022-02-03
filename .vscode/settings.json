@@ -24,5 +24,8 @@
         "y",
         "z",
         "zeros"
-    ]
+    ],
+    "python.pythonPath": "/home/hemik/anaconda3/envs/Visualization/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }
