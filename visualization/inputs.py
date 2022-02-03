@@ -182,7 +182,7 @@ class DaltonInput(Input):
 
         Out = self.get_Dalton_Output()
 
-        self.inactive = int(Out[Out.find(".INACTIVE"):Out.find("Number of basis functions") + 100].split()[1])
+        self.inactive = int(Out[Out.find("@    Inactive orbitals"):Out.find("@    Inactive orbitals") + 100].split()[3] )
 
         return self.inactive
 
@@ -319,22 +319,32 @@ class DaltonInput(Input):
 
         Out = self.get_Dalton_Output()
 
-        Bonds_str = Out[Out.find("Bond distances (Angstrom):"):Out.find("Output from **INTEGRALS input processing (HERMIT)")]
-        Bonds_str = Bonds_str[Bonds_str.find("bond"):]
-        Bonds_str_split = Bonds_str.split("\n")
+        start_bond_section = "Bond distances "
+        start_next_section = "| Starting in Integral Section (HERMIT) |"
 
-        for bond_str in Bonds_str_split:
+        Bonds_str = Out[Out.find( start_bond_section ):Out.find(start_next_section)]
+        Bonds_str = Bonds_str[Bonds_str.find("bond"):]
+        Bonds_str_lines = Bonds_str.splitlines()
+
+        for bond_str in Bonds_str_lines:
             bond_str_split = bond_str.split()
 
             try:
-                self.Bonds.append( [ ( bond_str_split[2], bond_str_split[3], float(bond_str_split[4]) ) ] )
+                self.Bonds.append(  [ bond_str_split[2], bond_str_split[3], float(bond_str_split[4]) ] )
+                continue
             except:
                 pass
 
             try:
-                self.Bonds.append( [ ( bond_str_split[2], bond_str_split[4], float(bond_str_split[6]) ) ] )
+                self.Bonds.append( [  bond_str_split[2], bond_str_split[4], float(bond_str_split[6])  ] )
+                continue
             except:
                 pass
+
+            if bond_str == "" :
+                break
+
+
 
         return self.Bonds
 
@@ -464,7 +474,7 @@ class DaltonInput(Input):
                 
                 for j in range(len(self.basis[n])):
                     if (j == 0):
-                        self.basis_norm[n].append(self.Norm_S2(self.basis[n][j]))
+                        self.basis_norm[n].append( self.Norm_S2(self.basis[n][j]) )
                     if (j == 1):
                         self.basis_norm[n].append(self.Norm_P2(self.basis[n][j]))
                     if (j == 2):
@@ -663,7 +673,7 @@ class DaltonInput(Input):
 
             for i in range(NExpans):
                 for j in range(i + 1):
-                    Norm += Data[i, 1:] * Data[j, 1:] / (Data[i, 0] + Data[j, 0]) ** pow_val
+                    Norm += Data[i, 1:] **2  / (Data[i, 0] + Data[j, 0]) ** pow_val
 
         else:
 
@@ -671,12 +681,37 @@ class DaltonInput(Input):
 
         return Norm
 
+
+    def normalization_summation_2(self, Data, pow_val):
+
+        if (len(self.np.shape(Data)) == 2):
+
+            NOrb = self.np.shape(Data)[-1] - 1
+            NExpans = self.np.shape(Data)[0]
+            Norm = self.np.zeros(NOrb, dtype=self.np.float64)
+
+            exponents = Data[:,0]
+            coefficents =  Data[:,1:]
+
+            for i in range(NExpans):
+                for j in range(i + 1):
+                    Norm += Data[i, 1:] **2  / (Data[i, 0] + Data[j, 0]) ** pow_val
+
+        else:
+
+            Norm += Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
+
+        return Norm
+
+
+
     def Norm_S2(self, Data):
 
         pow_val = 3.0 / 2.0
-        fact = 1.0
-
-        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        fact = self.np.sqrt(2)/4
+        fact = 1.0 
+        
+        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -686,7 +721,7 @@ class DaltonInput(Input):
         pow_val = 5.0 / 2.0
         fact = 1.0 / 2.0
 
-        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -696,7 +731,7 @@ class DaltonInput(Input):
         pow_val = 7.0 / 2.0
         fact = 3.0 / 4.0
 
-        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
 
         Norm = 1 / self.np.sqrt(Norm)
 
