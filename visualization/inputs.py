@@ -23,6 +23,10 @@ class Input( ):
     electrons = None
     Occ = None
 
+    basis = None
+    basis_norm = None
+    basis_norm2 = None
+
     Coeff= None
 
     Atoms_R = None
@@ -52,30 +56,6 @@ class Input( ):
         if data_source is not None:
             self.data_source = data_source
     
-#    @staticmethod
-#    def get_input( input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):#
-#
-#        try:
-#            #data_input = Input.input_types[input_type]
-#            data_input = Input( input_type=input_type, input_sub_type=input_sub_type, input_name=input_name, file_string=file_string, BAS_filename=BAS_filename, data_source=data_source )
-#            data_input.__class__ = Input.input_types[input_type]
-#        except KeyError:
-#            Exception(f"Input_type: {input_type} not found")
-
-#        print(data_input)
-#        return data_input
-
-        #return type(data_input, (data_input,), {'input_type' : input_type, 'input_sub_type':input_sub_type, 'input_name':input_name, 
-#'file_string':file_string, 'BAS_filename':BAS_filename, 'data_source':data_source})
-        #return data_input( input_type = input_type, input_sub_type=input_sub_type, input_name=input_name, file_string=file_string, BAS_filename=BAS_filename, data_source=data_source)
-        #if input_type in Input.input_types:
-        #    pass
-
-        #else:
-
-
-    
-
     def set_input_type(self, input_type):
         pass
 
@@ -137,7 +117,7 @@ class DaltonInput(Input):
             return self.dalton_output
 
         else:
-            with open(self.input_name + ".out", 'r') as f:
+            with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
                 self.dalton_output = f.read()
 
             return self.dalton_output
@@ -261,7 +241,6 @@ class DaltonInput(Input):
 
         return self.F_BAS
 
-
     def find_header_end_line(self, lines , Atom_header_pattern = ' {1,9}\d{1,9}\. ' ):
 
         import re
@@ -344,8 +323,6 @@ class DaltonInput(Input):
             if bond_str == "" :
                 break
 
-
-
         return self.Bonds
 
     def get_Basis(self):
@@ -388,16 +365,13 @@ class DaltonInput(Input):
 
         self.map_atoms_from_BAS_file(Atoms_Gropus)
 
-
         return self.basis, self.basis_norm, self.basis_norm2
-
 
 
     def map_atoms_geometry_from_BAS_file(self, Atoms_Gropus):
         """
         docstring
         """
-
 
         self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
         self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
@@ -425,7 +399,6 @@ class DaltonInput(Input):
         """
         docstring
         """
-
 
         self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
         self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
@@ -483,33 +456,6 @@ class DaltonInput(Input):
                         self.basis_norm[n].append(self.Norm_F2(self.basis[n][j]))
                     if (j == 4):
                         self.basis_norm[n].append(self.Norm_G2(self.basis[n][j]))
-
-
-
-#        if( len( self.basis )):
-#            for n in range(self.nAtoms):
-#                
-#                self.basis_norm.append([])
-#                self.basis_norm2.append([])
-#                # print(n, self.basis[n])
-#                for j in range(len(self.basis[n])):
-#                    # self.basis_norm2[n].append(self.Norm_2(self.basis[n][j] , j))
-#                    if (j == 0):
-#                        # self.basis_norm[n].append(self.Norm_1(self.basis[n][j] , j))
-#                        self.basis_norm[n].append(self.Norm_S(self.basis[n][j]))
-#                        self.basis_norm2[n].append(self.Norm_S2(self.basis[n][j]))
-#                    if (j == 1):
-#                        self.basis_norm[n].append(self.Norm_P(self.basis[n][j]))
-#                        self.basis_norm2[n].append(self.Norm_P2(self.basis[n][j]))
-#                    if (j == 2):
-#                        self.basis_norm[n].append(self.Norm_D(self.basis[n][j]))
-#                        self.basis_norm2[n].append(self.Norm_D2(self.basis[n][j]))
-#                    if (j == 3):
-#                        # self.basis_norm[n].append(self.Norm_F(self.basis[n][j]))
-#                        self.basis_norm2[n].append(self.Norm_F2(self.basis[n][j]))
-#                    if (j == 4):
-#                        # self.basis_norm[n].append(self.Norm_G(self.basis[n][j]))
-#                        self.basis_norm2[n].append(self.Norm_G2(self.basis[n][j]))
 
     def get_Printout_of_final_geminals(self, dalton_output ):
 
@@ -672,12 +618,12 @@ class DaltonInput(Input):
             Norm = self.np.zeros(NOrb, dtype=self.np.float64)
 
             for i in range(NExpans):
-                for j in range(i + 1):
-                    Norm += Data[i, 1:] **2  / (Data[i, 0] + Data[j, 0]) ** pow_val
+                for j in range(NExpans):
+                    Norm += Data[i, 1:] * Data[j, 1:] / (Data[i, 0] + Data[j, 0]) ** pow_val
 
         else:
 
-            Norm += Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
+            Norm = Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
 
         return Norm
 
@@ -694,12 +640,12 @@ class DaltonInput(Input):
             coefficents =  Data[:,1:]
 
             for i in range(NExpans):
-                for j in range(i + 1):
-                    Norm += Data[i, 1:] **2  / (Data[i, 0] + Data[j, 0]) ** pow_val
+                for j in range(NExpans):
+                    Norm += Data[i, 1:] *Data[j, 1:]  / (Data[i, 0] + Data[j, 0]) ** pow_val
 
         else:
 
-            Norm += Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
+            Norm + Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
 
         return Norm
 
@@ -711,7 +657,7 @@ class DaltonInput(Input):
         fact = self.np.sqrt(2)/4
         fact = 1.0 
         
-        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
+        Norm = fact * self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) 
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -721,7 +667,7 @@ class DaltonInput(Input):
         pow_val = 5.0 / 2.0
         fact = 1.0 / 2.0
 
-        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
+        Norm = fact * self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) 
         Norm = 1 / self.np.sqrt(Norm)
 
         return Norm
@@ -729,9 +675,9 @@ class DaltonInput(Input):
     def Norm_D2(self, Data):
 
         pow_val = 7.0 / 2.0
-        fact = 3.0 / 4.0
+        fact = 1.0 / 4.0
 
-        Norm = self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val) *  fact
+        Norm = fact * self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val)
 
         Norm = 1 / self.np.sqrt(Norm)
 
@@ -767,32 +713,208 @@ class DaltonInput(Input):
 
         return Norm
 
-    # def get_G_coeff(self):
+class MoldenInput(Input):
 
-    #     self.G_coeff = self.np.zeros([self.electrons], dtype=self.np.float64)
+    input_name = 'molden'
 
-    #     Out = self.get_Dalton_Output()
-    #     Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
-    #                       Out.rfind('NEWORB " orbitals punched.')].split(
-    #         "====================================================================")[1].split("\n")[1:-1]
+    output = None
 
-    #     for i in range(self.electrons):
-    #         self.G_coeff[i] = float(Geminal_buf[i].split()[5])
+    def get_Output(self, Filename):
+        file_type = '.molden'
+        if Filename[-len(file_type):] == file_type:
+            self.File_Name = Filename[:-len(file_type)]
+        else:
+            self.File_Name = Filename
 
-    # def get_Orb2Gem(self):
-    #     self.Orb2Gem = self.np.zeros([self.electrons], dtype=self.np.int64)
+    def get_file(self):
 
-    #     Out = self.get_Dalton_Output()
-    #     Geminal_buf = Out[Out.find("APSG geminal coefficients and natural orbital occupations:"):
-    #                       Out.rfind('NEWORB " orbitals punched.')].split(
-    #         "====================================================================")[1].split("\n")[1:-1]
+        if self.output is not None:
 
-    #     for i in range(self.electrons):
-    #         self.Orb2Gem[i] = int(Geminal_buf[i].split()[3]) - 1
+            return self.output
 
-    #     self.nGeminal = int(len(self.Orb2Gem) / 2)
+        else:
+            with open(self.input_name, 'r', encoding="utf-8") as f:
+                self.output = f.read()
 
-INPUT_TYPES = {'Dalton': DaltonInput}
+            return self.output
+
+    def get_data(self):
+
+        Atoms_begin = 'Atoms]'
+        GTO_begin   = 'GTO]'
+        MO_begin   = 'MO]'
+
+        Out = self.get_file()
+
+        if Out.find('[Molden Format]') >= 0:
+            Out_sections = Out.split('[')
+
+            sections = {}
+
+            for section  in Out_sections:
+
+                section_key = section[:section.find(']')]
+                section_data = section[section.find(']')+1:]
+                
+                sections[section_key] = section_data
+            
+            self.get_atoms(sections['Atoms'])
+            self.get_GTOs(sections['GTO'])
+            self.get_MOs(sections['MO'])
+
+        self.Spherical = True
+        self.calc_nb()
+
+    def calc_nb(self):
+        self.nb = len(self.MOs)
+
+    def get_MOs(self, section):
+
+        MO_sym = 'Sym'
+        MO_Ene = 'Ene'
+        MO_Spin = 'Spin'
+        MO_Occup = 'Occup'
+
+        self.MOs_list = []
+        section_lines = section.splitlines()
+        for j, line in enumerate(section_lines[1:]):
+            if line.count(MO_Occup):
+                #MO = []
+                #self.MOs_list.append(MO)
+                MO_dict = {}
+            
+            elif ( line.count(MO_sym) + line.count(MO_Ene) + line.count(MO_Spin) + line.count(MO_Occup) ) == 0:
+                #MO.append( float( line.split()[1] ) )
+
+                MO_dict[ int( line.split()[0] )  ] = float( line.split()[1] ) 
+
+        self.MOs = self.np.zeros([len(self.MOs_list),len(self.MOs_list)], dtype=self.np.float64)
+
+        for i, MO_dict in enumerate(self.MOs_list):
+            for j in MO_dict:
+                self.MOs[i,j] = MO_dict[j]
+        
+        #self.MOs = self.np.asarray( self.MOs_list )
+
+    def get_GTOs(self, section):
+        self.GTOs = []
+        section_lines = section.splitlines()
+        for j, line in enumerate(section_lines[1:]):
+            line_split = line.split()
+            if len(line_split) == 2 and len(line) < 18:
+                atom_GTOs = [[], [], [], [], [], []]
+                self.GTOs.append(atom_GTOs)
+            elif len(line_split) == 3 and  line_split[0] == 's':
+                GTO = []
+                harmonic_GTOs = atom_GTOs[0]
+                harmonic_GTOs.append(GTO)
+#            elif line[:2] == ' p':
+            elif len(line_split) == 3 and line_split[0] == 'p':
+                GTO = []
+                harmonic_GTOs = atom_GTOs[1]
+                harmonic_GTOs.append(GTO)
+            #elif line[:2] == ' d':
+            elif len(line_split) == 3 and line_split[0] == 'd':
+                GTO = []
+                harmonic_GTOs = atom_GTOs[2]
+                harmonic_GTOs.append(GTO)
+            #elif line[:2] == ' f':
+            elif len(line_split) == 3 and line_split[0] == 'f':
+                GTO = []
+                harmonic_GTOs = atom_GTOs[3]
+                harmonic_GTOs.append(GTO)
+#            elif line[:2] == '  ' and len(line) > 2:
+            elif len(line_split) == 2 and line[18] == ' ':
+
+                GTO.append( [float(line_split[0].replace('D', 'E')),   float(line_split[1].replace('D', 'E'))]  )
+
+        self.basis = []
+
+        for atom_GTOs in self.GTOs:
+            atom_basis = []
+            self.basis.append( atom_basis)
+            for harmonic_GTOs in atom_GTOs:
+                if len(harmonic_GTOs) > 0 :
+                    atom_basis.append( self.transform_molden_basis( harmonic_GTOs ) )
+
+    def transform_molden_basis(self, harmonic_GTOs ):
+
+        Sigmas_list = []
+        number_of_orbital = len(harmonic_GTOs)
+
+        for GTO in harmonic_GTOs:
+            for GTO_line in GTO:
+                Sigmas_list.append(GTO_line[0])
+
+        Sigmas = self.np.array(sorted(set(Sigmas_list), reverse=True))
+
+        basis = self.np.zeros([Sigmas.shape[0], number_of_orbital + 1], dtype=self.np.float64)
+        basis[:, 0] = Sigmas
+        for i, GTO in enumerate( harmonic_GTOs):
+            for GTO_line in GTO:
+                mask = Sigmas == GTO_line[0]
+                basis[mask, i + 1] = GTO_line[1]
+
+        return basis
+
+    def get_atoms(self, section):
+        self.Atoms = []
+        section_lines = section.splitlines()
+        for j, line in enumerate(section_lines[1:]):
+            self.Atoms.append(line)
+
+        self.nAtoms = len(self.Atoms)
+
+        self.Atoms_R = self.np.zeros([self.nAtoms,3],dtype=self.np.float64)
+        self.Atoms_Charge = self.np.zeros(self.nAtoms,dtype=self.np.int64)
+        self.Atoms_Name=[]
+
+        for i, atom in enumerate(self.Atoms):
+
+            atom_split = atom.split()
+            self.Atoms_Name.append( atom_split[0] )
+            self.Atoms_Charge[i] = int(atom_split[2])
+            self.Atoms_R[i] = self.np.array([ float(atom_split[-3]),   float(atom_split[-2]) , float(atom_split[-1])   ] )
+
+    def get_nb(self):
+        
+        if self.nb is None:
+            self.get_data()
+        return self.nb
+
+    def get_AO_number(self):
+        return self.MOs.shape[1]
+
+    def get_Atoms_R(self):
+        return self.Atoms_R
+
+    def get_Atoms_Name(self):
+        return self.Atoms_Name
+
+    def get_Atoms_Charge(self):
+        return self.Atoms_Charge
+
+    def get_Basis(self):
+        #return self.Basis
+        return self.basis, self.basis_norm, self.basis_norm2
+
+    def get_spherical(self):
+        return self.spherical
+
+    def get_nAtoms(self):
+        return self.nAtoms
+
+    def get_Coeff(self):
+        return self.Coeff
+
+    def get_Atoms(self):
+
+        self.get_data()
+        return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
+
+
+INPUT_TYPES = { 'Dalton': DaltonInput,
+                'molden': MoldenInput}
 
 def get_input( input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):
 
@@ -806,4 +928,3 @@ def get_input( input_type=None, input_sub_type=None, input_name=None, file_strin
         Exception(f"Input_type: {input_type} not found")
 
     return data_input
-

@@ -54,26 +54,26 @@ class Grid():
         self.z_max = self.np.max( atoms_R[:, 2]) + R_max
         self.z_min = self.np.min( atoms_R[:, 2]) - R_max
 
-    def generate_grid_boundaries_obsolete(self, basis, Atoms_R):
+    # def generate_grid_boundaries_obsolete(self, basis, Atoms_R):
 
-        Basis_max = []
-        for i in range(len(basis)):
-            for j in range(len(basis[i])):
-                Basis_max.append(1.64526336574595 / self.np.sqrt(( basis[i][j] ).max()))
+    #     Basis_max = []
+    #     for i in range(len(basis)):
+    #         for j in range(len(basis[i])):
+    #             Basis_max.append(1.64526336574595 / self.np.sqrt(( basis[i][j] ).max()))
 
-        R_max = self.R_max_multip * self.np.max(Basis_max)
+    #     R_max = self.R_max_multip * self.np.max(Basis_max)
 
-        if self.x_max is None:
-            self.x_max = self.np.max( Atoms_R[:, 0]) + R_max
-        if self.x_min is None:
-            self.x_min = self.np.min( Atoms_R[:, 0]) - R_max
+    #     if self.x_max is None:
+    #         self.x_max = self.np.max( Atoms_R[:, 0]) + R_max
+    #     if self.x_min is None:
+    #         self.x_min = self.np.min( Atoms_R[:, 0]) - R_max
 
-        if self.y_max is None:
-            self.y_max = self.np.max( Atoms_R[:, 1]) + R_max
-        if self.y_min is None:
-            self.y_min = self.np.min( Atoms_R[:, 1]) - R_max
+    #     if self.y_max is None:
+    #         self.y_max = self.np.max( Atoms_R[:, 1]) + R_max
+    #     if self.y_min is None:
+    #         self.y_min = self.np.min( Atoms_R[:, 1]) - R_max
 
-        if self.z_max is None:
-            self.z_max = self.np.max( Atoms_R[:, 2]) + R_max
-        if self.z_min is None:
-            self.z_min = self.np.min( Atoms_R[:, 2]) - R_max
+    #     if self.z_max is None:
+    #         self.z_max = self.np.max( Atoms_R[:, 2]) + R_max
+    #     if self.z_min is None:
+    #         self.z_min = self.np.min( Atoms_R[:, 2]) - R_max
