@@ -590,7 +590,7 @@ class Visualization():
             _figure = figure
 
         if plot_atoms:
-            self._plot_bonds(atom_scaling)
+            self._plot_atoms(atom_scaling)
 
         if atom_names:
             self._atom_names(atom_names_scaling)
