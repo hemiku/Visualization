@@ -520,26 +520,27 @@ class Visualization():
 
 
 
-    def _plot_bonds(self, bond_scaling):
+    def _plot_bonds(self, plot_bonds=True, bond_scaling=1.0):
 
-        for i, bond in enumerate( self.molecular_system.bonds ) :
+        if plot_bonds:
+            for i, bond in enumerate( self.molecular_system.bonds ) :
 
-            bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
-            bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
+                bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
+                bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
 
-            bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
+                bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
 
-            self.mlab.plot3d(   self.np.array([bond_begin[0] , bond_half[0]]),
-                                self.np.array([bond_begin[1] , bond_half[1]]),
-                                self.np.array([bond_begin[2] , bond_half[2]]),
-                                tube_radius=0.2 * bond_scaling ,                     
-                                color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
+                self.mlab.plot3d(   self.np.array([bond_begin[0] , bond_half[0]]),
+                                    self.np.array([bond_begin[1] , bond_half[1]]),
+                                    self.np.array([bond_begin[2] , bond_half[2]]),
+                                    tube_radius=0.2 * bond_scaling ,                     
+                                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
 
-            self.mlab.plot3d(   self.np.array([bond_end[0] , bond_half[0]]),
-                                self.np.array([bond_end[1] , bond_half[1]]),
-                                self.np.array([bond_end[2] , bond_half[2]]),
-                                tube_radius=0.2 * bond_scaling , 
-                                color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
+                self.mlab.plot3d(   self.np.array([bond_end[0] , bond_half[0]]),
+                                    self.np.array([bond_end[1] , bond_half[1]]),
+                                    self.np.array([bond_end[2] , bond_half[2]]),
+                                    tube_radius=0.2 * bond_scaling , 
+                                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
 
     def _plot_atoms(self, atom_scaling):
             
@@ -590,13 +591,13 @@ class Visualization():
             _figure = figure
 
         if plot_atoms:
-            self._plot_bonds(atom_scaling)
+            self._plot_atoms(atom_scaling)
 
         if atom_names:
             self._atom_names(atom_names_scaling)
 
         if plot_bonds:
-            self._plot_bonds(bond_scaling)
+            self._plot_bonds(plot_bonds, bond_scaling)
 
         for number in orbital_numbers:
 
@@ -639,13 +640,13 @@ class Visualization():
             _figure = figure
 
         if plot_atoms:
-            self._plot_bonds(atom_scaling)
+            self._plot_atoms(atom_scaling)
 
         if atom_names:
             self._atom_names(atom_names_scaling)
 
         if plot_bonds:
-            self._plot_bonds(bond_scaling)
+            self._plot_bonds(plot_bonds, bond_scaling)
 
         for number in orbital_numbers:
 
@@ -680,9 +681,6 @@ class Visualization():
         self.get_geminal_data()
         self.get_generate_geminals()
 
-    def dummy_plot(self):
-        return 0
-
     def plot_any_data(self,  any_data_to_plot=None,  
                                 plot_atoms = True, 
                                 atom_scaling = 1.0, 
@@ -714,13 +712,13 @@ class Visualization():
             _figure = figure
 
         if plot_atoms:
-            self._plot_bonds(atom_scaling)
+            self._plot_atoms(atom_scaling)
 
         if atom_names:
             self._atom_names(atom_names_scaling)
 
         if plot_bonds:
-            self._plot_bonds(bond_scaling)
+            self._plot_bonds(plot_bonds, bond_scaling)
 
 
         X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
@@ -731,3 +729,6 @@ class Visualization():
             self.mlab.show()
 
         return _figure
+
+    def dummy_plot(self):
+        return 0
