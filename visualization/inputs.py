@@ -253,7 +253,7 @@ class DaltonInput(Input):
 
         import re
 
-        self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
+        self.Atomsa_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
         self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
         self.Atoms_Name = []
 
