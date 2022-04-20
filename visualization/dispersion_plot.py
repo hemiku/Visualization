@@ -193,7 +193,7 @@ class DispersionPlot(visualization.visualization.Visualization):
         self.D_B = D_B
 
 
-    def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False, auto_show = True, figure = None ):  
+    def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, opacity = 0.5, background_color = None, sclalarbar = False, auto_show = True, figure = None ):  
         
         #from mayavi import mlab
 
@@ -213,49 +213,19 @@ class DispersionPlot(visualization.visualization.Visualization):
             _figure = figure
 
         if plot_atoms:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
-            
+            self._plot_atoms(atom_scaling)
+
         if atom_names:
-            for i in range( self.molecular_system.nAtoms ):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
-        
-        if plot_bonds:        
-            for i, bond in enumerate( self.molecular_system.bonds ) :
+            self._atom_names(atom_names_scaling)
 
-                bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
-                bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
-
-                bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
-
-                self.mlab.plot3d(
-                    self.np.array([bond_begin[0] , bond_half[0]]),
-                    self.np.array([bond_begin[1] , bond_half[1]]),
-                    self.np.array([bond_begin[2] , bond_half[2]]),
-                    tube_radius=0.2 * bond_scaling , 
-                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
-
-                self.mlab.plot3d(
-                    self.np.array([bond_end[0] , bond_half[0]]),
-                    self.np.array([bond_end[1] , bond_half[1]]),
-                    self.np.array([bond_end[2] , bond_half[2]]),
-                    tube_radius=0.2 * bond_scaling , 
-                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
+        if plot_bonds:
+            self._plot_bonds(plot_bonds, bond_scaling)
 
         X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
         D_AB_contur = self.mlab.contour3d(  X, Y, Z, (self.D_AB) , 
                                             contours=self.contur_process( contours, self.D_AB ), 
-                                            opacity=0.5) 
+                                            opacity=opacity) 
     
         if sclalarbar:
 
