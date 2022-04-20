@@ -1,8 +1,0 @@
-
-
-vtkCommonCorePython
-
-dnf install vtk*
-conda install -c conda-forge vtk
-conda install -c conda-forge dipy
-conda install jsoncpp
