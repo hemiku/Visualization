@@ -16,6 +16,8 @@ class Input( ):
     BAS_filename = None
     data_source = None
     
+    output = None
+    
     spherical = None
     nb = None
     nAtoms = None
@@ -94,6 +96,26 @@ class Input( ):
 
     def get_Bonds(self):
         pass
+
+    def set_source(self, source):
+
+        self.input_type = source
+
+    def get_data_source(self, data_source):
+
+        self.data_source = data_source
+
+    def get_output(self):
+
+        if self.output is not None:
+
+            return self.output
+
+        else:
+            with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
+                self.output = f.read()
+
+            return self.output
 
 class DaltonInput(Input):
 
@@ -914,7 +936,8 @@ class MoldenInput(Input):
 
 
 INPUT_TYPES = { 'Dalton': DaltonInput,
-                'molden': MoldenInput}
+                'molden': MoldenInput,
+                'Molpro': MolproInput}
 
 def get_input( input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):
 
