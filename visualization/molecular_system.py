@@ -1,29 +1,31 @@
 
 class Molecular_System:
 
+    import numpy as np
+
     spherical = None
     nb = None
     nAtoms = None
     inactive = None
     electrons = None
     Occ = None
-    Coeff = None
-    atoms_R = None
-    atoms_Charge = None
-    atoms_Name = None
+    Coeff:np.ndarray
+    atoms_R:np.ndarray
+    atoms_Charge: list 
+    atoms_Name: list 
     bonds = None
 
     basis = None
     basis_norm = None
     basis_norm2 = None
 
-    G_coeff = None
-    Orb2Gem = None
-    n_geminals = None
+    G_coeff:np.ndarray
+    Orb2Gem:np.ndarray
+    n_geminals:int
 
-    AOs = None
-    MOs = None
-    geminals = None
+    AOs:np.ndarray
+    MOs:np.ndarray
+    geminals:np.ndarray
 
     def __init__(self, spherical=None, nb=None, nAtoms=None, inactive=None, electrons=None, Occ=None, Coeff=None, atoms_R=None, atoms_Charge=None, atoms_Name=None, bonds=None):
 

@@ -7,18 +7,27 @@ class Grid():
 
     R_max_multip = None
 
-    x_min:np.float64 = None
-    x_max:np.float64 = None
-    x_n: int = None
-    y_min:np.float64 = None
-    y_max:np.float64 = None
-    y_n: int = None
-    z_min:np.float64 = None
-    z_max:np.float64 = None
-    z_n: int = None
+    x_min:np.float64 
+    x_max:np.float64 
+    x_n:np.int 
+    y_min:np.float64 
+    y_max:np.float64 
+    y_n:np.int 
+    z_min:np.float64 
+    z_max:np.float64 
+    z_n:np.int
 
 
-    def __init__(self, R_max_multip=12.0, x_min=None, x_max=None, x_n= 100, y_min=None, y_max=None, y_n=100, z_min=None, z_max=None, z_n=100):
+    def __init__(self,  R_max_multip:float =12.0, 
+                        x_min:np.float=None, 
+                        x_max:np.float=None, 
+                        x_n:np.int= 100, 
+                        y_min:np.float=None, 
+                        y_max:np.float=None, 
+                        y_n:np.int=100,
+                        z_min:np.float=None, 
+                        z_max:np.float=None, 
+                        z_n:np.int=100):
 
         self.R_max_multip = R_max_multip
 
@@ -32,7 +41,7 @@ class Grid():
         self.z_max = z_max
         self.z_n = z_n
 
-    def return_grid_arrays(self):
+    def return_grid_arrays(self) -> np.ndarray:
 
         return self.np.mgrid[self.x_min:self.x_max:self.x_n*1j, self.y_min:self.y_max:self.y_n*1j, self.z_min:self.z_max:self.z_n*1j]
 

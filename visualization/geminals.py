@@ -11,14 +11,19 @@ class GeminalGenerator():
 
     import numpy as np
 
-    MOs = None
-    inactive = None
-    n_geminal = None
-    Orb2Gem = None
-    G_coeff = None
-    geminals = None
+    MOs:np.ndarray
+    inactive: int 
+    n_geminal: int
+    Orb2Gem:np.ndarray
+    G_coeff:np.ndarray
+    geminals:np.ndarray
 
-    def __init__(self, MOs = MOs, n_geminal = n_geminal, inactive = inactive, Orb2Gem = Orb2Gem, G_coeff = G_coeff, geminals = geminals ):
+    def __init__(self,  MOs:np.ndarray, 
+                        n_geminal:int, 
+                        inactive:int, 
+                        Orb2Gem:np.ndarray, 
+                        G_coeff:np.ndarray, 
+                        geminals:np.ndarray):
 
         self.inactive = inactive
         self.MOs = MOs

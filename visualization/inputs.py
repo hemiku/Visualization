@@ -199,7 +199,7 @@ class DaltonInput(Input):
 
     def get_Coeff(self):
 
-        F_MOPUN = None
+        F_MOPUN:str 
 
         if self.Coeff is not None:
             return self.Coeff
@@ -210,7 +210,7 @@ class DaltonInput(Input):
 
         if self.input_type == 'tar':
             tar = self.tarfile.open(self.input_name + ".tar.gz")
-            f = tar.extractfile(tar.getmember("DALTON.MOPUN"))
+            f:str = tar.extractfile(tar.getmember("DALTON.MOPUN"))
             F_MOPUN = f.read().decode(encoding='utf-8')
             tar.close()
 
@@ -224,7 +224,7 @@ class DaltonInput(Input):
 
         return self.Coeff
 
-    def get_Basis_File(self):
+    def get_Basis_File(self) -> str:
 
         if self.F_BAS is not None:
             return self.F_BAS
@@ -340,7 +340,8 @@ class DaltonInput(Input):
         Atom_Geometries_pattern = '^\w{1,6} \D \D \D'
         Basis_header_pattern = '^H {1,3}\d{1,3} {1,4}\d{1,3}$'
 
-        Atoms_Gropus = []
+        Atoms_Gropus:list = []
+        Atoms_Group:dict 
 
         header_end_line = self.find_header_end_line( lines = F_BAS_split_lines, Atom_header_pattern = Atom_header_pattern )
 
@@ -348,7 +349,7 @@ class DaltonInput(Input):
 
             if re.match(Atom_header_pattern, line):
 
-                Atoms_Group = {'headerLine': line, 'Geometries': [], 'Basis': []}
+                Atoms_Group:dict = {'headerLine': line, 'Geometries': [], 'Basis': []}
                 Atoms_Gropus.append(Atoms_Group)
 
             elif re.match(Atom_Geometries_pattern, line):
@@ -534,6 +535,8 @@ class DaltonInput(Input):
 
     def Norm_P(self, Dane):
 
+        Norm:self.np.ndarray
+
         if (len(self.np.shape(Dane)) == 2):
 
             NOrb = self.np.shape(Dane)[-1] - 1
@@ -648,8 +651,6 @@ class DaltonInput(Input):
             Norm + Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
 
         return Norm
-
-
 
     def Norm_S2(self, Data):
 

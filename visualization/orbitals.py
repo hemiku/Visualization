@@ -22,22 +22,21 @@ class AOParameters():
 class OrbitalsGenerator( ):
 
     import numpy as np
-    import visualization.grid
+    import visualization.grid 
 
-    grid = None
+    grid:visualization.grid.Grid
 
-    nAtoms: int = None
-    atoms_R = None
+    nAtoms: int
+    atoms_R:np.ndarray
 
-    spherical = None
+    spherical:bool
     nb = None
-    coeff = None
-    basis = None
-    basis_norm = None
+    coeff:np.ndarray
+    basis:list
+    basis_norm: list
 
-    AOs = None
-    MOs = None
-
+    AOs:np.ndarray 
+    MOs:np.ndarray 
 
     def __init__(self, nAtoms = None, atoms_R = None, spherical=None, nb = None, coeff = None, basis = None, basis_norm = None, grid = None ):
 

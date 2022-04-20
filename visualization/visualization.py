@@ -54,19 +54,22 @@ class Visualization():
     from mayavi import mlab
     import numpy as np
 
-    #import visualization.visualization_data as vd
+    from visualization.orbitals import OrbitalsGenerator
+    from visualization.molecular_system import Molecular_System
+
+
     import visualization.utils as u
 
-    input_type: str = None
-    input_sub_type: str = None
-    input_name: str = None
+    input_type: str
+    input_sub_type: str
+    input_name: str
     file_string = None
     BAS_filename = None
     data_source = None
 
     data_input = None
-    molecular_system = None
-    orbital_generator = None
+    molecular_system: Molecular_System
+    orbital_generator: OrbitalsGenerator 
 
     visualization_data = VisualizationData()
 
@@ -123,55 +126,6 @@ class Visualization():
         import visualization.inputs
 
         self.data_input = visualization.inputs.get_input( input_type=self.input_type, input_sub_type=self.input_sub_type, input_name=self.input_name)
-
-
-    def plot_Geometry(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False, auto_show = True, figure = None ):
-
-        self.mlab.figure("Geometria", bgcolor=(.5, .5, .75), size=(1000, 1000))
-        self.mlab.clf()
-
-        if plot_atoms:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor=self.visualization_data.Atoms_Scale[
-                                       self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[
-                                       self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
-
-        if atom_names:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9, .9, .9))
-
-        if plot_bonds:
-            for i, bond in enumerate( self.molecular_system.bonds ) :
-
-                bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
-                bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
-
-                bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
-
-                self.mlab.plot3d(
-                    self.np.array([bond_begin[0] , bond_half[0]]),
-                    self.np.array([bond_begin[1] , bond_half[1]]),
-                    self.np.array([bond_begin[2] , bond_half[2]]),
-                    tube_radius=0.2 * bond_scaling , 
-                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
-
-                self.mlab.plot3d(
-                    self.np.array([bond_end[0] , bond_half[0]]),
-                    self.np.array([bond_end[1] , bond_half[1]]),
-                    self.np.array([bond_end[2] , bond_half[2]]),
-                    tube_radius=0.2 * bond_scaling , 
-                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
-
-        self.mlab.show()
 
     def initialize_molecular_system(self):
 
@@ -240,8 +194,6 @@ class Visualization():
         self.molecular_system.AOs = self.orbital_generator.AOs
 
 
-
-#    @numba.cuda.jit
     def generate_AO_orbitals_numba(self):
 
 
@@ -322,144 +274,75 @@ class Visualization():
         else: 
             return contour
 
-        #if type( contour ) == int:
-        #    return contour
-
-        #if type( contour ) == list:
-        #    return contour
-
-
-        
-
     def get_generate_geminals(self):
 
-        self.molecular_system.geminals = self.geminal_generator.Calc_Geminals( )
+        self.geminal_generator.Calc_Geminals( )
         self.molecular_system.geminals = self.geminal_generator.geminals
 
-
-    def plot_Orbitals(self, orbital_numbers, plot_atoms=1, atom_names=1, plot_bonds=1):
-
-        fig1 = self.mlab.figure("Orbitals_" + str(orbital_numbers), bgcolor=(.5, .5, .75), size=(1000, 1000))
-        fig1.scene.parallel_projection = False
-
-        self.mlab.clf()
-
-        if plot_atoms:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor=self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
-
-        if atom_names:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9, .9, .9))
-
-        if plot_bonds:
-            for i in range(len(self.molecular_system.bonds)):
-                self.mlab.plot3d(
-                    self.np.array([ self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 0],
-                                    self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 0]]),
-                    self.np.array([ self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 1],
-                                    self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 1]]),
-                    self.np.array([ self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 2],
-                                    self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 2]]),
-                    tube_radius=0.2, color=(233.0 / 255, 165.0 / 255, 165.0 / 255))
-
-        for number in orbital_numbers:
-            
-            #X, Y, Z = self.molecular_system.grid.return_grid_arrays()
-            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
-            self.mlab.contour3d( X, Y, Z, (self.molecular_system.MOs[number]), contours=12, opacity=0.5)
-
-
-        self.mlab.show()
-
-    def plot_Orbitals_AO(self, orbital_numbers, plot_atoms=1, atom_names=1, plot_bonds=1):
-
-        fig1 = self.mlab.figure("Orbitals_AO_" + str(orbital_numbers), bgcolor=(.5, .5, .75), size=(1000, 1000))
-        fig1.scene.parallel_projection = False
-
-        self.mlab.clf()
-
-        if plot_atoms:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor=self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
-
-        if atom_names:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9, .9, .9))
-
-        if plot_bonds:
-            for i in range(len(self.molecular_system.bonds)):
-                self.mlab.plot3d(
-                    self.np.array([ self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 0],
-                                    self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 0]]),
-                    self.np.array([ self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 1],
-                                    self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 1]]),
-                    self.np.array([ self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 2],
-                                    self.molecular_system.atoms_R[
-                                    self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 2]]),
-                    tube_radius=0.2, color=(233.0 / 255, 165.0 / 255, 165.0 / 255))
-
-        for number in orbital_numbers:
-            
-            #X, Y, Z = self.molecular_system.grid.return_grid_arrays()
-            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
-            
-            self.mlab.contour3d( X, Y, Z, (self.molecular_system.AOs[number]), contours=12, opacity=0.5)
-
-
-        self.mlab.show()
-
-    def plot_Geminals(self, geminal_numbers = [0],  
-                            plot_atoms = True, 
-                            atom_names =True, 
-                            plot_bonds = True , 
+    def plot_Geometry(self, plot_atoms = True, 
                             atom_scaling = 1.0, 
+                            atom_names =True, 
+                            atom_names_scaling = 1.0, 
+                            plot_bonds = True , 
                             bond_scaling = 1.0, 
                             contours = 6, 
                             background_color = None, 
                             sclalarbar = False, 
-                            auto_show = True, 
+                            auto_show = True,
+                            opacity = 0.5,
                             figure = None ):  
-        
+
+        _plot_type = "Geometry"
+        _figure_title = _plot_type 
         if background_color is None:
             _background_color = self.visualization_data.background_colors['White']
         else:
             _background_color = background_color
 
         if figure is None:
-            _figure = self.mlab.figure(   "Dispersion", 
-                            bgcolor=_background_color,
-                            size=(600, 600) )
+            _figure = self.mlab.figure( _figure_title, bgcolor=_background_color, size=(600, 600) )
+            self.mlab.clf()
+        else:
+            _figure = figure
+        
+        if plot_atoms:
+            self._plot_atoms(atom_scaling)
 
+        if atom_names:
+            self._atom_names(atom_names_scaling)
+
+        if plot_bonds:
+            self._plot_bonds(plot_bonds, bond_scaling)
+
+        if auto_show:
+            self.mlab.show()
+
+        return _figure
+
+    def plot_Orbitals(self, orbital_numbers,                                 
+                            plot_atoms = True, 
+                            atom_scaling = 1.0, 
+                            atom_names =True, 
+                            atom_names_scaling = 1.0, 
+                            plot_bonds = True , 
+                            bond_scaling = 1.0, 
+                            contours = 6, 
+                            background_color = None, 
+                            sclalarbar = False, 
+                            auto_show = True,
+                            opacity = 0.5,
+                            figure = None ):  
+
+        _plot_type = "Orbitals_"
+        _figure_title = _plot_type  + str(orbital_numbers)
+
+        if background_color is None:
+            _background_color = self.visualization_data.background_colors['White']
+        else:
+            _background_color = background_color
+
+        if figure is None:
+            _figure = self.mlab.figure( _figure_title, bgcolor=_background_color, size=(600, 600) )
             self.mlab.clf()
 
         else:
@@ -467,57 +350,122 @@ class Visualization():
             _figure = figure
 
         if plot_atoms:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
+            self._plot_atoms(atom_scaling)
 
         if atom_names:
-            for i in range(self.molecular_system.nAtoms):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9, .9, .9))
+            self._atom_names(atom_names_scaling)
 
         if plot_bonds:
-            for i, bond in enumerate( self.molecular_system.bonds ) :
+            self._plot_bonds(plot_bonds, bond_scaling)
 
-                bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
-                bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
-
-                bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
-
-                self.mlab.plot3d(
-                    self.np.array([bond_begin[0] , bond_half[0]]),
-                    self.np.array([bond_begin[1] , bond_half[1]]),
-                    self.np.array([bond_begin[2] , bond_half[2]]),
-                    tube_radius=0.2 * bond_scaling , 
-                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[0] ) ])
-
-                self.mlab.plot3d(
-                    self.np.array([bond_end[0] , bond_half[0]]),
-                    self.np.array([bond_end[1] , bond_half[1]]),
-                    self.np.array([bond_end[2] , bond_half[2]]),
-                    tube_radius=0.2 * bond_scaling , 
-                    color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
-
-        for number in geminal_numbers:
-
-            #X, Y, Z = self.molecular_system.grid.return_grid_arrays()
+        for number in orbital_numbers:
+            
             X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
-
-            #          exec(self.Geminnals[i].g)
-            #self.mlab.contour3d(X, Y, Z, (self.Geminnals[number].v), contours=12, opacity=0.5)
-            self.mlab.contour3d( X, Y, Z, (self.molecular_system.geminals[number]), 
-                                contours= self.contur_process( contours, self.molecular_system.geminals[number] ) , opacity=0.5)
+            self.mlab.contour3d( X, Y, Z, ( self.molecular_system.MOs[number] ), contours=12, opacity=0.5)
 
         if auto_show:
             self.mlab.show()
 
+        return _figure
+
+    def plot_Orbitals_AO(self, orbital_numbers, 
+                                plot_atoms = True, 
+                                atom_scaling = 1.0, 
+                                atom_names =True, 
+                                atom_names_scaling = 1.0, 
+                                plot_bonds = True , 
+                                bond_scaling = 1.0, 
+                                contours = 6, 
+                                background_color = None, 
+                                sclalarbar = False, 
+                                auto_show = True,
+                                opacity = 0.5,
+                                figure = None ):  
+
+        _plot_type = "Orbitals_AO_"
+        _figure_title = _plot_type  + str(orbital_numbers)
+
+        if background_color is None:
+            _background_color = self.visualization_data.background_colors['White']
+        else:
+            _background_color = background_color
+
+        if figure is None:
+            _figure = self.mlab.figure( _figure_title, bgcolor=_background_color, size=(600, 600) )
+
+            self.mlab.clf()
+
+        else:
+
+            _figure = figure
+        
+        if plot_atoms:
+            self._plot_atoms(atom_scaling)
+
+        if atom_names:
+            self._atom_names(atom_names_scaling)
+
+        if plot_bonds:
+            self._plot_bonds(plot_bonds, bond_scaling)
+
+        for number in orbital_numbers:
+
+            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
+            self.mlab.contour3d( X, Y, Z, (self.molecular_system.AOs[number]), contours=12, opacity=0.5)
+
+        if auto_show:
+            self.mlab.show()
+
+        return _figure
+
+    def plot_Geminals(self, geminal_numbers = [0],  
+                            plot_atoms = True, 
+                            atom_scaling = 1.0, 
+                            atom_names =True, 
+                            atom_names_scaling = 1.0, 
+                            plot_bonds = True , 
+                            bond_scaling = 1.0, 
+                            contours = 6, 
+                            background_color = None, 
+                            sclalarbar = False, 
+                            auto_show = True,
+                            opacity = 0.5,
+                            figure = None ):  
+        
+        _plot_type = "Geminals_"
+        _figure_title = _plot_type  + str(geminal_numbers)
+
+        if background_color is None:
+            _background_color = self.visualization_data.background_colors['White']
+        else:
+            _background_color = background_color
+
+        if figure is None:
+            _figure = self.mlab.figure( _figure_title, bgcolor=_background_color, size=(600, 600) )
+            self.mlab.clf()
+        else:
+            _figure = figure
+
+        if plot_atoms:
+            self._plot_atoms(atom_scaling)
+
+        if atom_names:
+            self._atom_names(atom_names_scaling)
+
+        if plot_bonds:
+            self._plot_bonds(plot_bonds, bond_scaling)
+
+        for number in geminal_numbers:
+
+            X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
+
+            self.mlab.contour3d( X, Y, Z, (self.molecular_system.geminals[number]), 
+                                contours= self.contur_process( contours, self.molecular_system.geminals[number] ) , opacity=opacity)
+
+        if auto_show:
+            self.mlab.show()
+
+        return _figure
 
 
     def _plot_bonds(self, plot_bonds=True, bond_scaling=1.0):
@@ -543,7 +491,7 @@ class Visualization():
                                     color= self.visualization_data.Atoms_Color[  self.u.letters( bond[1] ) ])
 
     def _plot_atoms(self, atom_scaling):
-            
+
         for i in range(self.molecular_system.nAtoms):
             self.mlab.points3d( self.molecular_system.atoms_R[i, 0],
                                 self.molecular_system.atoms_R[i, 1],
@@ -555,11 +503,12 @@ class Visualization():
 
     def _atom_names(self, atom_names_scaling):
             for i in range(self.molecular_system.nAtoms):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], 
-                                 scale=(.9*atom_names_scaling, .9*atom_names_scaling, .9*atom_names_scaling)  )
+                self.mlab.text3d(   self.molecular_system.atoms_R[i, 0],
+                                    self.molecular_system.atoms_R[i, 1],
+                                    self.molecular_system.atoms_R[i, 2],
+                                    self.molecular_system.atoms_Name[i],
+                                    color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
+                                    scale=(.9*atom_names_scaling, .9*atom_names_scaling, .9*atom_names_scaling)  )
 
     def plot_orbitals_MO(self,  orbital_numbers = [0],  
                                 plot_atoms = True, 
@@ -574,20 +523,19 @@ class Visualization():
                                 auto_show = True, 
                                 figure = None ):  
         
+
+        _plot_type = "Orbitals_MO_"
+        _figure_title = _plot_type  + str(orbital_numbers)
+
         if background_color is None:
             _background_color = self.visualization_data.background_colors['White']
         else:
             _background_color = background_color
 
         if figure is None:
-            _figure = self.mlab.figure( "Dispersion", 
-                                        bgcolor=_background_color,
-                                        size=(600, 600) )
-
+            _figure = self.mlab.figure( _figure_title, bgcolor=_background_color, size=(600, 600) )
             self.mlab.clf()
-
         else:
-
             _figure = figure
 
         if plot_atoms:
@@ -659,7 +607,8 @@ class Visualization():
 
         return _figure
 
-    def get_geminals(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50, gpu=False):
+
+    def get_orbitals(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50, gpu=False):
 
         self.get_orbital_data()
         self.orbital_generator.grid.R_max_multip = R_max_multip
@@ -677,6 +626,28 @@ class Visualization():
         else:
             self.generate_AO_orbitals()            
             self.generate_MO_orbitals()
+
+
+    def get_geminals(self, R_max_multip = 3.0, x_n= 50, y_n= 50, z_n= 50, gpu=False):
+
+#        self.get_orbital_data()
+#        self.orbital_generator.grid.R_max_multip = R_max_multip
+#        self.orbital_generator.grid.x_n= x_n 
+#        self.orbital_generator.grid.y_n= y_n
+#        self.orbital_generator.grid.z_n= z_n
+#        self.orbital_generator.init_grid( )
+
+#        self.orbital_generator.init_AOs()
+
+#        if gpu:
+#            self.generate_AO_orbitals_gpu()            
+#            self.generate_MO_orbitals_gpu()
+
+#        else:
+#            self.generate_AO_orbitals()            
+#            self.generate_MO_orbitals()
+
+        self.get_orbitals(R_max_multip = R_max_multip, x_n= x_n, y_n= y_n, z_n= z_n, gpu=gpu)
 
         self.get_geminal_data()
         self.get_generate_geminals()
@@ -730,5 +701,67 @@ class Visualization():
 
         return _figure
 
+
+
     def dummy_plot(self):
         return 0
+
+    def plot_grid(self, plot_boundaries=True, 
+                        plot_points=True, 
+                        point_scaling=1.0, 
+                        points_color=(1.0, 0, 0),
+                        plot_atoms = True, 
+                        atom_scaling = 1.0, 
+                        atom_names =True, 
+                        atom_names_scaling = 1.0, 
+                        plot_bonds = True , 
+                        bond_scaling = 1.0, 
+                        background_color = None, 
+                        auto_show = True,
+                        opacity = 0.5,
+                        figure = None ):  
+
+        if background_color is None:
+            _background_color = self.visualization_data.background_colors['White']
+        else:
+            _background_color = background_color
+
+        if figure is None:
+            _figure = self.mlab.figure( "Dispersion", 
+                                        bgcolor=_background_color,
+                                        size=(600, 600) )
+
+            self.mlab.clf()
+
+        else:
+
+            _figure = figure
+
+        if plot_atoms:
+            self._plot_atoms(atom_scaling)
+
+        if atom_names:
+            self._atom_names(atom_names_scaling)
+
+        if plot_bonds:
+            self._plot_bonds(plot_bonds, bond_scaling)
+
+
+        X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
+
+        point_size = 0.05 * self.np.sqrt((X[0,0,0]-X[1,0,0])**2 + (Y[0,0,0]-Y[0,1,0])**2 + (Z[0,0,0]-Z[0,0,1])**2  )
+
+        if plot_points:
+            self.mlab.points3d( X, Y, Z,
+                                scale_factor= point_scaling * point_size,
+                                resolution=10,
+                                color=points_color,
+                                scale_mode='none')
+    
+        if plot_boundaries:
+            self.mlab.outline()
+        
+        if auto_show:
+            self.mlab.show()
+
+        return _figure
