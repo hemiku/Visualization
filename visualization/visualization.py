@@ -73,8 +73,7 @@ class Visualization():
 
     visualization_data = VisualizationData()
 
-
-    def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None):
+    def __init__(self, input_type=None, input_sub_type='Output', input_name=None, file_string=None, BAS_filename=None, data_source=None):
 
         if input_type is not None:
             self.input_type = input_type
@@ -101,6 +100,25 @@ class Visualization():
 
         self.initialize_molecular_system()
 
+    def set_input(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):
+
+        import visualization.inputs 
+        import visualization.input_molpro
+
+        INPUT_TYPES = { 'Dalton': visualization.inputs.DaltonInput,
+                        'Molpro': visualization.input_molpro.MolproInput,
+                        'MolproSapt': visualization.input_molpro.MolproSaptInput
+                        }
+
+        try:
+            return INPUT_TYPES[input_type](    input_type=  input_sub_type, 
+                                                            input_name=input_name, 
+                                                            file_string=file_string, 
+                                                            BAS_filename=BAS_filename, 
+                                                            data_source=data_source )
+        except KeyError:
+            Exception(f"Input_type: {input_type} not found")
+
     def set_input_type(self, input_type):
 
         self.input_type = input_type
@@ -123,9 +141,11 @@ class Visualization():
 
     def initialize_data_input(self):
 
-        import visualization.inputs
+        #import visualization.inputs
 
-        self.data_input = visualization.inputs.get_input( input_type=self.input_type, input_sub_type=self.input_sub_type, input_name=self.input_name)
+        self.data_input = self.set_input(   input_type =self.input_type,
+                                            input_sub_type=self.input_sub_type,
+                                            input_name=self.input_name)
 
     def initialize_molecular_system(self):
 
@@ -200,17 +220,25 @@ class Visualization():
         self.orbital_generator.calc_AOs( AO = self.orbital_generator.AOs )
         self.molecular_system.AOs = self.orbital_generator.AOs
 
-    def generate_MO_orbitals(self, gpu=False):
+    def generate_MO_orbitals(self, gpu=False, MOs_limit = None):
 
-        self.orbital_generator.calc_MOs( )
+        if MOs_limit is None:
+            self.orbital_generator.calc_MOs( )            
+        else:
+            self.orbital_generator.calc_MOs( MOs_limit = MOs_limit )
+
         self.molecular_system.MOs = self.orbital_generator.MOs
 
-    def generate_MO_orbitals_gpu(self):
+    def generate_MO_orbitals_gpu(self, MOs_limit = None):
 
-        self.orbital_generator.calc_MOs_gpu( )
+        if MOs_limit is None:
+            self.orbital_generator.calc_MOs_gpu( )            
+        else:
+            self.orbital_generator.calc_MOs_gpu( MOs_limit = MOs_limit )
+        # self.orbital_generator.calc_MOs_gpu( )
         self.molecular_system.MOs = self.orbital_generator.MOs
 
-    def generate_MO_orbitals_gpu_low_memory(self):
+    def generate_MO_orbitals_gpu_low_memory(self, MOs_limit = None):
 
         self.orbital_generator.calc_MOs_gpu_low_memory( )
         self.molecular_system.MOs = self.orbital_generator.MOs
@@ -470,7 +498,7 @@ class Visualization():
 
     def _plot_bonds(self, plot_bonds=True, bond_scaling=1.0):
 
-        if plot_bonds:
+        if plot_bonds and self.molecular_system.bonds is not None :
             for i, bond in enumerate( self.molecular_system.bonds ) :
 
                 bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]

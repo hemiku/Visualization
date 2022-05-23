@@ -37,7 +37,7 @@ class Input( ):
 
     Bonds = None
 
-    def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None ):
+    def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None, **kwargs):
 
 
         if input_type is not None:
@@ -65,9 +65,6 @@ class Input( ):
         pass
 
     def set_input_name(self, source):
-        pass
-
-    def get_data_source(self, data_source):
         pass
 
     def get_harmonic(self):
@@ -100,6 +97,7 @@ class Input( ):
     def set_source(self, source):
 
         self.input_type = source
+        
 
     def get_data_source(self, data_source):
 
@@ -116,6 +114,137 @@ class Input( ):
                 self.output = f.read()
 
             return self.output
+
+    def calc_norm_from_basis(self, basis):
+
+        _basis_norm:list
+
+        if basis :
+
+            _basis_norm = []
+
+            # for n in range(self.nAtoms):
+                
+            for n, atom_basis in enumerate( basis ):
+
+                _atom_basis_norm =[]
+                _basis_norm.append( _atom_basis_norm )
+
+                for j, orbital_type_basis in enumerate( atom_basis ):
+                    if (j == 0):
+                        _atom_basis_norm.append( self.Norm_S2( orbital_type_basis ) )
+                    if (j == 1):
+                        _atom_basis_norm.append( self.Norm_P2( orbital_type_basis ) )
+                    if (j == 2):
+                        _atom_basis_norm.append( self.Norm_D2( orbital_type_basis ) )
+                    if (j == 3):
+                        _atom_basis_norm.append( self.Norm_F2( orbital_type_basis ) )
+                    if (j == 4):
+                        _atom_basis_norm.append( self.Norm_G2( orbital_type_basis ) )
+
+        return _basis_norm
+    
+
+    def normalization_summation(self, Data, pow_val):
+
+        if (len(self.np.shape(Data)) == 2):
+
+            NOrb = self.np.shape(Data)[-1] - 1
+            NExpans = self.np.shape(Data)[0]
+            Norm = self.np.zeros(NOrb, dtype=self.np.float64)
+
+            for i in range(NExpans):
+                for j in range(NExpans):
+                    Norm += Data[i, 1:] * Data[j, 1:] / (Data[i, 0] + Data[j, 0]) ** pow_val
+
+        else:
+
+            Norm = Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
+
+        return Norm
+        
+    def normalization_summation_2(self, Data, pow_val):
+
+        if (len(self.np.shape(Data)) == 2):
+
+            NOrb = self.np.shape(Data)[-1] - 1
+            NExpans = self.np.shape(Data)[0]
+            Norm = self.np.zeros(NOrb, dtype=self.np.float64)
+
+            exponents = Data[:,0]
+            coefficents =  Data[:,1:]
+
+            for i in range(NExpans):
+                for j in range(NExpans):
+                    Norm += Data[i, 1:] *Data[j, 1:]  / (Data[i, 0] + Data[j, 0]) ** pow_val
+
+        else:
+
+            Norm + Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
+
+        return Norm
+
+    def Norm_S2(self, Data):
+
+        pow_val = 3.0 / 2.0
+        fact = self.np.sqrt(2)/4
+        fact = 1.0 
+        
+        Norm = fact * self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val )
+        Norm = 1 / self.np.sqrt(Norm)
+
+        return Norm
+
+    def Norm_P2(self, Data):
+
+        pow_val = 5.0 / 2.0
+        fact = 1.0 / 2.0
+
+        Norm = fact * self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val )
+        Norm = 1 / self.np.sqrt(Norm)
+
+        return Norm
+
+    def Norm_D2(self, Data):
+
+        pow_val = 7.0 / 2.0
+        fact = 1.0 / 4.0
+
+        Norm = fact * self.np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val )
+
+        Norm = 1 / self.np.sqrt(Norm)
+
+        return Norm
+
+    def Norm_F2(self, Data):
+
+        pow_val = 9.0 / 2.0
+        fact = 15.0 / 8.0
+
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm = 1 / self.np.sqrt(Norm)
+
+        return Norm
+
+    def Norm_G2(self, Data):
+
+        pow_val = 11.0 / 2.0
+        fact = 105.0 / 16.0
+
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact       
+        Norm = 1 / self.np.sqrt(Norm)
+
+        return Norm
+
+    def Norm_H2(self, Data):
+
+        pow_val = 13.0 / 2.0
+        fact = 945.0 / 32.0
+
+        Norm =  self.normalization_summation( Data, pow_val) * self.np.pi ** (3.0 / 2.0) * fact
+        Norm = 1 / self.np.sqrt(Norm)
+
+        return Norm
 
 class DaltonInput(Input):
 
@@ -479,6 +608,54 @@ class DaltonInput(Input):
                         self.basis_norm[n].append(self.Norm_F2(self.basis[n][j]))
                     if (j == 4):
                         self.basis_norm[n].append(self.Norm_G2(self.basis[n][j]))
+
+
+    def calc_norm_from_basis(self, basis):
+
+        _basis_norm:list
+
+        if basis :
+
+            _basis_norm = []
+
+            # for n in range(self.nAtoms):
+                
+            for n, atom_basis in enumerate( basis ):
+
+                _atom_basis_norm =[]
+                _basis_norm.append( _atom_basis_norm )
+
+                for j, orbital_type_basis in enumerate( atom_basis ):
+                    if (j == 0):
+                        _atom_basis_norm.append( self.Norm_S2( orbital_type_basis ) )
+                    if (j == 1):
+                        _atom_basis_norm.append( self.Norm_P2( orbital_type_basis ) )
+                    if (j == 2):
+                        _atom_basis_norm.append( self.Norm_D2( orbital_type_basis ) )
+                    if (j == 3):
+                        _atom_basis_norm.append( self.Norm_F2( orbital_type_basis ) )
+                    if (j == 4):
+                        _atom_basis_norm.append( self.Norm_G2( orbital_type_basis ) )
+
+        return _basis_norm
+
+
+                # self.basis_norm.append([])
+                
+                # for j in range(len(self.basis[n])):
+                #     if (j == 0):
+                #         self.basis_norm[n].append( self.Norm_S2(self.basis[n][j]) )
+                #     if (j == 1):
+                #         self.basis_norm[n].append(self.Norm_P2(self.basis[n][j]))
+                #     if (j == 2):
+                #         self.basis_norm[n].append(self.Norm_D2(self.basis[n][j]))
+                #     if (j == 3):
+                #         self.basis_norm[n].append(self.Norm_F2(self.basis[n][j]))
+                #     if (j == 4):
+                #         self.basis_norm[n].append(self.Norm_G2(self.basis[n][j]))
+
+
+
 
     def get_Printout_of_final_geminals(self, dalton_output ):
 
@@ -935,7 +1112,7 @@ class MoldenInput(Input):
         self.get_data()
         return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
-
+MolproInput = None
 INPUT_TYPES = { 'Dalton': DaltonInput,
                 'molden': MoldenInput,
                 'Molpro': MolproInput}
