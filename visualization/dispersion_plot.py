@@ -216,10 +216,10 @@ class DispersionPlot(visualization.visualization.Visualization):
             self._plot_atoms(atom_scaling)
 
         if atom_names:
-            self._atom_names(atom_names_scaling)
+            self._atom_names( atom_names_scaling )
 
         if plot_bonds:
-            self._plot_bonds(plot_bonds, bond_scaling)
+            self._plot_bonds( plot_bonds, bond_scaling)
 
         X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
@@ -266,20 +266,20 @@ class DispersionPlot(visualization.visualization.Visualization):
 
         if plot_atoms:
             for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
+                self.mlab.points3d( self.molecular_system.atoms_R[i, 0],
+                                    self.molecular_system.atoms_R[i, 1],
+                                    self.molecular_system.atoms_R[i, 2],
+                                    scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
+                                    resolution=20,
+                                    color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
+                                    scale_mode='none')
             
         if atom_names:
             for i in range( self.molecular_system.nAtoms ):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
+                self.mlab.text3d(   self.molecular_system.atoms_R[i, 0],
+                                    self.molecular_system.atoms_R[i, 1],
+                                    self.molecular_system.atoms_R[i, 2],
+                                    self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
         
         if plot_bonds:        
             for i, bond in enumerate( self.molecular_system.bonds ) :
@@ -335,20 +335,20 @@ class DispersionPlot(visualization.visualization.Visualization):
 
         if plot_atoms:
             for i in range(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i, 0],
-                                   self.molecular_system.atoms_R[i, 1],
-                                   self.molecular_system.atoms_R[i, 2],
-                                   scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   resolution=20,
-                                   color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
-                                   scale_mode='none')
+                self.mlab.points3d( self.molecular_system.atoms_R[i, 0],
+                                    self.molecular_system.atoms_R[i, 1],
+                                    self.molecular_system.atoms_R[i, 2],
+                                    scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
+                                    resolution=20,
+                                    color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
+                                    scale_mode='none')
             
         if atom_names:
             for i in range( self.molecular_system.nAtoms ):
-                self.mlab.text3d(self.molecular_system.atoms_R[i, 0],
-                                 self.molecular_system.atoms_R[i, 1],
-                                 self.molecular_system.atoms_R[i, 2],
-                                 self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
+                self.mlab.text3d(   self.molecular_system.atoms_R[i, 0],
+                                    self.molecular_system.atoms_R[i, 1],
+                                    self.molecular_system.atoms_R[i, 2],
+                                    self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
         
         if plot_bonds:        
             for i, bond in enumerate( self.molecular_system.bonds ) :
@@ -383,39 +383,39 @@ class DispersionPlot(visualization.visualization.Visualization):
         return _figure
 
     def Plot_D_AB_log(self, Plot_Atoms = 1, Atom_Names = 1, Plot_Bonds = 1 , Atom_Scaling = 1.0, Bond_Scaling = 1.0, contours = 6 ):  
-        
+        _
         #from mayavi import mlab
         
-        self.mlab.figure("Dispersion ", bgcolor=(.5, .5, .75), size=(1000, 1000))
-        self.mlab.clf()
+        # self.mlab.figure("Dispersion ", bgcolor=(.5, .5, .75), size=(1000, 1000))
+        # self.mlab.clf()
         
-        if Plot_Atoms:
-            for i in xrange(self.molecular_system.nAtoms):
-                self.mlab.points3d(self.molecular_system.atoms_R[i,0], self.molecular_system.atoms_R[i,1], self.molecular_system.atoms_R[i,2], 
-                    scale_factor=self.molecular_system.Atoms_Scale[letters(self.molecular_system.atoms_Name[i])] * Atom_Scaling  , resolution=20, 
-                    color=self.molecular_system.Atoms_Color[letters(self.molecular_system.atoms_Name[i])], scale_mode='none')
+        # if Plot_Atoms:
+        #     for i in xrange(self.molecular_system.nAtoms):
+        #         self.mlab.points3d(self.molecular_system.atoms_R[i,0], self.molecular_system.atoms_R[i,1], self.molecular_system.atoms_R[i,2], 
+        #             scale_factor=self.molecular_system.Atoms_Scale[letters(self.molecular_system.atoms_Name[i])] * Atom_Scaling  , resolution=20, 
+        #             color=self.molecular_system.Atoms_Color[letters(self.molecular_system.atoms_Name[i])], scale_mode='none')
             
-        if Atom_Names:
-            for i in xrange(self.molecular_system.nAtoms):
-                self.mlab.text3d(self.molecular_system.atoms_R[i,0], self.molecular_system.atoms_R[i,1], self.molecular_system.atoms_R[i,2], 
-                            self.molecular_system.atoms_Name[i],scale=(.2, .2, .2))
+        # if Atom_Names:
+        #     for i in xrange(self.molecular_system.nAtoms):
+        #         self.mlab.text3d(self.molecular_system.atoms_R[i,0], self.molecular_system.atoms_R[i,1], self.molecular_system.atoms_R[i,2], 
+        #                     self.molecular_system.atoms_Name[i],scale=(.2, .2, .2))
         
-        if Plot_Bonds:        
-            for i in xrange(len(self.molecular_system.bonds)):
-                self.mlab.plot3d(
-                    self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 0] , 
-                                   self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 0]]),
-                    self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 1] , 
-                                   self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 1]]), 
-                    self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 2] , 
-                                   self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 2]]),
-                    tube_radius=0.2 * Bond_Scaling , color=(233.0/255, 165.0/255, 165.0/255))
+        # if Plot_Bonds:        
+        #     for i in xrange(len(self.molecular_system.bonds)):
+        #         self.mlab.plot3d(
+        #             self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 0] , 
+        #                            self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 0]]),
+        #             self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 1] , 
+        #                            self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 1]]), 
+        #             self.np.array([self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][0]), 2] , 
+        #                            self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(self.molecular_system.bonds[i][1]), 2]]),
+        #             tube_radius=0.2 * Bond_Scaling , color=(233.0/255, 165.0/255, 165.0/255))
         
-        X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
+        # X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-        self.mlab.contour3d(X, Y, Z, self.np.log(self.D_AB), contours = contours, opacity=0.5, vmax = 4.8312953302547844e-05) 
+        # self.mlab.contour3d(X, Y, Z, self.np.log(self.D_AB), contours = contours, opacity=0.5, vmax = 4.8312953302547844e-05) 
     
-        self.mlab.show()
+        # self.mlab.show()
     
 
     
@@ -438,4 +438,4 @@ class DispersionPlot(visualization.visualization.Visualization):
 
     def print_something(self):
 
-        pritnt("orint something")
+        print("orint something")

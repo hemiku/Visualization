@@ -1,9 +1,12 @@
 
 from visualization.inputs import Input
 
-
 class MolproInput(Input):
+    """
 
+        Input from molpro
+
+    """
     input_name = 'Molpro'
 
     output = None
@@ -218,7 +221,61 @@ class MolproInput(Input):
 
         return None
 
+    def _read_basis_to_list(self, basis_data:str ):
+
+        _basis:list = []
+
+        _atom_basis:list = []
+        _atom_number: int = 0   
+
+        _orbital_type_basis:list = []
+        _orbitals_type:int = 0
+
+        _orbital_basis:list = []
+
+        _orbitals_coefficient_count:int = 0        
+        _orbitals_exponent_count:int = 0
+
+
+        _header_length:int = 4
+
+        for i, basis_line in enumerate ( basis_data ):
+            
+            begining = basis_line[:21].split()
+            data = basis_line[21:].split()
+            
+            if len(begining) ==_header_length:
+
+                if _atom_number != int( begining[2] ):
+
+                    _orbitals_coefficient_count = 0
+                    _orbitals_exponent_count = 0
+
+                    _atom_basis = []
+                    _basis.append(_atom_basis)
+                    _atom_number = int( begining[2] )
+
+                if _orbitals_type != int( begining[3][0]  ):
+                    
+                    _orbital_type_basis = []
+                    _atom_basis.append( _orbital_type_basis )             
+                    _orbitals_type = int( begining[3][0] )
+
+                _orbital_basis = []
+                _orbital_type_basis.append( _orbital_basis )
+
+            if begining:
+                _orbitals_coefficient_count += 1
+
+            _orbitals_exponent_count += 1
+
+            _orbital_basis.append(data)
+
+        return _basis
+
+
     def get_Basis(self):
+        """ get basis for the molpro input """
 
         _output = self.get_output()
 
@@ -228,7 +285,94 @@ class MolproInput(Input):
 
         _basis_data = _output[_output.find( beginning_basis_data ):_output.find( ending_basis_data )].split( empty_line )[2].splitlines()
 
+        _basis:list = []
 
 
+        _basis_read = self._read_basis_to_list( basis_data = _basis_data )   # type: ignore
+
+        _orbitals_count:int = 0        
+        _processed_orbitals:int = 0
+
+        _orbital_exponent_set: type( set())    # type: ignore
+
+        for _atom_basis in _basis_read:
+
+            _atom_basis_process = []
+            _basis.append(_atom_basis_process)
+
+            
+            for i, _orbital_type_basis in enumerate( _atom_basis ):
+                
+                _orbital_exponent_set = set([])
+                _orbitals_count = 0 
+
+                for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
+                    
+                    for j, _orbital_entry in enumerate(_orbital_group):
+
+                        if not j:
+                            _orbitals_count += len(_orbital_entry) -1
+                    
+                        _orbital_exponent_set = _orbital_exponent_set.union( [ float( _orbital_entry[0] )] ) 
+
+                _orbital_type_basis_array = self.np.zeros( [len(_orbital_exponent_set) , _orbitals_count+1 ] ,dtype=self.np.float32)
+                _atom_basis_process.append(_orbital_type_basis_array)
+
+                _orbital_type_basis_array[:,0] = self.np.sort(self.np.array( list( _orbital_exponent_set ) ))[::-1]  
+
+                _processed_orbitals = 0 
+                for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
+                    
+                    for j, _orbital_entry in enumerate(_orbital_group):
+
+                        _exponent_mask =_orbital_type_basis_array[:,0] == float( _orbital_entry[0] )
+                        _numer_of_coefficents = len(_orbital_entry) - 1
+                        _exponent_line = self.np.array( [ float( coefficient ) for coefficient in _orbital_entry[1:] ]  ,dtype=self.np.float32)
+
+                        _orbital_type_basis_array[_exponent_mask, _processed_orbitals + 1:(_processed_orbitals + _numer_of_coefficents + 1) ] = _exponent_line
+
+                        if j == len(_orbital_group)-1:
+                            _processed_orbitals += _numer_of_coefficents
+
+
+        basis_norm =  self.calc_norm_from_basis( basis = _basis)
+        basis_norm2 = basis_norm
+
+        self.basis = _basis
+        self.basis_norm = basis_norm
+        self.basis_norm2 = basis_norm2
 
         return self.basis, self.basis_norm, self.basis_norm2
+
+class MolproSaptInput(MolproInput):
+    """
+
+        Input from molpro
+
+    """
+    input_name = 'Molpro'
+    monomer:int = 0
+
+
+    def __init__(self, *args, **kwargs):
+        super(MolproSaptInput, self).__init__(*args, **kwargs)
+
+        if 'monomer' in kwargs:
+            self.monomer = kwargs['monomer']
+
+
+    def get_output(self):
+
+        if self.output is not None:
+
+            return self.output
+
+        else:
+            with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
+                _output = f.read()
+
+            geometry_block_begining_sentence = 'Geometry written to block  1 of record 700' 
+
+            self.output = _output.split(geometry_block_begining_sentence)[ 1+ self.monomer ]
+
+            return self.output
