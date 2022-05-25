@@ -28,7 +28,7 @@ class MolproSaptInput(MolproInput):
             with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
                 _output = f.read()
 
-            geometry_block_begining_sentence = 'Geometry written to block  1 of record 700' 
+            geometry_block_begining_sentence = '1PROGRAM * SEWARD (Integral evaluation for generally contracted gaussian basis sets)     Author: Roland Lindh, 1990' 
 
             self.output = _output.split(geometry_block_begining_sentence)[ 1+ self.monomer ]
 
