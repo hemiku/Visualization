@@ -4,7 +4,7 @@ class Molecular_System:
     import numpy as np
 
     spherical = None
-    nb = None
+    nb:int 
     nAtoms = None
     inactive = None
     electrons = None

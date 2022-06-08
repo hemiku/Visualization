@@ -238,6 +238,17 @@ class Visualization():
         # self.orbital_generator.calc_MOs_gpu( )
         self.molecular_system.MOs = self.orbital_generator.MOs
 
+
+
+    def generate_MO_orbitals_gpu_fast(self, MOs_limit = None):
+
+        if MOs_limit is None:
+            self.orbital_generator.calc_MOs_gpu_fast( )            
+        else:
+            self.orbital_generator.calc_MOs_gpu_fast( MOs_limit = MOs_limit )
+
+        self.molecular_system.MOs = self.orbital_generator.MOs
+
     def generate_MO_orbitals_gpu_low_memory(self, MOs_limit = None):
 
         self.orbital_generator.calc_MOs_gpu_low_memory( )

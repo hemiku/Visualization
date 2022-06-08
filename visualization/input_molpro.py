@@ -22,7 +22,7 @@ class MolproInput(Input):
             with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
                 _output = f.read()
 
-            geometry_block_begining_sentence = 'Geometry written to block  1 of record 700' 
+            geometry_block_begining_sentence = '1PROGRAM * SEWARD (Integral evaluation for generally contracted gaussian basis sets)     Author: Roland Lindh, 1990' 
 
             self.output = _output.split(geometry_block_begining_sentence)[1]
 
@@ -149,44 +149,28 @@ class MolproInput(Input):
 
         _output = self.get_output()
 
+
+        program_split_str = "1PROGRAM *"
+
+        _output_last_program = _output.split(program_split_str)[-1]
+
+        # output_programs[-1]
+
         beginning_orbital_data = 'Orb     Occ        Energy       Coefficients'
-        ending_orbital_data = 'orbital dump at molpro section'
+        ending_orbital_data = '*****************************************************************************************'
         empty_line = '\n\n'
 
-        _orbital_data = _output[_output.find( beginning_orbital_data ):_output.find( ending_orbital_data )].split( empty_line )[2:-1]
+        _orbital_data = _output_last_program[   _output_last_program.find( beginning_orbital_data   ):
+                                                _output_last_program.find( ending_orbital_data      )].split( empty_line )[2:-3]
+
 
         for i , orbital in enumerate(_orbital_data):
             orbital_splti = orbital.split()
-            #number = orbital_splti[0]
             Occ = orbital_splti[1]
-            #energy = orbital_splti[2]
             coeff = orbital_splti[3:]
-            #print(coeff)
             coeff_line = self.np.fromstring(' '.join(coeff), dtype=self.np.float64, sep=' ')
             self.Coeff[i,:] = coeff_line
 
-        #F_MOPUN = None
-
-        #if self.Coeff is not None:
-        #    return self.Coeff
-
-        #if self.input_type == 'MOPUN':
-        #    with open("DALTON.MOPUN", 'r') as f:
-        #        F_MOPUN = f.read()
-
-        #if self.input_type == 'tar':
-        #    tar = self.tarfile.open(self.input_name + ".tar.gz")
-        #    f = tar.extractfile(tar.getmember("DALTON.MOPUN"))
-        #    F_MOPUN = f.read().decode(encoding='utf-8')
-        #    tar.close()
-
-        #F_MOPUN = F_MOPUN.replace('-', ' -')
-
-        #a = " ".join( F_MOPUN[F_MOPUN.find("\n"):].split() )
-        #b = self.np.fromstring( a, dtype=self.np.float64, sep=' ')
-
-        #self.Coeff = self.np.reshape(self.np.fromstring(" ".join(F_MOPUN[F_MOPUN.find("\n"):].split()),
-        #                                                dtype=self.np.float64, sep=' '), [self.nb, self.nb])
 
         return self.Coeff
 

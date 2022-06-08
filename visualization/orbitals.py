@@ -137,6 +137,45 @@ class OrbitalsGenerator( ):
 
         print( f"Generate MOs total:", time.time() - t_start_total )
 
+    def calc_MOs_gpu_fast(self, start = None, stop = None, MOs_limit = None ):
+
+        import time
+        import cupy as cp
+
+        t_start_total = time.time()
+
+        if MOs_limit is None:
+            _MOs_limit = self.nb
+        else:
+            _MOs_limit = MOs_limit
+
+        self.MOs = self.np.zeros( [self.nb, self.grid.x_n, self.grid.y_n, self.grid.z_n], dtype=self.np.float64)
+
+        AO_gpu = cp.array( self.AOs )
+        MOs_gpu = cp.empty( [self.nb, self.grid.x_n, self.grid.y_n, self.grid.z_n], dtype=cp.float64 )
+
+        for i in range(_MOs_limit):
+            t_start = time.time()
+
+            MO_gpu = 0.0
+
+            for j in range(self.nb):
+
+                MOs_gpu[i, :, :, :] += self.coeff[i, j] * AO_gpu[j, :, :, :]
+
+
+
+            print( f"Generate MO orbital { i }:", time.time() - t_start )
+        
+        self.MOs = cp.asnumpy(MOs_gpu)
+
+        AO_gpu = None
+        MOs_gpu = None
+
+        cp._default_memory_pool.free_all_blocks()
+
+        print( f"Generate MOs total:", time.time() - t_start_total )
+
     def calc_MOs_gpu_low_memory(self, start = None, stop = None, MOs_limit = None ):
 
         import time
