@@ -12,6 +12,9 @@ def read_mo_molpro( filename, text, nbasis ):
     temporaly in the utils
 
     """
+
+    import numpy as np
+
     text_binary = text.encode('ascii') 
 
     cmo = np.zeros([nbasis,nbasis], dtype=np.float64)
