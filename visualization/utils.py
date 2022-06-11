@@ -60,3 +60,28 @@ def read_mo_molpro( filename, text, nbasis ):
             break
 
     return cmo
+
+
+def read_SAPTVIS( filename):
+
+
+
+    from scipy.io import FortranFile
+    import numpy as np
+
+
+    f = FortranFile( filename, 'r')
+
+    ANBasis, BNBasis = f.read_ints(np.int32)
+    NOccupA, NOccupB = f.read_ints(np.int32)
+
+    Occ_buff = f.read_reals(np.float64)
+
+    A_Occ = Occ_buff[0:ANBasis]
+    B_Occ = Occ_buff[ANBasis:ANBasis+BNBasis]
+
+    ACMO = np.reshape(f.read_reals(np.float64), [ANBasis,ANBasis] )
+    BCMO = np.reshape(f.read_reals(np.float64), [BNBasis,BNBasis] )
+    Qmat = np.reshape(f.read_reals(np.float64), [NOccupA,NOccupB] ).transpose()
+
+    return ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat
