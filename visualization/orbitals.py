@@ -1,5 +1,5 @@
 
-#from visualisation.grid import Grid
+#from visualization.grid import Grid
 
 
 class AOParameters():
@@ -30,7 +30,7 @@ class OrbitalsGenerator( ):
     atoms_R:np.ndarray
 
     spherical:bool
-    nb = None
+    nb:int = None
     coeff:np.ndarray
     basis:list
     basis_norm: list

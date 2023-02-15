@@ -7,9 +7,9 @@ def strip_input_name( input ):
 def read_mo_molpro( filename, text, nbasis ):
     """
 
-    Python version on GAMMCOR fuction
+    Python version on GAMMCOR function
 
-    temporaly in the utils
+    temporally in the utils
 
     """
 
@@ -72,16 +72,16 @@ def read_SAPTVIS( filename):
 
     f = FortranFile( filename, 'r')
 
-    ANBasis, BNBasis = f.read_ints(np.int32)
-    NOccupA, NOccupB = f.read_ints(np.int32)
+    ANBasis, BNBasis = f.read_ints(np.int32) # type: ignore
+    NOccupA, NOccupB = f.read_ints(np.int32) # type: ignore
 
-    Occ_buff = f.read_reals(np.float64)
+    Occ_buff = f.read_reals(np.float64) # type: ignore
 
     A_Occ = Occ_buff[0:ANBasis]
     B_Occ = Occ_buff[ANBasis:ANBasis+BNBasis]
 
-    ACMO = np.reshape(f.read_reals(np.float64), [ANBasis,ANBasis] )
-    BCMO = np.reshape(f.read_reals(np.float64), [BNBasis,BNBasis] )
-    Qmat = np.reshape(f.read_reals(np.float64), [NOccupA,NOccupB] ).transpose()
+    ACMO = np.reshape(f.read_reals(np.float64), [ANBasis,ANBasis] ) # type: ignore
+    BCMO = np.reshape(f.read_reals(np.float64), [BNBasis,BNBasis] ) # type: ignore
+    Qmat = np.reshape(f.read_reals(np.float64), [NOccupA,NOccupB] )  # type: ignore
 
     return ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat
