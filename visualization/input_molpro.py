@@ -2,361 +2,384 @@
 from visualization.inputs import Input
 
 class MolproInput(Input):
-    """
+	"""
 
-        Input from molpro
+		Input from molpro
 
-    """
-    input_name = 'Molpro'
+	"""
+	input_name = 'Molpro'
 
-    output = None
-    F_BAS = None
+	output = None
+	F_BAS = None
 
-    def get_output(self):
+	def get_output(self):
 
-        if self.output is not None:
+		if self.output is not None:
 
-            return self.output
+			return self.output
 
-        else:
-            with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
-                _output = f.read()
+		else:
+			with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
+				_output = f.read()
 
-            geometry_block_begining_sentence = '1PROGRAM * SEWARD (Integral evaluation for generally contracted gaussian basis sets)     Author: Roland Lindh, 1990' 
+			geometry_block_beginning_sentence = '1PROGRAM * SEWARD (Integral evaluation for generally contracted gaussian basis sets)     Author: Roland Lindh, 1990'
 
-            self.output = _output.split(geometry_block_begining_sentence)[1]
+			self.output = _output.split(geometry_block_beginning_sentence)[1]
 
-            return self.output
+			return self.output
 
 
-    def get_spherical(self):
+	def get_spherical(self):
 
-        _output = self.get_output()
+		_output = self.get_output()
 
-        if (_output.find("Using spherical harmonics") > 0):
-            self.spherical = 1
-        else:
-            self.spherical = 0
+		if (_output.find("Using spherical harmonics") > 0):
+			self.spherical = 1
+		else:
+			self.spherical = 0
 
-        return self.spherical
+		return self.spherical
 
-    def get_nb(self):
+	def get_nb(self):
 
-        if self.nb is not None:
-            return self.nb
+		if self.nb is not None:
+			return self.nb
 
-        _output = self.get_output()
+		_output = self.get_output()
 
-        search_string = 'NUMBER OF CONTRACTIONS:'
-        search_offset = 38
+		search_string = 'NUMBER OF CONTRACTIONS:'
+		search_offset = 38
 
-        self.nb = int(_output[_output.find(search_string):_output.find(search_string) + search_offset].split()[3] )
+		self.nb = int(_output[_output.find(search_string):_output.find(search_string) + search_offset].split()[3] )
 
-        return self.nb
+		return self.nb
 
-    def get_nAtoms(self):
+	def get_nAtoms(self):
 
-        if self.nAtoms is not None:
-            return self.nAtoms
+		if self.nAtoms is not None:
+			return self.nAtoms
 
-        _output = self.get_output()
+		_output = self.get_output()
 
-        nAtoms = 0 
-        _atomic_data = _output[_output.find("ATOMIC COORDINATES"):_output.find("BASIS DATA") + 30].splitlines()
+		nAtoms = 0
+		_atomic_data = _output[_output.find("ATOMIC COORDINATES"):_output.find("BASIS DATA") + 30].splitlines()
 
-        _sepparator = ['']
-        _sepparator_countdown = 3
-        for i, atomic_data_line in enumerate( _atomic_data ): 
+		_separator = ['']
+		_separator_countdown = 3
+		for i, atomic_data_line in enumerate( _atomic_data ):
 
-            if atomic_data_line in _sepparator:
-                _sepparator_countdown -= 1       
-                continue    
-            
-            if not _sepparator_countdown:
-                break
-            elif _sepparator_countdown == 1:
-                nAtoms += 1
+			if atomic_data_line in _separator:
+				_separator_countdown -= 1
+				continue
 
-        self.nAtoms = nAtoms
+			if not _separator_countdown:
+				break
+			elif _separator_countdown == 1:
+				nAtoms += 1
 
+		self.nAtoms = nAtoms
 
-        return self.nAtoms
 
-    def get_inactive(self):
+		return self.nAtoms
 
-        if self.inactive is not None:
-            return self.inactive
+	def get_inactive(self):
 
-        _output = self.get_output()
-        
-        search_string = 'Number of closed-shell orbitals:'
-        search_offset = 38
+		if self.inactive is not None:
+			return self.inactive
 
-        self.inactive = int(_output[_output.find(search_string):_output.find(search_string) + search_offset].split()[2])
+		_output = self.get_output()
 
-        return self.inactive
+		search_string = 'Number of closed-shell orbitals:'
+		search_offset = 38
 
-    def get_electrons(self):
+		self.inactive = int(_output[_output.find(search_string):_output.find(search_string) + search_offset].split()[2])
 
-        if self.electrons is not None:
-            return self.electrons
+		return self.inactive
 
-        _output = self.get_output()
+	def get_electrons(self):
 
-        search_string = 'NUCLEAR CHARGE:'
-        search_offset = 38
+		if self.electrons is not None:
+			return self.electrons
 
-        self.electrons = int(_output[_output.find(search_string):_output.find(search_string) + search_offset].split()[2])
+		_output = self.get_output()
 
-        return self.electrons
+		search_string = 'NUCLEAR CHARGE:'
+		search_offset = 38
 
-    def get_Occ(self):
+		self.electrons = int(_output[_output.find(search_string):_output.find(search_string) + search_offset].split()[2])
 
-        if self.Occ is not None:
-            return self.Occ
+		return self.electrons
 
-        self.Occ = self.np.zeros([self.nb], dtype=self.np.float64)
+	def get_Occ(self):
 
-        _output = self.get_output()
+		if self.Occ is not None:
+			return self.Occ
 
-        beginning_orbital_part = 'Orb     Occ        Energy       Coefficients'
-        ending_orbital_part = 'orbital dump at molpro section'
-        empty_line = '\n\n'
+		self.Occ = self.np.zeros([self.nb], dtype=self.np.float64)
 
-        orbital_buf = _output[_output.find( beginning_orbital_part ):_output.find( ending_orbital_part )].split( empty_line )[2:-1]
+		_output = self.get_output()
 
-        for i , orbital in enumerate(orbital_buf):
-            orbital_splti = orbital.split()
-            #number = orbital_splti[0]
-            Occ = orbital_splti[1]
-            #energy = orbital_splti[2]
-            #coeff = orbital_splti[2:]
-            #print(coeff)
+		beginning_orbital_part = 'Orb     Occ        Energy       Coefficients'
+		ending_orbital_part = 'orbital dump at molpro section'
+		empty_line = '\n\n'
 
-            self.Occ[i] = 0.5 *float(  Occ ) 
+		orbital_buf = _output[_output.find( beginning_orbital_part ):_output.find( ending_orbital_part )].split( empty_line )[2:-1]
 
-        #for i in range(self.electrons):
-        #    self.Occ[self.inactive + i] = float(Geminal_buf[i].split()[6])
+		for i , orbital in enumerate(orbital_buf):
+			orbital_split = orbital.split()
+			#number = orbital_split[0]
+			Occ = orbital_split[1]
+			#energy = orbital_split[2]
+			#coeff = orbital_split[2:]
+			#print(coeff)
 
-        #self.Occ[:self.inactive] = 1
+			self.Occ[i] = 0.5 *float(  Occ )
 
-        return self.Occ
+		#for i in range(self.electrons):
+		#    self.Occ[self.inactive + i] = float(Geminal_buf[i].split()[6])
 
+		#self.Occ[:self.inactive] = 1
 
-    def get_Coeff(self):
+		return self.Occ
 
-        self.Coeff = self.np.zeros([self.nb, self.nb], dtype=self.np.float64)
 
-        _output = self.get_output()
+	def get_Coeff(self):
 
+		self.Coeff = self.np.zeros([self.nb, self.nb], dtype=self.np.float64)
 
-        program_split_str = "1PROGRAM *"
+		_output = self.get_output()
 
-        _output_last_program = _output.split(program_split_str)[-1]
 
-        # output_programs[-1]
+		program_split_str = "1PROGRAM *"
 
-        beginning_orbital_data = 'Orb     Occ        Energy       Coefficients'
-        ending_orbital_data = '*****************************************************************************************'
-        empty_line = '\n\n'
+		_output_last_program = _output.split(program_split_str)[-1]
 
-        _orbital_data = _output_last_program[   _output_last_program.find( beginning_orbital_data   ):
-                                                _output_last_program.find( ending_orbital_data      )].split( empty_line )[2:-3]
+		# output_programs[-1]
 
+		beginning_orbital_data = 'Orb     Occ        Energy       Coefficients'
+		ending_orbital_data = '*****************************************************************************************'
+		empty_line = '\n\n'
 
-        for i , orbital in enumerate(_orbital_data):
-            orbital_splti = orbital.split()
-            Occ = orbital_splti[1]
-            coeff = orbital_splti[3:]
-            coeff_line = self.np.fromstring(' '.join(coeff), dtype=self.np.float64, sep=' ')
-            self.Coeff[i,:] = coeff_line
+		_orbital_data = _output_last_program[   _output_last_program.find( beginning_orbital_data   ):
+												_output_last_program.find( ending_orbital_data      )].split( empty_line )[2:-3]
 
 
-        return self.Coeff
+		for i , orbital in enumerate(_orbital_data):
+			orbital_split = orbital.split()
+			Occ = orbital_split[1]
+			coeff = orbital_split[3:]
+			coeff_line = self.np.fromstring(' '.join(coeff), dtype=self.np.float64, sep=' ')
+			self.Coeff[i,:] = coeff_line
 
 
-    def get_Atoms(self):
+		return self.Coeff
 
-        if self.Atoms_R is not None and self.Atoms_Charge is not None and self.Atoms_Name is not None:
-            return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
-        self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
-        self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
-        self.Atoms_Name = []
+	def get_Atoms(self):
 
-        _output = self.get_output()
+		if self.Atoms_R is not None and self.Atoms_Charge is not None and self.Atoms_Name is not None:
+			return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
-        beginning_atomic_data = ' ATOMIC COORDINATES'
-        ending_atomic_data = ' BASIS DATA'
-        empty_line = '\n\n'
+		self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
+		self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
+		self.Atoms_Name = []
 
-        _atomic_data = _output[_output.find( beginning_atomic_data ):_output.find( ending_atomic_data )].split( empty_line )[2].splitlines()
+		_output = self.get_output()
 
-        for i , atom in enumerate( _atomic_data):
-            atom_splti = atom.split()
-            self.Atoms_Name.append( atom_splti[1] )
-            self.Atoms_Charge[i] = self.Atoms_Charge[i] = int( float(atom_splti[2]) )
-            self.Atoms_R[i,:] = self.np.fromstring(' '.join(atom_splti[3:]), dtype=self.np.float64, sep=' ')
+		beginning_atomic_data = ' ATOMIC COORDINATES'
+		ending_atomic_data = ' BASIS DATA'
+		empty_line = '\n\n'
 
-        return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
+		_atomic_data = _output[_output.find( beginning_atomic_data ):_output.find( ending_atomic_data )].split( empty_line )[2].splitlines()
 
-    
-    def get_Bonds(self):
+		for i , atom in enumerate( _atomic_data):
+			atom_split = atom.split()
+			self.Atoms_Name.append( atom_split[1] )
+			self.Atoms_Charge[i] = self.Atoms_Charge[i] = int( float(atom_split[2]) )
+			self.Atoms_R[i,:] = self.np.fromstring(' '.join(atom_split[3:]), dtype=self.np.float64, sep=' ')
 
-        return None
+		return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
-    def _read_basis_to_list(self, basis_data:str ):
 
-        _basis:list = []
+	def get_Bonds(self):
 
-        _atom_basis:list = []
-        _atom_number: int = 0   
+		_bonds = []
 
-        _orbital_type_basis:list = []
-        _orbitals_type:int = 0
+		beginning_atomic_data = ' ATOMIC COORDINATES'
+		ending_atomic_data = ' BASIS DATA'
+		empty_line = '\n\n'
 
-        _orbital_basis:list = []
+		bond_length_start = 'Bond lengths'
+		bond_angles_start = 'Bond angles'
 
-        _orbitals_coefficient_count:int = 0        
-        _orbitals_exponent_count:int = 0
+		_output = self.get_output()
 
+		_atomic_data = _output[_output.find( beginning_atomic_data ):_output.find( ending_atomic_data )]
+		_bond_length_data_lines = _atomic_data[ _atomic_data.find( bond_length_start):_atomic_data.find( bond_angles_start) ].split(empty_line)[1:-1]
 
-        _header_length:int = 4
+		for bonds_twoline in _bond_length_data_lines:
+			_bonds_line = bonds_twoline.splitlines()[0].replace('-', ' ' ).split( )
 
-        for i, basis_line in enumerate ( basis_data ):
-            
-            begining = basis_line[:21].split()
-            data = basis_line[21:].split()
-            
-            if len(begining) ==_header_length:
+			for i in range( int( len(_bonds_line)/3 ) ):
+				_bond = [ int(_bonds_line[0 + i*3])-1, int(_bonds_line[1 + i*3])-1, float(_bonds_line[2 + i*3 ]) ]
+				_bonds.append(_bond)
 
-                if _atom_number != int( begining[2] ):
+		self.Bonds = _bonds
 
-                    _orbitals_coefficient_count = 0
-                    _orbitals_exponent_count = 0
+		return self.Bonds
 
-                    _atom_basis = []
-                    _basis.append(_atom_basis)
-                    _atom_number = int( begining[2] )
+	def _read_basis_to_list(self, basis_data:str ):
 
-                if _orbitals_type != int( begining[3][0]  ):
-                    
-                    _orbital_type_basis = []
-                    _atom_basis.append( _orbital_type_basis )             
-                    _orbitals_type = int( begining[3][0] )
+		_basis:list = []
 
-                _orbital_basis = []
-                _orbital_type_basis.append( _orbital_basis )
+		_atom_basis:list = []
+		_atom_number: int = 0
 
-            if begining:
-                _orbitals_coefficient_count += 1
+		_orbital_type_basis:list = []
+		_orbitals_type:int = 0
 
-            _orbitals_exponent_count += 1
+		_orbital_basis:list = []
 
-            _orbital_basis.append(data)
+		_orbitals_coefficient_count:int = 0
+		_orbitals_exponent_count:int = 0
 
-        return _basis
 
+		_header_length:int = 4
 
-    def get_Basis(self):
-        """ get basis for the molpro input """
+		for i, basis_line in enumerate ( basis_data ):
 
-        _output = self.get_output()
+			beginning = basis_line[:21].split()
+			data = basis_line[21:].split()
 
-        beginning_basis_data = ' BASIS DATA'
-        ending_basis_data = ' NUCLEAR CHARGE:'
-        empty_line = '\n\n'
+			if len(beginning) ==_header_length:
 
-        _basis_data = _output[_output.find( beginning_basis_data ):_output.find( ending_basis_data )].split( empty_line )[2].splitlines()
+				if _atom_number != int( beginning[2] ):
 
-        _basis:list = []
+					_orbitals_coefficient_count = 0
+					_orbitals_exponent_count = 0
 
+					_atom_basis = []
+					_basis.append(_atom_basis)
+					_atom_number = int( beginning[2] )
 
-        _basis_read = self._read_basis_to_list( basis_data = _basis_data )   # type: ignore
+				if _orbitals_type != int( beginning[3][0]  ):
 
-        _orbitals_count:int = 0        
-        _processed_orbitals:int = 0
+					_orbital_type_basis = []
+					_atom_basis.append( _orbital_type_basis )
+					_orbitals_type = int( beginning[3][0] )
 
-        _orbital_exponent_set: type( set())    # type: ignore
+				_orbital_basis = []
+				_orbital_type_basis.append( _orbital_basis )
 
-        for _atom_basis in _basis_read:
+			if beginning:
+				_orbitals_coefficient_count += 1
 
-            _atom_basis_process = []
-            _basis.append(_atom_basis_process)
+			_orbitals_exponent_count += 1
 
-            
-            for i, _orbital_type_basis in enumerate( _atom_basis ):
-                
-                _orbital_exponent_set = set([])
-                _orbitals_count = 0 
+			_orbital_basis.append(data)
 
-                for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
-                    
-                    for j, _orbital_entry in enumerate(_orbital_group):
+		return _basis
 
-                        if not j:
-                            _orbitals_count += len(_orbital_entry) -1
-                    
-                        _orbital_exponent_set = _orbital_exponent_set.union( [ float( _orbital_entry[0] )] ) 
 
-                _orbital_type_basis_array = self.np.zeros( [len(_orbital_exponent_set) , _orbitals_count+1 ] ,dtype=self.np.float32)
-                _atom_basis_process.append(_orbital_type_basis_array)
+	def get_Basis(self):
+		""" get basis for the molpro input """
 
-                _orbital_type_basis_array[:,0] = self.np.sort(self.np.array( list( _orbital_exponent_set ) ))[::-1]  
+		_output = self.get_output()
 
-                _processed_orbitals = 0 
-                for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
-                    
-                    for j, _orbital_entry in enumerate(_orbital_group):
+		beginning_basis_data = ' BASIS DATA'
+		ending_basis_data = ' NUCLEAR CHARGE:'
+		empty_line = '\n\n'
 
-                        _exponent_mask =_orbital_type_basis_array[:,0] == float( _orbital_entry[0] )
-                        _numer_of_coefficents = len(_orbital_entry) - 1
-                        _exponent_line = self.np.array( [ float( coefficient ) for coefficient in _orbital_entry[1:] ]  ,dtype=self.np.float32)
+		_basis_data = _output[_output.find( beginning_basis_data ):_output.find( ending_basis_data )].split( empty_line )[2].splitlines()
 
-                        _orbital_type_basis_array[_exponent_mask, _processed_orbitals + 1:(_processed_orbitals + _numer_of_coefficents + 1) ] = _exponent_line
+		_basis:list = []
 
-                        if j == len(_orbital_group)-1:
-                            _processed_orbitals += _numer_of_coefficents
 
+		_basis_read = self._read_basis_to_list( basis_data = _basis_data )   # type: ignore
 
-        basis_norm =  self.calc_norm_from_basis( basis = _basis)
-        basis_norm2 = basis_norm
+		_orbitals_count:int = 0
+		_processed_orbitals:int = 0
 
-        self.basis = _basis
-        self.basis_norm = basis_norm
-        self.basis_norm2 = basis_norm2
+		_orbital_exponent_set: type( set())    # type: ignore
 
-        return self.basis, self.basis_norm, self.basis_norm2
+		for _atom_basis in _basis_read:
+
+			_atom_basis_process = []
+			_basis.append(_atom_basis_process)
+
+
+			for i, _orbital_type_basis in enumerate( _atom_basis ):
+
+				_orbital_exponent_set = set([])
+				_orbitals_count = 0
+
+				for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
+
+					for j, _orbital_entry in enumerate(_orbital_group):
+
+						if not j:
+							_orbitals_count += len(_orbital_entry) -1
+
+						_orbital_exponent_set = _orbital_exponent_set.union( [ float( _orbital_entry[0] )] )
+
+				_orbital_type_basis_array = self.np.zeros( [len(_orbital_exponent_set) , _orbitals_count+1 ] ,dtype=self.np.float32)
+				_atom_basis_process.append(_orbital_type_basis_array)
+
+				_orbital_type_basis_array[:,0] = self.np.sort(self.np.array( list( _orbital_exponent_set ) ))[::-1]
+
+				_processed_orbitals = 0
+				for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
+
+					for j, _orbital_entry in enumerate(_orbital_group):
+
+						_exponent_mask =_orbital_type_basis_array[:,0] == float( _orbital_entry[0] )
+						_number_of_coefficients = len(_orbital_entry) - 1
+						_exponent_line = self.np.array( [ float( coefficient ) for coefficient in _orbital_entry[1:] ]  ,dtype=self.np.float32)
+
+						_orbital_type_basis_array[_exponent_mask, _processed_orbitals + 1:(_processed_orbitals + _number_of_coefficients + 1) ] = _exponent_line
+
+						if j == len(_orbital_group)-1:
+							_processed_orbitals += _number_of_coefficients
+
+
+		basis_norm =  self.calc_norm_from_basis( basis = _basis)
+		basis_norm2 = basis_norm
+
+		self.basis = _basis
+		self.basis_norm = basis_norm
+		self.basis_norm2 = basis_norm2
+
+		return self.basis, self.basis_norm, self.basis_norm2
 
 class MolproSaptInput(MolproInput):
-    """
+	"""
 
-        Input from molpro
+		Input from molpro
 
-    """
-    input_name = 'Molpro'
-    monomer:int = 0
-
-
-    def __init__(self, *args, **kwargs):
-        super(MolproSaptInput, self).__init__(*args, **kwargs)
-
-        if 'monomer' in kwargs:
-            self.monomer = kwargs['monomer']
+	"""
+	input_name = 'Molpro'
+	monomer:int = 0
 
 
-    def get_output(self):
+	def __init__(self, *args, **kwargs):
+		super(MolproSaptInput, self).__init__(*args, **kwargs)
 
-        if self.output is not None:
+		if 'monomer' in kwargs:
+			self.monomer = kwargs['monomer']
 
-            return self.output
 
-        else:
-            with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
-                _output = f.read()
+	def get_output(self):
 
-            geometry_block_begining_sentence = 'Geometry written to block  1 of record 700' 
+		if self.output is not None:
 
-            self.output = _output.split(geometry_block_begining_sentence)[ 1+ self.monomer ]
+			return self.output
 
-            return self.output
+		else:
+			with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
+				_output = f.read()
+
+			geometry_block_beginning_sentence = 'Geometry written to block  1 of record 700'
+
+			self.output = _output.split(geometry_block_beginning_sentence)[ 1+ self.monomer ]
+
+			return self.output

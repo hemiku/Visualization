@@ -27,5 +27,11 @@
     ],
     "python.pythonPath": "/home/hemik/anaconda3/envs/Visualization/bin/python",
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.linting.ignorePatterns": [
+        ".vscode/*.py",
+        "**{filename or pattern}**",
+        "**/site-packages/**/*.py"
+    ]
+
 }

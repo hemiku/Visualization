@@ -24,19 +24,19 @@ class OrbitalsGenerator_gpu( ):
     import numpy as np
     import visualization.grid
 
-    grid = None
+    grid:visualization.grid.Grid = None
 
     nAtoms: int = None
-    atoms_R = None
+    atoms_R:np.ndarray = None
 
     spherical = None
-    nb = None
-    coeff = None
-    basis = None
-    basis_norm = None
+    nb:int = None
+    coeff:np.ndarray = None
+    basis:list = None
+    basis_norm:list = None
 
-    AOs = None
-    MOs = None
+    AOs:np.ndarray = None
+    MOs:np.ndarray = None
 
 
     def __init__(self, nAtoms = None, atoms_R = None, spherical=None, nb = None, coeff = None, basis = None, basis_norm = None, grid = None ):
@@ -92,7 +92,7 @@ class OrbitalsGenerator_gpu( ):
 
     def calc_AOs(self, AO, grid=None):
 
-        from scipy.special import sph_harm  
+        # from scipy.special import sph_harm  
         import cupy as cp      
 
         if grid is None:
