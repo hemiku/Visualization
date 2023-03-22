@@ -3,9 +3,9 @@
 
 
 class AOParameters():
-	
+
 	import numpy as np
-	
+
 	universal_norm = ( 2 / np.pi)**(3/4)
 	sqrt3 = np.sqrt(3.0)
 	sqrt3p4 = np.sqrt(3.0 / 4.0)
@@ -22,7 +22,7 @@ class AOParameters():
 class OrbitalsGenerator( ):
 
 	import numpy as np
-	import visualization.grid 
+	import visualization.grid
 
 	grid:visualization.grid.Grid
 
@@ -35,13 +35,13 @@ class OrbitalsGenerator( ):
 	basis:list
 	basis_norm: list
 
-	AOs:np.ndarray 
-	MOs:np.ndarray 
+	AOs:np.ndarray
+	MOs:np.ndarray
 
 	def __init__(self, nAtoms = None, atoms_R = None, spherical=None, nb = None, coeff = None, basis = None, basis_norm = None, grid = None ):
 
 		self.nAtoms = nAtoms
-		self.atoms_R = atoms_R    
+		self.atoms_R = atoms_R
 
 		self.spherical=spherical
 		self.nb = nb
@@ -50,7 +50,7 @@ class OrbitalsGenerator( ):
 		self.basis_norm = basis_norm
 
 		if grid is None:
-	
+
 			self.grid = self.visualization.grid.Grid()
 
 		else:
@@ -97,7 +97,7 @@ class OrbitalsGenerator( ):
 
 			for j in range(self.nb):
 				self.MOs[i, :, :, :] += self.coeff[i, j] * self.AOs[j, :, :, :]
-				
+
 			print( f"Generate MO orbital { i }:", time.time() - t_start )
 		print( f"Generate MOs total:", time.time() - t_start_total )
 
@@ -166,7 +166,7 @@ class OrbitalsGenerator( ):
 
 
 			print( f"Generate MO orbital { i }:", time.time() - t_start )
-		
+
 		self.MOs = cp.asnumpy(MOs_gpu)
 
 		AO_gpu = None
@@ -217,8 +217,8 @@ class OrbitalsGenerator( ):
 
 	def calc_AOs(self, AO, grid=None):
 
-		import time 
-		#from scipy.special import sph_harm        
+		import time
+		#from scipy.special import sph_harm
 
 		if grid is None:
 			grid = self.grid
@@ -259,7 +259,7 @@ class OrbitalsGenerator( ):
 			theta = self.np.arctan(y / x)
 			phi = self.np.arccos(z / r)
 			print( "Generate RR, r, theta, phi:", time.time() - t_start )
-			
+
 			t_start_atom = time.time()
 			for j in range(len(self.basis[n])):
 
@@ -267,17 +267,17 @@ class OrbitalsGenerator( ):
 
 					t_start_orbitals = time.time()
 					for k in range(self.np.shape(self.basis[n][j])[1] - 1):
-						
+
 						t_start = time.time()
 						for l in range(self.np.shape(self.basis[n][j])[0]):
-							
+
 							alpha = (self.basis[n][j])[l, 0]
 							coefficient = (self.basis[n][j])[l, k + 1]
-							
+
 							norm = 2**(3/4)*alpha**(3/4)/self.np.pi**(3/4)
 
 							AO[nOrb, :, :, :] +=   norm * coefficient * self.np.exp( -alpha * RR )
-							
+
 						#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 						#print( f"Generate S orbital { nOrb}:", time.time() - t_start )
 						nOrb += 1
@@ -289,9 +289,9 @@ class OrbitalsGenerator( ):
 						for m in ['x', 'y', 'z']:
 							t_start = time.time()
 							if (m == 'x'):
-								
+
 								for l in range(self.np.shape(self.basis[n][j])[0]):
-									
+
 									alpha = (self.basis[n][j])[l, 0]
 									coefficient = (self.basis[n][j])[l, k + 1]
 
@@ -302,34 +302,34 @@ class OrbitalsGenerator( ):
 								#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 
 							if (m == 'y'):
-								
+
 								for l in range(self.np.shape(self.basis[n][j])[0]):
 
 									alpha = (self.basis[n][j])[l, 0]
 									coefficient = (self.basis[n][j])[l, k + 1]
 
 									norm = 2*2**(3/4)*alpha**(5/4)/self.np.pi**(3/4)
-									
-									AO[nOrb, :, :, :] += norm * coefficient  * self.np.exp( -alpha * RR) * (y) 
+
+									AO[nOrb, :, :, :] += norm * coefficient  * self.np.exp( -alpha * RR) * (y)
 								#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / (self.basis_norm[n][j])[k]
 
 
 							if (m == 'z'):
-								
+
 								for l in range(self.np.shape(self.basis[n][j])[0]):
 									alpha = (self.basis[n][j])[l, 0]
 									coefficient = (self.basis[n][j])[l, k + 1]
 									norm = 2*2**(3/4)*alpha**(5/4)/self.np.pi**(3/4)
-									#norm = 1 
+									#norm = 1
 									AO[nOrb, :, :, :] += norm * coefficient * self.np.exp( -alpha * RR) * (z)
 								#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :]
 
-							#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]   
+							#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 							nOrb += 1
 							#print( f"Generate P orbital { nOrb}:", time.time() - t_start )
 					print( f"Generate P orbitals:", time.time() - t_start_orbitals )
 				if (j == 2):
-					
+
 					if (self.spherical == 1):
 						t_start_orbitals = time.time()
 						if (len(self.np.shape(self.basis[n][j])) == 2):
@@ -339,24 +339,24 @@ class OrbitalsGenerator( ):
 									t_start = time.time()
 									if (m == -2):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 1  
+											norm = 1
 
-											AO[nOrb, :, :, :] += norm  * coefficient *  ( x * y ) *self.np.exp(-alpha*RR)   
+											AO[nOrb, :, :, :] += norm  * coefficient *  ( x * y ) *self.np.exp(-alpha*RR)
 
 									if (m == -1):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 1 
+											norm = 1
 
-											AO[nOrb, :, :, :] += norm * coefficient * ( y * z ) *self.np.exp(-alpha * RR )   
-											
+											AO[nOrb, :, :, :] += norm * coefficient * ( y * z ) *self.np.exp(-alpha * RR )
+
 									if (m == 0):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 
@@ -365,28 +365,28 @@ class OrbitalsGenerator( ):
 
 											norm = 1 / self.np.sqrt(12)
 
-											AO[nOrb, :, :, :] += norm * coefficient * (-x**2 - y**2 + 2*z**2)*self.np.exp( -alpha * RR )   
-									
+											AO[nOrb, :, :, :] += norm * coefficient * (-x**2 - y**2 + 2*z**2)*self.np.exp( -alpha * RR )
+
 									if (m == 1):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 1 
+											norm = 1
 
-											AO[nOrb, :, :, :] += norm  * coefficient * ( x * z ) *self.np.exp(-alpha * RR )   
-											
+											AO[nOrb, :, :, :] += norm  * coefficient * ( x * z ) *self.np.exp(-alpha * RR )
+
 									if (m == 2):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 0.5 
-											
-											AO[nOrb, :, :, :] += norm * coefficient * (x**2 - y**2) *self.np.exp( -alpha * RR )   
-									
+											norm = 0.5
+
+											AO[nOrb, :, :, :] += norm * coefficient * (x**2 - y**2) *self.np.exp( -alpha * RR )
+
 									AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 									nOrb += 1
 									#print( f"Generate D orbital { nOrb}:", time.time() - t_start )
@@ -400,14 +400,14 @@ class OrbitalsGenerator( ):
 									if (m == 'xx'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (x ** 2)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
 									if (m == 'yy'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (y ** 2)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
@@ -421,23 +421,23 @@ class OrbitalsGenerator( ):
 									if (m == 'xy'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (x * y * AOParameters.sqrt3)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
 									if (m == 'xz'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -( self.basis[n][j])[l, 0] * RR) * (x * z * AOParameters.sqrt3)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
 									if (m == 'yz'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * self.np.exp( -(self.basis[n][j])[l, 0] * RR) * (y * z * AOParameters.sqrt3)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-										nOrb += 1 
+										nOrb += 1
 
 				if (j == 3):
 					if (self.spherical == 1):
@@ -577,8 +577,8 @@ class OrbitalsGenerator( ):
 
 	def calc_AOs_gpu(self, AO, grid=None):
 
-		import time 
-		import cupy as cp       
+		import time
+		import cupy as cp
 
 		if grid is None:
 			grid = self.grid
@@ -602,7 +602,7 @@ class OrbitalsGenerator( ):
 
 		for n in range( self.nAtoms ):
 
-			
+
 			t_start = time.time()
 
 			x = X - self.atoms_R[n, 0]
@@ -619,7 +619,7 @@ class OrbitalsGenerator( ):
 			r = cp.sqrt(RR)
 
 			print( "Generate RR, r, theta, phi:", time.time() - t_start )
-			
+
 			t_start_atom = time.time()
 			for j in range(len(self.basis[n])):
 
@@ -627,18 +627,18 @@ class OrbitalsGenerator( ):
 
 					t_start_orbitals = time.time()
 					for k in range(self.np.shape(self.basis[n][j])[1] - 1):
-						
+
 						AO_gpu = 0.0
 
 						t_start = time.time()
 						for l in range(self.np.shape(self.basis[n][j])[0]):
-							
+
 							alpha = (self.basis[n][j])[l, 0]
 							coefficient = (self.basis[n][j])[l, k + 1]
 
 							norm = 2**(3/4)*alpha**(3/4)/self.np.pi**(3/4)
 
-							AO_gpu += norm * coefficient * cp.exp( -alpha * RR ) 
+							AO_gpu += norm * coefficient * cp.exp( -alpha * RR )
 
 						AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu )
 						print( f"Generate S orbital { nOrb}:", time.time() - t_start )
@@ -650,13 +650,13 @@ class OrbitalsGenerator( ):
 					for k in range(self.np.shape(self.basis[n][j])[1] - 1):
 						for m in ['x', 'y', 'z']:
 							t_start = time.time()
-							
+
 							AO_gpu = 0.0
-							
+
 							if (m == 'x'):
-								
+
 								for l in range(self.np.shape(self.basis[n][j])[0]):
-									
+
 									alpha = (self.basis[n][j])[l, 0]
 									coefficient = (self.basis[n][j])[l, k + 1]
 
@@ -666,62 +666,62 @@ class OrbitalsGenerator( ):
 
 
 							if (m == 'y'):
-								
+
 								for l in range(self.np.shape(self.basis[n][j])[0]):
 
 									alpha = (self.basis[n][j])[l, 0]
 									coefficient = (self.basis[n][j])[l, k + 1]
 
 									norm = 2*2**(3/4)*alpha**(5/4)/self.np.pi**(3/4)
-									
-									AO_gpu += norm * coefficient * cp.exp( -alpha * RR) * (y) 
+
+									AO_gpu += norm * coefficient * cp.exp( -alpha * RR) * (y)
 
 							if (m == 'z'):
-								
+
 								for l in range(self.np.shape(self.basis[n][j])[0]):
-									
+
 									alpha = (self.basis[n][j])[l, 0]
 									coefficient = (self.basis[n][j])[l, k + 1]
-									
+
 									norm = 2*2**(3/4)*alpha**(5/4)/self.np.pi**(3/4)
 
 									AO_gpu += norm * coefficient * cp.exp( -alpha * RR) * (z)
 
-							AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu ) 
+							AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu )
 							nOrb += 1
 							print( f"Generate P orbital { nOrb}:", time.time() - t_start )
 					print( f"Generate P orbitals:", time.time() - t_start_orbitals )
 				if (j == 2):
-					
+
 					if (self.spherical == 1):
 						t_start_orbitals = time.time()
 						if (len(self.np.shape(self.basis[n][j])) == 2):
 							for k in range(self.np.shape(self.basis[n][j])[1] - 1):
 								for m in self.np.arange(-j,j+1):
-									
+
 									AO_gpu = 0.0
 
 									t_start = time.time()
 									if (m == -2):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 1  
+											norm = 1
 
-											AO_gpu += norm  * coefficient *  ( x * y ) * cp.exp(-alpha*RR)   
+											AO_gpu += norm  * coefficient *  ( x * y ) * cp.exp(-alpha*RR)
 
 									if (m == -1):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 1 
+											norm = 1
 
-											AO_gpu += norm * coefficient * ( y * z ) * cp.exp(-alpha * RR )   
-											
+											AO_gpu += norm * coefficient * ( y * z ) * cp.exp(-alpha * RR )
+
 									if (m == 0):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 
@@ -730,28 +730,28 @@ class OrbitalsGenerator( ):
 
 											norm = 1 / self.np.sqrt(12)
 
-											AO_gpu += norm * coefficient * (-x**2 - y**2 + 2*z**2) * cp.exp( -alpha * RR )   
-									
+											AO_gpu += norm * coefficient * (-x**2 - y**2 + 2*z**2) * cp.exp( -alpha * RR )
+
 									if (m == 1):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 1 
+											norm = 1
 
-											AO_gpu += norm  * coefficient * ( x * z ) * cp.exp(-alpha * RR )   
-											
+											AO_gpu += norm  * coefficient * ( x * z ) * cp.exp(-alpha * RR )
+
 									if (m == 2):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
-											
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = 0.5 
-											
-											AO_gpu += norm * coefficient * (x**2 - y**2) * cp.exp( -alpha * RR )   
-									
+											norm = 0.5
+
+											AO_gpu += norm * coefficient * (x**2 - y**2) * cp.exp( -alpha * RR )
+
 									AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu ) * (self.basis_norm[n][j])[k]
 
 									nOrb += 1
@@ -771,7 +771,7 @@ class OrbitalsGenerator( ):
 
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * cp.exp( -(self.basis[n][j])[l, 0] * RR) * (x ** 2)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 
 
@@ -781,7 +781,7 @@ class OrbitalsGenerator( ):
 									if (m == 'yy'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * cp.exp( -(self.basis[n][j])[l, 0] * RR) * (y ** 2)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
@@ -795,23 +795,23 @@ class OrbitalsGenerator( ):
 									if (m == 'xy'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * cp.exp( -(self.basis[n][j])[l, 0] * RR) * (x * y * AOParameters.sqrt3)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
 									if (m == 'xz'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * cp.exp( -( self.basis[n][j])[l, 0] * RR) * (x * z * AOParameters.sqrt3)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
 
 									if (m == 'yz'):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											AO[nOrb, :, :, :] += AOParameters.universal_norm * ( (self.basis[n][j])[l, 0])**((1+2*(j+1))/4) * (self.basis[n][j])[l, k + 1] * cp.exp( -(self.basis[n][j])[l, 0] * RR) * (y * z * AOParameters.sqrt3)
-										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv 
+										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
-										nOrb += 1 
+										nOrb += 1
 
 				if (j == 3):
 					if (self.spherical == 1):
@@ -823,14 +823,14 @@ class OrbitalsGenerator( ):
 									if (m == -3):
 										for l in range(self.np.shape(self.basis[n][j])[0]):
 											#AO[nOrb, :, :, :] += AOParameters.universal_norm * (self.basis[n][j])[l, k + 1] * cp.exp( -(self.basis[n][j])[l, 0] * RR) * (AOParameters.sqrt10p16 * ( 3 * x ** 2 * y - y ** 3))
-										
+
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt10p16 
-											
-											AO_gpu += norm * coefficient * ( 3 * x ** 2 * y - y ** 3) * cp.exp( -alpha * RR )   
-										
+											norm = AOParameters.universal_norm * AOParameters.sqrt10p16
+
+											AO_gpu += norm * coefficient * ( 3 * x ** 2 * y - y ** 3) * cp.exp( -alpha * RR )
+
 										# AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu ) * (self.basis_norm[n][j])[k]
 										# nOrb += 1
 
@@ -842,9 +842,9 @@ class OrbitalsGenerator( ):
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt15 
-											
-											AO_gpu += norm * coefficient * (x * y * z)  * cp.exp( -alpha * RR )   
+											norm = AOParameters.universal_norm * AOParameters.sqrt15
+
+											AO_gpu += norm * coefficient * (x * y * z)  * cp.exp( -alpha * RR )
 
 
 									if (m == -1):
@@ -856,9 +856,9 @@ class OrbitalsGenerator( ):
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt125p108_1440 * AOParameters.sqrt45p100 
-											
-											AO_gpu += norm * coefficient * ( -x ** 2 * y - y ** 3 + AOParameters.sqrt40_25 * y * z ** 2) * cp.exp( -alpha * RR )   
+											norm = AOParameters.universal_norm * AOParameters.sqrt125p108_1440 * AOParameters.sqrt45p100
+
+											AO_gpu += norm * coefficient * ( -x ** 2 * y - y ** 3 + AOParameters.sqrt40_25 * y * z ** 2) * cp.exp( -alpha * RR )
 
 
 
@@ -869,9 +869,9 @@ class OrbitalsGenerator( ):
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt45p100 
-											
-											AO_gpu += norm * coefficient * ( AOParameters.sqrt5 * x ** 2 * z + AOParameters.sqrt5 * y ** 2 * z) * cp.exp( -alpha * RR )   
+											norm = AOParameters.universal_norm * AOParameters.sqrt45p100
+
+											AO_gpu += norm * coefficient * ( AOParameters.sqrt5 * x ** 2 * z + AOParameters.sqrt5 * y ** 2 * z) * cp.exp( -alpha * RR )
 
 
 
@@ -883,9 +883,9 @@ class OrbitalsGenerator( ):
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt125p108_1440 * AOParameters.sqrt45p100 
-											
-											AO_gpu += norm * coefficient * ( -x ** 3 - x * y ** 2 + AOParameters.sqrt40_25 * x * z ** 2) * cp.exp( -alpha * RR )   
+											norm = AOParameters.universal_norm * AOParameters.sqrt125p108_1440 * AOParameters.sqrt45p100
+
+											AO_gpu += norm * coefficient * ( -x ** 3 - x * y ** 2 + AOParameters.sqrt40_25 * x * z ** 2) * cp.exp( -alpha * RR )
 
 
 
@@ -897,9 +897,9 @@ class OrbitalsGenerator( ):
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt10p16 
-											
-											AO_gpu += norm * coefficient * (x ** 2 * z - y ** 2 * z) * cp.exp( -alpha * RR )   
+											norm = AOParameters.universal_norm * AOParameters.sqrt10p16
+
+											AO_gpu += norm * coefficient * (x ** 2 * z - y ** 2 * z) * cp.exp( -alpha * RR )
 
 
 									if (m == 3):
@@ -909,13 +909,13 @@ class OrbitalsGenerator( ):
 											alpha = (self.basis[n][j])[l, 0]
 											coefficient = (self.basis[n][j])[l, k + 1]
 
-											norm = AOParameters.universal_norm * AOParameters.sqrt10p16 
-											
-											AO_gpu += norm * coefficient * ( x ** 3 - 3 * x * y ** 2) * cp.exp( -alpha * RR )   
+											norm = AOParameters.universal_norm * AOParameters.sqrt10p16
+
+											AO_gpu += norm * coefficient * ( x ** 3 - 3 * x * y ** 2) * cp.exp( -alpha * RR )
 
 
 
-									
+
 									AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu ) * (self.basis_norm[n][j])[k]
 									nOrb += 1
 
