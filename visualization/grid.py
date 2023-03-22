@@ -3,30 +3,30 @@ class Grid():
 
     import numpy as np
 
-    initail = None
+    initial = None
 
     R_max_multip = None
 
-    x_min:np.float64 
-    x_max:np.float64 
+    x_min:np.float64
+    x_max:np.float64
     x_n:np.int32
-    y_min:np.float64 
-    y_max:np.float64 
-    y_n:np.int32 
-    z_min:np.float64 
-    z_max:np.float64 
+    y_min:np.float64
+    y_max:np.float64
+    y_n:np.int32
+    z_min:np.float64
+    z_max:np.float64
     z_n:np.int32
 
 
-    def __init__(self,  R_max_multip:float =12.0, 
-                        x_min:np.float32=None, 
-                        x_max:np.float32=None, 
-                        x_n:np.int32= 100, 
-                        y_min:np.float32=None, 
-                        y_max:np.float32=None, 
+    def __init__(self,  R_max_multip:float =12.0,
+                        x_min:np.float64=None,
+                        x_max:np.float64=None,
+                        x_n:np.int32= 100,
+                        y_min:np.float64=None,
+                        y_max:np.float64=None,
                         y_n:np.int32=100,
-                        z_min:np.float32=None, 
-                        z_max:np.float32=None, 
+                        z_min:np.float64=None,
+                        z_max:np.float64=None,
                         z_n:np.int32=100):
 
         self.R_max_multip = R_max_multip
