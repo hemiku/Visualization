@@ -98,8 +98,8 @@ class OrbitalsGenerator( ):
 			for j in range(self.nb):
 				self.MOs[i, :, :, :] += self.coeff[i, j] * self.AOs[j, :, :, :]
 
-			print( f"Generate MO orbital { i }:", time.time() - t_start )
-		print( f"Generate MOs total:", time.time() - t_start_total )
+		# 	print( f"Generate MO orbital { i }:", time.time() - t_start )
+		# print( f"Generate MOs total:", time.time() - t_start_total )
 
 	def calc_MOs_gpu(self, start = None, stop = None, MOs_limit = None ):
 
@@ -128,14 +128,14 @@ class OrbitalsGenerator( ):
 
 			self.MOs[i, :, :, :] = cp.asnumpy(MO_gpu)
 
-			print( f"Generate MO orbital { i }:", time.time() - t_start )
+			# print( f"Generate MO orbital { i }:", time.time() - t_start )
 
 		AO_gpu = None
 		MO_gpu = None
 
 		cp._default_memory_pool.free_all_blocks()
 
-		print( f"Generate MOs total:", time.time() - t_start_total )
+		# print( f"Generate MOs total:", time.time() - t_start_total )
 
 	def calc_MOs_gpu_fast(self, start = None, stop = None, MOs_limit = None ):
 
@@ -165,7 +165,7 @@ class OrbitalsGenerator( ):
 
 
 
-			print( f"Generate MO orbital { i }:", time.time() - t_start )
+			# print( f"Generate MO orbital { i }:", time.time() - t_start )
 
 		self.MOs = cp.asnumpy(MOs_gpu)
 
@@ -174,7 +174,7 @@ class OrbitalsGenerator( ):
 
 		cp._default_memory_pool.free_all_blocks()
 
-		print( f"Generate MOs total:", time.time() - t_start_total )
+		# print( f"Generate MOs total:", time.time() - t_start_total )
 
 	def calc_MOs_gpu_low_memory(self, start = None, stop = None, MOs_limit = None ):
 
@@ -206,14 +206,14 @@ class OrbitalsGenerator( ):
 
 			self.MOs[i, :, :, :] = cp.asnumpy(MO_gpu)
 
-			print( f"Generate MO orbital { i }:", time.time() - t_start )
+			# print( f"Generate MO orbital { i }:", time.time() - t_start )
 
 		AO_gpu = None
 		MO_gpu = None
 
 		cp._default_memory_pool.free_all_blocks()
 
-		print( f"Generate MOs total:", time.time() - t_start_total )
+		# print( f"Generate MOs total:", time.time() - t_start_total )
 
 	def calc_AOs(self, AO, grid=None):
 
@@ -225,7 +225,7 @@ class OrbitalsGenerator( ):
 
 		t_start = time.time()
 		X, Y, Z = self.grid.return_grid_arrays()
-		print( "Generate X, Y, Z:", time.time() - t_start )
+		# print( "Generate X, Y, Z:", time.time() - t_start )
 
 		dx = ( grid.x_max - grid.x_min )/ ( grid.x_n -1 )
 		dy = ( grid.y_max - grid.y_min )/ ( grid.y_n -1 )
@@ -250,7 +250,7 @@ class OrbitalsGenerator( ):
 			y = Y - self.atoms_R[n, 1]
 			z = Z - self.atoms_R[n, 2]
 
-			print( "Generate z, y, z:", time.time() - t_start )
+			# print( "Generate z, y, z:", time.time() - t_start )
 
 			t_start = time.time()
 			RR = x * x + y * y + z * z
@@ -258,7 +258,7 @@ class OrbitalsGenerator( ):
 			r = self.np.sqrt(RR)
 			theta = self.np.arctan(y / x)
 			phi = self.np.arccos(z / r)
-			print( "Generate RR, r, theta, phi:", time.time() - t_start )
+			# print( "Generate RR, r, theta, phi:", time.time() - t_start )
 
 			t_start_atom = time.time()
 			for j in range(len(self.basis[n])):
@@ -281,7 +281,7 @@ class OrbitalsGenerator( ):
 						#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 						#print( f"Generate S orbital { nOrb}:", time.time() - t_start )
 						nOrb += 1
-					print( f"Generate S orbitals:", time.time() - t_start_orbitals )
+					# print( f"Generate S orbitals:", time.time() - t_start_orbitals )
 				if (j == 1):
 
 					t_start_orbitals = time.time()
@@ -327,7 +327,7 @@ class OrbitalsGenerator( ):
 							#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 							nOrb += 1
 							#print( f"Generate P orbital { nOrb}:", time.time() - t_start )
-					print( f"Generate P orbitals:", time.time() - t_start_orbitals )
+					# print( f"Generate P orbitals:", time.time() - t_start_orbitals )
 				if (j == 2):
 
 					if (self.spherical == 1):
@@ -390,7 +390,7 @@ class OrbitalsGenerator( ):
 									AO[nOrb, :, :, :] = AO[nOrb, :, :, :] * (self.basis_norm[n][j])[k]
 									nOrb += 1
 									#print( f"Generate D orbital { nOrb}:", time.time() - t_start )
-						print( f"Generate D orbitals:", time.time() - t_start_orbitals )
+						# print( f"Generate D orbitals:", time.time() - t_start_orbitals )
 
 					else:
 						if (len(self.np.shape(self.basis[n][j])) == 2):
@@ -569,8 +569,8 @@ class OrbitalsGenerator( ):
 										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
-			print( f"Generate for Atom {n}:", time.time() - t_start_atom )
-		print( f"Generate total:", time.time() - t_start_total )
+		# 	print( f"Generate for Atom {n}:", time.time() - t_start_atom )
+		# print( f"Generate total:", time.time() - t_start_total )
 
 		#for n in range( self.nb ):
 		#    AO[n, :, :, :] = AO[n, :, :, :] / self.np.sqrt( self.np.sum(AO[n, :, :, :] ** 2 * dv ) )
@@ -586,7 +586,7 @@ class OrbitalsGenerator( ):
 		t_start = time.time()
 
 		X, Y, Z = cp.mgrid[self.grid.x_min:self.grid.x_max:self.grid.x_n*1j, self.grid.y_min:self.grid.y_max:self.grid.y_n*1j, self.grid.z_min:self.grid.z_max:self.grid.z_n*1j]
-		print( "Generate X, Y, Z:", time.time() - t_start )
+		# print( "Generate X, Y, Z:", time.time() - t_start )
 
 		dx = ( grid.x_max - grid.x_min )/ ( grid.x_n -1 )
 		dy = ( grid.y_max - grid.y_min )/ ( grid.y_n -1 )
@@ -611,14 +611,14 @@ class OrbitalsGenerator( ):
 
 
 
-			print( "Generate z, y, z:", time.time() - t_start )
+			# print( "Generate z, y, z:", time.time() - t_start )
 
 			t_start = time.time()
 
 			RR = x * x + y * y + z * z
 			r = cp.sqrt(RR)
 
-			print( "Generate RR, r, theta, phi:", time.time() - t_start )
+			# print( "Generate RR, r, theta, phi:", time.time() - t_start )
 
 			t_start_atom = time.time()
 			for j in range(len(self.basis[n])):
@@ -641,9 +641,9 @@ class OrbitalsGenerator( ):
 							AO_gpu += norm * coefficient * cp.exp( -alpha * RR )
 
 						AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu )
-						print( f"Generate S orbital { nOrb}:", time.time() - t_start )
+						# print( f"Generate S orbital { nOrb}:", time.time() - t_start )
 						nOrb += 1
-					print( f"Generate S orbitals:", time.time() - t_start_orbitals )
+					# print( f"Generate S orbitals:", time.time() - t_start_orbitals )
 				if (j == 1):
 
 					t_start_orbitals = time.time()
@@ -689,8 +689,8 @@ class OrbitalsGenerator( ):
 
 							AO[nOrb, :, :, :] =  cp.asnumpy( AO_gpu )
 							nOrb += 1
-							print( f"Generate P orbital { nOrb}:", time.time() - t_start )
-					print( f"Generate P orbitals:", time.time() - t_start_orbitals )
+					# 		print( f"Generate P orbital { nOrb}:", time.time() - t_start )
+					# print( f"Generate P orbitals:", time.time() - t_start_orbitals )
 				if (j == 2):
 
 					if (self.spherical == 1):
@@ -756,7 +756,7 @@ class OrbitalsGenerator( ):
 
 									nOrb += 1
 									#print( f"Generate D orbital { nOrb}:", time.time() - t_start )
-						print( f"Generate D orbitals:", time.time() - t_start_orbitals )
+						# print( f"Generate D orbitals:", time.time() - t_start_orbitals )
 
 					else:
 						if (len(self.np.shape(self.basis[n][j])) == 2):
@@ -994,8 +994,8 @@ class OrbitalsGenerator( ):
 										#AO[nOrb, :, :, :] = (self.basis_norm[n][j])[k] * AO[nOrb, :, :, :] * sqrt_dv
 										#AO[nOrb, :, :, :] = AO[nOrb, :, :, :] / self.np.sqrt( self.np.sum(AO[nOrb, :, :, :] ** 2 ) )
 										nOrb += 1
-			print( f"Generate for Atom {n}:", time.time() - t_start_atom )
-		print( f"Generate total:", time.time() - t_start_total )
+		# 	print( f"Generate for Atom {n}:", time.time() - t_start_atom )
+		# print( f"Generate total:", time.time() - t_start_total )
 
 		r = None
 		RR = None
