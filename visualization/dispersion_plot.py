@@ -43,7 +43,7 @@ class DispersionPlot(visualization.visualization.Visualization):
 	def get_Fragments(self):
 
 
-		nParts =  2 * self.MolecularSystem.n_geminals + self.MolecularSystem.inactive
+		nParts =  2 * self.molecular_system.n_geminals + self.molecular_system.inactive
 
 		Orb = self.np.zeros([ nParts ], dtype=self.np.int32)
 		Occ = self.np.zeros([ nParts ], dtype=self.np.float64)
@@ -109,8 +109,8 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		import logging
 
-		D_A = self.np.zeros_like(self.MolecularSystem.AOs[0])
-		D_B = self.np.zeros_like(self.MolecularSystem.AOs[0])
+		D_A = self.np.zeros_like(self.molecular_system.AOs[0])
+		D_B = self.np.zeros_like(self.molecular_system.AOs[0])
 
 		grid = self.orbital_generator.grid
 
@@ -140,28 +140,28 @@ class DispersionPlot(visualization.visualization.Visualization):
 			for j in range(self.nParts):
 
 				if  ( fragments_counts[self.Fragments[i]] == 2 and fragments_counts[self.Fragments[j]] == 2 ):
-					multipier = 1.0/2
+					multiplier = 1.0/2
 
 				elif  ( ( fragments_counts[self.Fragments[i]] == 4 and fragments_counts[self.Fragments[j]] == 2 ) or
 						( fragments_counts[self.Fragments[j]] == 4 and fragments_counts[self.Fragments[i]] == 2 ) ):
-					multipier = 1.0/4
+					multiplier = 1.0/4
 
 				elif  ( fragments_counts[self.Fragments[i]] == 4 and fragments_counts[self.Fragments[j]] == 4 ):
-					multipier = 1.0/8
+					multiplier = 1.0/8
 
 				elif  ( fragments_counts[self.Fragments[i]] == 6 and fragments_counts[self.Fragments[j]] == 6 ):
 					counter_6_6 += 1
-					multipier = 1.0/18
+					multiplier = 1.0/18
 
 				elif  ( ( fragments_counts[self.Fragments[i]] == 6 and fragments_counts[self.Fragments[j]] == 2 ) or
 						( fragments_counts[self.Fragments[j]] == 6 and fragments_counts[self.Fragments[i]] == 2 ) ):
 					counter_6_2 += 1
-					multipier = 1.0/6
+					multiplier = 1.0/6
 
 				else:
-					print("Undefnied proportion", "Fragment A:", self.Fragments[i],fragments_counts[self.Fragments[i]] , "Fragment B:", self.Fragments[j],fragments_counts[self.Fragments[j]]  )
+					print("Undefined proportion", "Fragment A:", self.Fragments[i],fragments_counts[self.Fragments[i]] , "Fragment B:", self.Fragments[j],fragments_counts[self.Fragments[j]]  )
 					counter += 1
-					multipier = 1.0
+					multiplier = 1.0
 
 
 				if self.Monomers[i] == Monomer_A and self.Monomers[j] == Monomer_B :
@@ -170,8 +170,8 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 					if epsilon != 0.0:
 						logging.info(f'A: {i},{j}, {self.Orb[i]}, {epsilon} ')
-						print(f'A: {i},{j}, {self.Orb[i]}, {epsilon} ')
-					D_A -= multipier * self.Occ[i] * self.MolecularSystem.MOs[i]**2 * epsilon
+						# print(f'A: {i},{j}, {self.Orb[i]}, {epsilon} ')
+					D_A -= multiplier * self.Occ[i] * self.molecular_system.MOs[i]**2 * epsilon
 
 				if self.Monomers[i] == Monomer_B and self.Monomers[j] == Monomer_A:
 
@@ -179,12 +179,12 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 					if epsilon != 0.0:
 						logging.info(f'B: {i},{j}, {self.Orb[i]}, {epsilon} ')
-						print(f'B: {i},{j}, {self.Orb[i]}, {epsilon} ')
-					D_B -= multipier * self.Occ[i] * self.MolecularSystem.MOs[i]**2 * epsilon
+						# print(f'B: {i},{j}, {self.Orb[i]}, {epsilon} ')
+					D_B -= multiplier * self.Occ[i] * self.molecular_system.MOs[i]**2 * epsilon
 
-		print("counter 6 6 :",counter_6_6)
-		print("counter 6 2 :",counter_6_2)
-		print("counter:",counter)
+		# print("counter 6 6 :",counter_6_6)
+		# print("counter 6 2 :",counter_6_2)
+		# print("counter:",counter)
 
 		D_AB  = 0.5 *( D_A + D_B )
 
@@ -193,7 +193,7 @@ class DispersionPlot(visualization.visualization.Visualization):
 		self.D_B = D_B
 
 
-	def Plot_D_AB(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, opacity = 0.5, background_color = None, sclalarbar = False, auto_show = True, figure = None ):
+	def Plot_D_AB(self, plot_atoms = True, atom_names = True, plot_bonds = True , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, opacity = 0.5, background_color = None, scalarbar = False, auto_show = True, figure = None ):
 
 		#from mayavi import mlab
 
@@ -223,13 +223,13 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-		D_AB_contur = self.mlab.contour3d(  X, Y, Z, (self.D_AB) ,
+		D_AB_contour = self.mlab.contour3d(  X, Y, Z, (self.D_AB) ,
 											contours=self.contour_process( contours, self.D_AB ),
 											opacity=opacity)
 
-		if sclalarbar:
+		if scalarbar:
 
-			_scalarbar = self.mlab.scalarbar(object=D_AB_contur, title='D^{AB}' ,orientation='vertical' )
+			_scalarbar = self.mlab.scalarbar(object=D_AB_contour, title='D^{AB}' ,orientation='vertical' )
 			_scalarbar.scalar_bar.unconstrained_font_size = True
 			_scalarbar.scalar_bar.label_text_property.color = (0.0, 0.0, 0.0)
 			_scalarbar.scalar_bar.label_text_property.italic = False
@@ -245,7 +245,7 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		return _figure
 
-	def Plot_D_A(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False, auto_show = True, figure = None ):
+	def Plot_D_A(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, scalarbar = False, auto_show = True, figure = None ):
 
 		#from mayavi import mlab
 
@@ -265,29 +265,29 @@ class DispersionPlot(visualization.visualization.Visualization):
 			_figure = figure
 
 		if plot_atoms:
-			for i in range(self.MolecularSystem.nAtoms):
-				self.mlab.points3d( self.MolecularSystem.atoms_R[i, 0],
-									self.MolecularSystem.atoms_R[i, 1],
-									self.MolecularSystem.atoms_R[i, 2],
-									scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.MolecularSystem.atoms_Name[i])],
+			for i in range(self.molecular_system.nAtoms):
+				self.mlab.points3d( self.molecular_system.atoms_R[i, 0],
+									self.molecular_system.atoms_R[i, 1],
+									self.molecular_system.atoms_R[i, 2],
+									scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
 									resolution=20,
-									color=self.visualization_data.Atoms_Color[ self.u.letters(self.MolecularSystem.atoms_Name[i])],
+									color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
 									scale_mode='none')
 
 		if atom_names:
-			for i in range( self.MolecularSystem.nAtoms ):
-				self.mlab.text3d(   self.MolecularSystem.atoms_R[i, 0],
-									self.MolecularSystem.atoms_R[i, 1],
-									self.MolecularSystem.atoms_R[i, 2],
-									self.MolecularSystem.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
+			for i in range( self.molecular_system.nAtoms ):
+				self.mlab.text3d(   self.molecular_system.atoms_R[i, 0],
+									self.molecular_system.atoms_R[i, 1],
+									self.molecular_system.atoms_R[i, 2],
+									self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
 
 		if plot_bonds:
-			for i, bond in enumerate( self.MolecularSystem.bonds ) :
+			for i, bond in enumerate( self.molecular_system.bonds ) :
 
-				bond_begin = self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[0]) ]
-				bond_end   = self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[1]) ]
+				bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
+				bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
 
-				bond_half = 0.5 * ( self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[0]) ] + self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[1]) ] )
+				bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
 
 				self.mlab.plot3d(
 					self.np.array([bond_begin[0] , bond_half[0]]),
@@ -305,7 +305,7 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-		D_A_contur = self.mlab.contour3d(X, Y, Z,   (self.D_A) ,
+		D_A_contour = self.mlab.contour3d(X, Y, Z,   (self.D_A) ,
 													contours=self.contour_process( contours, self.D_A ),
 													opacity=0.5)
 
@@ -314,9 +314,8 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		return _figure
 
-	def Plot_D_B(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, sclalarbar = False, auto_show = True, figure = None ):
+	def Plot_D_B(self, plot_atoms = 1, atom_names = 1, plot_bonds = 1 , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, background_color = None, scalarbar = False, auto_show = True, figure = None ):
 
-		#from mayavi import mlab
 
 		if background_color is None:
 			_background_color = self.visualization_data.background_colors['White']
@@ -334,29 +333,29 @@ class DispersionPlot(visualization.visualization.Visualization):
 			_figure = figure
 
 		if plot_atoms:
-			for i in range(self.MolecularSystem.nAtoms):
-				self.mlab.points3d( self.MolecularSystem.atoms_R[i, 0],
-									self.MolecularSystem.atoms_R[i, 1],
-									self.MolecularSystem.atoms_R[i, 2],
-									scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.MolecularSystem.atoms_Name[i])],
+			for i in range(self.molecular_system.nAtoms):
+				self.mlab.points3d( self.molecular_system.atoms_R[i, 0],
+									self.molecular_system.atoms_R[i, 1],
+									self.molecular_system.atoms_R[i, 2],
+									scale_factor= atom_scaling * self.visualization_data.Atoms_Scale[ self.u.letters(self.molecular_system.atoms_Name[i])],
 									resolution=20,
-									color=self.visualization_data.Atoms_Color[ self.u.letters(self.MolecularSystem.atoms_Name[i])],
+									color=self.visualization_data.Atoms_Color[ self.u.letters(self.molecular_system.atoms_Name[i])],
 									scale_mode='none')
 
 		if atom_names:
-			for i in range( self.MolecularSystem.nAtoms ):
-				self.mlab.text3d(   self.MolecularSystem.atoms_R[i, 0],
-									self.MolecularSystem.atoms_R[i, 1],
-									self.MolecularSystem.atoms_R[i, 2],
-									self.MolecularSystem.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
+			for i in range( self.molecular_system.nAtoms ):
+				self.mlab.text3d(   self.molecular_system.atoms_R[i, 0],
+									self.molecular_system.atoms_R[i, 1],
+									self.molecular_system.atoms_R[i, 2],
+									self.molecular_system.atoms_Name[i], scale=(.9*atom_scaling , .9*atom_scaling , .9*atom_scaling ))
 
 		if plot_bonds:
-			for i, bond in enumerate( self.MolecularSystem.bonds ) :
+			for i, bond in enumerate( self.molecular_system.bonds ) :
 
-				bond_begin = self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[0]) ]
-				bond_end   = self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[1]) ]
+				bond_begin = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ]
+				bond_end   = self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ]
 
-				bond_half = 0.5 * ( self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[0]) ] + self.MolecularSystem.atoms_R[ self.MolecularSystem.atoms_Name.index(bond[1]) ] )
+				bond_half = 0.5 * ( self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[0]) ] + self.molecular_system.atoms_R[ self.molecular_system.atoms_Name.index(bond[1]) ] )
 
 				self.mlab.plot3d(
 					self.np.array([bond_begin[0] , bond_half[0]]),
@@ -374,7 +373,7 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-		D_B_contur = self.mlab.contour3d(X, Y, Z, (self.D_B) ,
+		D_B_contour = self.mlab.contour3d(X, Y, Z, (self.D_B) ,
 													contours=self.contour_process( contours, self.D_B ),
 													opacity=0.5)
 		if auto_show:
@@ -384,7 +383,7 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 	def Plot_D_AB_log(self, Plot_Atoms = 1, Atom_Names = 1, Plot_Bonds = 1 , Atom_Scaling = 1.0, Bond_Scaling = 1.0, contours = 6 ):
 
-		return _
+		return 0
 		#from mayavi import mlab
 
 		# self.mlab.figure("Dispersion ", bgcolor=(.5, .5, .75), size=(1000, 1000))
@@ -439,4 +438,4 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 	def print_something(self):
 
-		print("orint something")
+		print("print something")

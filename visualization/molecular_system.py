@@ -27,7 +27,7 @@ class MolecularSystem:
 
 	AOs:np.ndarray
 	MOs:np.ndarray
-	geminals:np.ndarray
+	geminals:np.ndarray = None
 
 	def __init__(self, spherical=None, nb=None, nAtoms=None, inactive=None, electrons=None, Occ=None, Coeff=None, atoms_R=None, atoms_Charge=None, atoms_Name=None, bonds=None):
 

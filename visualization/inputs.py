@@ -423,7 +423,7 @@ class DaltonInput(Input):
 		Atom_Geometries_pattern = '^\w{1,6} \D \D \D'
 		Basis_header_pattern = '^H {1,3}\d{1,3} {1,4}\d{1,3}$'
 
-		Atoms_Gropus = []
+		Atoms_Groups = []
 
 		header_end_line = self.find_header_end_line( lines = F_BAS_split_lines, Atom_header_pattern = Atom_header_pattern )
 
@@ -432,7 +432,7 @@ class DaltonInput(Input):
 			if re.match(Atom_header_pattern, line):
 
 				Atoms_Group = {'headerLine': line, 'Geometries': [], 'Basis': []}
-				Atoms_Gropus.append(Atoms_Group)
+				Atoms_Groups.append(Atoms_Group)
 
 			elif re.match(Atom_Geometries_pattern, line):
 
@@ -447,7 +447,7 @@ class DaltonInput(Input):
 				pass
 				#basis_part['data'].append(line)
 
-		self.map_atoms_geometry_from_BAS_file( Atoms_Gropus )
+		self.map_atoms_geometry_from_BAS_file( Atoms_Groups )
 
 		return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
@@ -468,13 +468,13 @@ class DaltonInput(Input):
 			bond_str_split = bond_str.split()
 
 			try:
-				self.Bonds.append(  [ bond_str_split[2], bond_str_split[3], float(bond_str_split[4]) ] )
+				self.Bonds.append(  [ self.Atoms_Name.index(bond_str_split[2]), self.Atoms_Name.index(bond_str_split[3]), float(bond_str_split[4]) ] )
 				continue
 			except:
 				pass
 
 			try:
-				self.Bonds.append( [  bond_str_split[2], bond_str_split[4], float(bond_str_split[6])  ] )
+				self.Bonds.append( [  self.Atoms_Name.index(bond_str_split[2]), self.Atoms_Name.index(bond_str_split[4]), float(bond_str_split[6])  ] )
 				continue
 			except:
 				pass
