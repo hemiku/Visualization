@@ -1,7 +1,3 @@
-
-#from visualisation.grid import Grid
-
-
 class AOParameters_gpu():
     
     import numpy as np
