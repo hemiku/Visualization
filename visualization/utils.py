@@ -85,3 +85,29 @@ def read_SAPTVIS( filename):
     Qmat = np.reshape(f.read_reals(np.float64), [NOccupA,NOccupB] )  # type: ignore
 
     return ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat
+
+
+def read_SAPTVIS_ELECTRO( filename):
+    
+
+
+    from scipy.io import FortranFile
+    import numpy as np
+
+
+    f = FortranFile( filename, 'r')
+
+    ANBasis, BNBasis = f.read_ints(np.int32) # type: ignore
+    NOccupA, NOccupB = f.read_ints(np.int32) # type: ignore
+
+    Occ_buff = f.read_reals(np.float64) # type: ignore
+
+    A_Occ = Occ_buff[0:ANBasis]
+    B_Occ = Occ_buff[ANBasis:ANBasis+BNBasis]
+
+    ACMO = np.reshape(f.read_reals(np.float64), [ANBasis,ANBasis] ) # type: ignore
+    BCMO = np.reshape(f.read_reals(np.float64), [BNBasis,BNBasis] ) # type: ignore
+    Qmat = np.reshape(f.read_reals(np.float64), [NOccupA,NOccupB] )  # type: ignore
+    QelA = np.reshape(f.read_reals(np.float64), [NOccupA] )  # type: ignore
+    QelB = np.reshape(f.read_reals(np.float64), [NOccupB] )  # type: ignore
+    return ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat, QelA, QelB
