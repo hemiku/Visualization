@@ -1,13 +1,47 @@
+# IDEs
 .idea/
 .vscode/
-*.pyc
 
+# Python
+*.pyc
 __pycache__/
 *.py[cod]
 *$py.class
 
+# Distribution / packaging
 wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 build/
+dist/
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+
+# UV
+.uv_cache/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Temporary visualization outputs (test artifacts in root)
+water_dimer_output.png
+*_output.png
+test_*.png
+
+# AI conversation logs (development notes, not for commit)
+CLAUDE.md
+EXPERTS.md
+EXPERT_ANALYSIS.md

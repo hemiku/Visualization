@@ -1,0 +1,122 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, test-suite-development ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        lfs: true  # Enable Git LFS for large example files
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
+
+    - name: Run smoke tests
+      run: |
+        uv run pytest tests/unit/test_smoke.py -v
+
+    - name: Run unit tests
+      run: |
+        uv run pytest tests/unit/ -v -m "unit and not gpu"
+
+    - name: Run integration tests
+      run: |
+        uv run pytest tests/integration/ -v -m "integration and not slow and not gpu"
+      continue-on-error: true  # Allow failures until tests are fully implemented
+
+    - name: Run validation tests
+      run: |
+        uv run pytest tests/validation/ -v -m "validation and not slow and not gpu"
+      continue-on-error: true  # Allow failures until tests are fully implemented
+
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
+
+    - name: Check code formatting with black
+      run: |
+        uv run black --check visualization/ tests/
+      continue-on-error: true  # Don't fail CI on formatting issues yet
+
+    - name: Lint with flake8
+      run: |
+        uv run flake8 visualization/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+      continue-on-error: true  # Don't fail CI on linting issues yet
+
+    - name: Type check with mypy
+      run: |
+        uv run mypy visualization/ --ignore-missing-imports
+      continue-on-error: true  # Don't fail CI on type errors yet
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        lfs: true
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
+
+    - name: Run tests with coverage
+      run: |
+        uv run pytest tests/ -v --cov=visualization --cov-report=xml --cov-report=term-missing -m "not gpu and not slow"
+      continue-on-error: true  # Allow failures during initial setup
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+      continue-on-error: true  # Don't fail if codecov upload fails
