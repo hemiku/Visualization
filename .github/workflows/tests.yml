@@ -43,28 +43,28 @@ jobs:
     - name: Install dependencies
       shell: bash -l {0}
       run: |
-        uv sync --extra dev
+        uv pip install --system -e ".[dev]"
 
     - name: Run smoke tests
       shell: bash -l {0}
       run: |
-        uv run pytest tests/unit/test_smoke.py -v
+        pytest tests/unit/test_smoke.py -v
 
     - name: Run unit tests
       shell: bash -l {0}
       run: |
-        uv run pytest tests/unit/ -v -m "unit and not gpu"
+        pytest tests/unit/ -v -m "unit and not gpu"
 
     - name: Run integration tests
       shell: bash -l {0}
       run: |
-        uv run pytest tests/integration/ -v -m "integration and not slow and not gpu"
+        pytest tests/integration/ -v -m "integration and not slow and not gpu"
       continue-on-error: true  # Allow failures until tests are fully implemented
 
     - name: Run validation tests
       shell: bash -l {0}
       run: |
-        uv run pytest tests/validation/ -v -m "validation and not slow and not gpu"
+        pytest tests/validation/ -v -m "validation and not slow and not gpu"
       continue-on-error: true  # Allow failures until tests are fully implemented
 
   code-quality:
@@ -135,12 +135,12 @@ jobs:
     - name: Install dependencies
       shell: bash -l {0}
       run: |
-        uv sync --extra dev
+        uv pip install --system -e ".[dev]"
 
     - name: Run tests with coverage
       shell: bash -l {0}
       run: |
-        uv run pytest tests/ -v --cov=visualization --cov-report=xml --cov-report=term-missing -m "not gpu and not slow"
+        pytest tests/ -v --cov=visualization --cov-report=xml --cov-report=term-missing -m "not gpu and not slow"
       continue-on-error: true  # Allow failures during initial setup
 
     - name: Upload coverage reports
