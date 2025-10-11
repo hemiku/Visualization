@@ -78,28 +78,16 @@ class Visualization():
 	visualization_data = VisualizationData()
 
 	def __init__(self, input_type=None, input_sub_type='Output', input_name=None, file_string=None, BAS_filename=None, data_source=None):
+		# Always set attributes (defaults to None if not provided)
+		self.input_type = input_type
+		self.input_sub_type = input_sub_type
+		self.input_name = input_name
+		self.file_string = file_string
+		self.BAS_filename = BAS_filename
+		self.data_source = data_source
 
-		if input_type is not None:
-			self.input_type = input_type
-
-		if input_sub_type is not None:
-			self.input_sub_type = input_sub_type
-
-		if input_name is not None:
-			self.input_name = input_name
-
-		if file_string is not None:
-			self.file_string = file_string
-
-		if BAS_filename is not None:
-			self.BAS_filename = BAS_filename
-
-		if data_source is not None:
-			self.data_source = data_source
-
-		#if self.input_type is not None and self.input_sub_type and self.input_name is not None:
+		# Initialize data input if both type and name are provided
 		if self.input_type is not None and self.input_name is not None:
-
 			self.initialize_data_input()
 
 		self.initialize_molecular_system()
