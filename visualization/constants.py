@@ -1,0 +1,78 @@
+"""Constants for molecular visualization.
+
+This module contains:
+- Atom colors (RGB tuples for rendering)
+- Atom scales (relative sizes for visualization)
+- Atom masses (atomic mass units)
+- Element symbol to atomic number mapping
+- Background color presets
+"""
+
+# Background color presets for visualization
+BACKGROUND_COLORS = {
+    'Gaussian': (0.5, 0.5, 0.75),
+    'White': (1.0, 1.0, 1.0),
+}
+
+# RGB colors for atoms (values 0-1)
+ATOM_COLORS = {
+    "H": (1.0, 1.0, 1.0),      # White
+    "He": (0.5, 0.5, 0.5),     # Gray
+    "Ar": (0.75, 0.75, 0.75),  # Light gray
+    "O": (1.0, 0.0, 0.0),      # Red
+    "B": (233.0 / 255, 165.0 / 255, 165.0 / 255),  # Light pink
+    "N": (0.0, 0.0, 1.0),      # Blue
+    "C": (0.0, 0.0, 0.0),      # Black
+    "F": (0.0, 1.0, 0.0),      # Green
+    "Ne": (178.0 / 256, 229.0 / 256, 247.0 / 256),  # Light blue
+}
+
+# Relative atom sizes for visualization
+ATOM_SCALES = {
+    "H": 1.0,
+    "He": 1.0,
+    "O": 1.4,
+    "B": 1.4,
+    "N": 1.4,
+    "C": 1.4,
+    "F": 1.4,
+    "Ne": 1.4,
+    "Ar": 1.4,
+}
+
+# Atomic masses in atomic mass units (u)
+ATOM_MASSES = {
+    "H": 1.00794, "He": 4.002602, "Li": 6.941, "Be": 9.012182,
+    "B": 10.811, "C": 12.011, "N": 14.00674, "O": 15.9994,
+    "F": 18.9984032, "Ne": 20.1797, "Na": 22.989768, "Mg": 24.305,
+    "Al": 26.981539, "Si": 28.0855, "P": 30.973762, "S": 32.066,
+    "Cl": 35.4527, "Ar": 39.948, "K": 39.0983, "Ca": 40.078,
+    "Sc": 44.95591, "Ti": 47.88, "V": 50.9415, "Cr": 51.9961,
+    "Mn": 54.93805, "Fe": 55.847, "Co": 58.9332, "Ni": 58.69,
+    "Cu": 63.546, "Zn": 65.39, "Ga": 69.723, "Ge": 72.61,
+    "As": 74.92159, "Se": 78.96, "Br": 79.904, "Kr": 83.8,
+    "Rb": 85.4678, "Sr": 87.62, "Y": 88.90585, "Zr": 91.224,
+    "Nb": 92.90638, "Mo": 95.94,
+}
+
+# Element symbol to atomic number
+ELEMENT_TO_ATOMIC_NUMBER = {
+    'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10,
+    'Na': 11, 'Mg': 12, 'Al': 13, 'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'Ar': 18,
+    'K': 19, 'Ca': 20, 'Sc': 21, 'Ti': 22, 'V': 23, 'Cr': 24, 'Mn': 25, 'Fe': 26,
+    'Co': 27, 'Ni': 28, 'Cu': 29, 'Zn': 30, 'Ga': 31, 'Ge': 32, 'As': 33, 'Se': 34,
+    'Br': 35, 'Kr': 36, 'Rb': 37, 'Sr': 38, 'Y': 39, 'Zr': 40, 'Nb': 41, 'Mo': 42,
+    'Tc': 43, 'Ru': 44, 'Rh': 45, 'Pd': 46, 'Ag': 47, 'Cd': 48, 'In': 49, 'Sn': 50,
+    'Sb': 51, 'Te': 52, 'I': 53, 'Xe': 54, 'Cs': 55, 'Ba': 56, 'La': 57, 'Ce': 58,
+    'Pr': 59, 'Nd': 60, 'Pm': 61, 'Sm': 62, 'Eu': 63, 'Gd': 64, 'Tb': 65, 'Dy': 66,
+    'Ho': 67, 'Er': 68, 'Tm': 69, 'Yb': 70, 'Lu': 71, 'Hf': 72, 'Ta': 73, 'W': 74,
+    'Re': 75, 'Os': 76, 'Ir': 77, 'Pt': 78, 'Au': 79, 'Hg': 80, 'Tl': 81, 'Pb': 82,
+    'Bi': 83, 'Po': 84, 'At': 85, 'Rn': 86, 'Fr': 87, 'Ra': 88, 'Ac': 89, 'Th': 90,
+    'Pa': 91, 'U': 92, 'Np': 93, 'Pu': 94, 'Am': 95, 'Cm': 96, 'Bk': 97, 'Cf': 98,
+    'Es': 99, 'Fm': 100, 'Md': 101, 'No': 102, 'Lr': 103, 'Rf': 104, 'Db': 105,
+    'Sg': 106, 'Bh': 107, 'Hs': 108, 'Mt': 109, 'Ds': 110, 'Rg': 111, 'Cn': 112,
+    'Nh': 113, 'Fl': 114, 'Mc': 115, 'Lv': 116, 'Ts': 117, 'Og': 118,
+}
+
+# Atomic number to element symbol (reverse lookup)
+ATOMIC_NUMBER_TO_ELEMENT = {v: k for k, v in ELEMENT_TO_ATOMIC_NUMBER.items()}

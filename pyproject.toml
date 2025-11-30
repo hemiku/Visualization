@@ -30,12 +30,19 @@ keywords = ["quantum-chemistry", "molecular-visualization", "orbitals", "sapt", 
 dependencies = [
     "numpy>=1.20.0",
     "scipy>=1.6.0",
+    "pyvista>=0.38.0",  # Default visualization backend
 ]
 
 [project.optional-dependencies]
 # GPU acceleration support
 gpu = [
     "cupy-cuda11x>=10.0",
+]
+
+# Mayavi backend (optional, requires conda for easy install)
+# Enable via: VIZ_BACKEND=mayavi environment variable
+mayavi = [
+    "mayavi>=4.7.0",
 ]
 
 # Development dependencies
@@ -61,6 +68,7 @@ dev = [
 # All optional dependencies combined
 all = [
     "cupy-cuda11x>=10.0",
+    "mayavi>=4.7.0",
     "pytest>=6.2.0",
     "pytest-cov>=2.12.0",
     "pytest-xdist>=2.3.0",

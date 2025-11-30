@@ -6,6 +6,7 @@ without errors. They don't validate correctness, just that nothing crashes.
 """
 
 import pytest
+import os
 
 
 class TestImports:
@@ -46,6 +47,18 @@ class TestImports:
         import visualization.inputs
         assert hasattr(visualization.inputs, 'DaltonInput')
 
+    def test_import_backends(self):
+        """Test importing backends module."""
+        import visualization.backends
+        assert hasattr(visualization.backends, 'get_backend')
+        assert hasattr(visualization.backends, 'set_backend')
+        assert hasattr(visualization.backends, 'VisualizationBackend')
+
+    def test_import_pyvista_backend(self):
+        """Test importing PyVista backend (default)."""
+        from visualization.backends.pyvista_backend import PyVistaBackend
+        assert PyVistaBackend is not None
+
 
 class TestBasicInstantiation:
     """Test that basic objects can be instantiated without crashing."""
@@ -71,6 +84,64 @@ class TestBasicInstantiation:
         # Don't pass input_name to avoid file access
         viz = Visualization()
         assert viz is not None
+
+    def test_create_pyvista_backend(self):
+        """Test creating PyVista backend (default)."""
+        from visualization.backends import get_backend
+        backend = get_backend('pyvista')
+        assert backend is not None
+        assert backend.name == 'pyvista'
+
+    def test_visualization_has_backend(self):
+        """Test Visualization object has a backend."""
+        from visualization.visualization import Visualization
+        viz = Visualization()
+        assert hasattr(viz, '_backend')
+        assert viz._backend is not None
+        assert viz._backend.name == 'pyvista'  # Default backend
+
+
+class TestBackendFactory:
+    """Test backend factory functionality."""
+
+    def test_get_default_backend(self):
+        """Test getting default backend (pyvista)."""
+        from visualization.backends import get_backend, set_backend
+        # Reset to ensure clean state
+        set_backend('pyvista')
+        backend = get_backend()
+        assert backend.name == 'pyvista'
+
+    def test_get_pyvista_backend_explicitly(self):
+        """Test getting pyvista backend by name."""
+        from visualization.backends import get_backend
+        backend = get_backend('pyvista')
+        assert backend.name == 'pyvista'
+
+    def test_backend_env_variable(self):
+        """Test backend selection via environment variable."""
+        from visualization.backends import set_backend, get_backend
+        # First reset to clean state
+        set_backend('pyvista')
+        # Set env var (this only affects new get_backend calls with name=None)
+        old_env = os.environ.get('VIZ_BACKEND')
+        try:
+            os.environ['VIZ_BACKEND'] = 'pyvista'
+            # Need to clear cache to pick up env var
+            set_backend('pyvista')
+            backend = get_backend()
+            assert backend.name == 'pyvista'
+        finally:
+            if old_env is None:
+                os.environ.pop('VIZ_BACKEND', None)
+            else:
+                os.environ['VIZ_BACKEND'] = old_env
+
+    def test_invalid_backend_raises_error(self):
+        """Test that invalid backend name raises ValueError."""
+        from visualization.backends import get_backend
+        with pytest.raises(ValueError, match="Unknown backend"):
+            get_backend('nonexistent_backend')
 
 
 class TestNumpyAvailability:
