@@ -1,12 +1,51 @@
 """Constants for molecular visualization.
 
 This module contains:
+- Grid generation defaults
+- Visualization defaults (figure size, opacity, etc.)
 - Atom colors (RGB tuples for rendering)
 - Atom scales (relative sizes for visualization)
 - Atom masses (atomic mass units)
 - Element symbol to atomic number mapping
 - Background color presets
 """
+
+# =============================================================================
+# Grid Generation Defaults
+# =============================================================================
+
+# Multiplier for grid extent beyond molecular boundaries
+# Grid extends R_max_multip * max_basis_extent in each direction
+DEFAULT_R_MAX_MULTIPLIER = 12.0
+
+# Default grid resolution (number of points in each dimension)
+DEFAULT_GRID_RESOLUTION = 50
+
+# Factor for converting Gaussian exponent to spatial extent
+# Derived from: π^(1/4) / √(2^(3/2)) × 2
+# Used to estimate the spatial extent of a Gaussian basis function
+BOHR_EXTENT_FACTOR = 1.64526336574595
+
+# =============================================================================
+# Visualization Defaults
+# =============================================================================
+
+# Default figure size in pixels (width, height)
+DEFAULT_FIGURE_SIZE = (600, 600)
+
+# Default opacity for isosurface rendering (0.0 = transparent, 1.0 = opaque)
+DEFAULT_OPACITY = 0.5
+
+# Default number of contour levels for isosurface plots
+DEFAULT_CONTOURS = 12
+
+# Default atom/bond scaling factors
+DEFAULT_ATOM_SCALING = 1.0
+DEFAULT_BOND_SCALING = 1.0
+
+# =============================================================================
+# Background Colors
+# =============================================================================
 
 # Background color presets for visualization
 BACKGROUND_COLORS = {

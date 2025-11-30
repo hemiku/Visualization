@@ -1,4 +1,6 @@
 import tarfile
+from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple
 
 import numpy as np
 from numpy import float32
@@ -9,115 +11,112 @@ from visualization.basis_normalization import (
 )
 
 
-class Input( ):
+class Input(ABC):
+	"""Abstract base class for quantum chemistry file parsers.
 
-	input_type = None
-	input_type = None
-	input_name = None
-	file_string = None
-	BAS_filename = None
-	data_source = None
+	This class defines the interface that all input parsers must implement.
+	Subclasses handle specific file formats (Dalton, Molpro, Molden, etc.)
+	but all provide the same core data: atoms, basis sets, and coefficients.
+	"""
 
-	output = None
+	input_type: Optional[str] = None
+	input_name: Optional[str] = None
+	file_string: Optional[str] = None
+	BAS_filename: Optional[str] = None
+	data_source: Optional[str] = None
 
-	nb = None
-	spherical:MolecularSystem.spherical
-	nAtoms = None
-	inactive:int = None
-	electrons = None
-	Occ = None
+	output: Optional[str] = None
 
-	basis = None
-	basis_norm = None
-	basis_norm2 = None
+	nb: Optional[int] = None
+	spherical: bool = False
+	nAtoms: Optional[int] = None
+	inactive: int = 0
+	electrons: Optional[int] = None
+	Occ: Optional[np.ndarray] = None
 
-	Coeff= None
+	basis: Optional[List] = None
+	basis_norm: Optional[List] = None
+	basis_norm2: Optional[List] = None
 
-	Atoms_R = None
-	Atoms_Charge = None
-	Atoms_Name = None
+	Coeff: Optional[np.ndarray] = None
 
-	Bonds = None
+	Atoms_R: Optional[np.ndarray] = None
+	Atoms_Charge: Optional[np.ndarray] = None
+	Atoms_Name: Optional[List[str]] = None
 
-	def __init__(self, input_type=None, input_sub_type=None, input_name=None, file_string=None, BAS_filename=None, data_source=None, **kwargs):
+	Bonds: Optional[List] = None
 
-
+	def __init__(self, input_type=None, input_sub_type=None, input_name=None,
+				 file_string=None, BAS_filename=None, data_source=None, **kwargs):
 		if input_type is not None:
 			self.input_type = input_type
-
 		if input_sub_type is not None:
 			self.input_sub_type = input_sub_type
-
 		if input_name is not None:
 			self.input_name = input_name
-
 		if file_string is not None:
 			self.file_string = file_string
-
 		if BAS_filename is not None:
 			self.BAS_filename = BAS_filename
-
 		if data_source is not None:
 			self.data_source = data_source
 
-	def set_input_type(self, input_type):
+	# Abstract methods - must be implemented by subclasses
+	@abstractmethod
+	def get_nb(self) -> int:
+		"""Return number of basis functions."""
 		pass
 
-	def set_input_sub_type(self, input_sub_type):
+	@abstractmethod
+	def get_nAtoms(self) -> int:
+		"""Return number of atoms."""
 		pass
 
-	def set_input_name(self, source):
+	@abstractmethod
+	def get_atoms(self) -> Tuple[np.ndarray, np.ndarray, List[str]]:
+		"""Return atomic data (positions, charges, names)."""
 		pass
 
-	def get_harmonic(self):
+	@abstractmethod
+	def get_basis(self) -> Tuple[List, List, List]:
+		"""Return basis set data (basis, basis_norm, basis_norm2)."""
 		pass
 
-	def get_nb(self):
+	@abstractmethod
+	def get_coeff(self) -> np.ndarray:
+		"""Return MO coefficients."""
 		pass
 
-	def get_nAtoms(self):
-		pass
+	# Optional methods - subclasses may override
+	def get_spherical(self) -> bool:
+		"""Return True if using spherical harmonics."""
+		return self.spherical
 
-	def get_inactive(self):
-		pass
+	def get_inactive(self) -> int:
+		"""Return number of inactive orbitals."""
+		return self.inactive
 
-	def get_electrons(self):
-		pass
+	def get_electrons(self) -> Optional[int]:
+		"""Return number of electrons."""
+		return self.electrons
 
-	def get_occ(self):
-		pass
+	def get_occ(self) -> Optional[np.ndarray]:
+		"""Return orbital occupation numbers."""
+		return self.Occ
 
-	def get_coeff(self):
-		pass
+	def get_bonds(self) -> Optional[List]:
+		"""Return bond information."""
+		return self.Bonds
 
-	def get_atoms(self) -> list:
-		pass
-
-	def get_bonds(self):
-		pass
-
-	def set_source(self, source):
-
-		self.input_type = source
-
-
-	def get_data_source(self, data_source):
-
-		self.data_source = data_source
-
-	def get_output(self):
-
+	def get_output(self) -> str:
+		"""Read and return output file contents."""
 		if self.output is not None:
-
 			return self.output
+		with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
+			self.output = f.read()
+		return self.output
 
-		else:
-			with open(self.input_name + ".out", 'r', encoding="utf-8") as f:
-				self.output = f.read()
-
-			return self.output
-
-	def calc_norm_from_basis(self, basis):
+	def calc_norm_from_basis(self, basis: List) -> List:
 		"""Calculate normalization factors for basis set."""
 		return _calc_norm(basis)
 

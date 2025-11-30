@@ -1,36 +1,37 @@
+"""3D grid generation for molecular orbital calculations."""
 
-class Grid():
+from typing import List, Optional
 
-    import numpy as np
+import numpy as np
 
-    initial = None
-
-    R_max_multip = None
-
-    x_min:np.float64
-    x_max:np.float64
-    x_n:np.int32
-    y_min:np.float64
-    y_max:np.float64
-    y_n:np.int32
-    z_min:np.float64
-    z_max:np.float64
-    z_n:np.int32
+from visualization.constants import (
+    DEFAULT_R_MAX_MULTIPLIER,
+    DEFAULT_GRID_RESOLUTION,
+    BOHR_EXTENT_FACTOR,
+)
 
 
-    def __init__(self,  R_max_multip:float =12.0,
-                        x_min:np.float64=None,
-                        x_max:np.float64=None,
-                        x_n:np.int32= 100,
-                        y_min:np.float64=None,
-                        y_max:np.float64=None,
-                        y_n:np.int32=100,
-                        z_min:np.float64=None,
-                        z_max:np.float64=None,
-                        z_n:np.int32=100):
+class Grid:
+    """3D spatial grid for orbital calculations.
 
+    The grid extends beyond the molecular boundaries based on the
+    spatial extent of the basis functions.
+    """
+
+    def __init__(
+        self,
+        R_max_multip: float = DEFAULT_R_MAX_MULTIPLIER,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        x_n: int = DEFAULT_GRID_RESOLUTION,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        y_n: int = DEFAULT_GRID_RESOLUTION,
+        z_min: Optional[float] = None,
+        z_max: Optional[float] = None,
+        z_n: int = DEFAULT_GRID_RESOLUTION,
+    ):
         self.R_max_multip = R_max_multip
-
         self.x_min = x_min
         self.x_max = x_max
         self.x_n = x_n
@@ -42,47 +43,35 @@ class Grid():
         self.z_n = z_n
 
     def return_grid_arrays(self) -> np.ndarray:
+        """Return 3D meshgrid arrays for X, Y, Z coordinates."""
+        return np.mgrid[
+            self.x_min:self.x_max:self.x_n*1j,
+            self.y_min:self.y_max:self.y_n*1j,
+            self.z_min:self.z_max:self.z_n*1j
+        ]
 
-        return self.np.mgrid[self.x_min:self.x_max:self.x_n*1j, self.y_min:self.y_max:self.y_n*1j, self.z_min:self.z_max:self.z_n*1j]
+    def generate_grid_boundaries(self, basis: List, atoms_R: np.ndarray) -> None:
+        """Calculate grid boundaries from basis set extent and atomic positions.
 
-    def generate_grid_boundaries(self, basis, atoms_R):
+        Args:
+            basis: List of basis set data per atom
+            atoms_R: Atomic positions array (n_atoms x 3)
+        """
+        # Calculate maximum spatial extent of each basis function
+        basis_extents = []
+        for atom_basis in basis:
+            for orbital_basis in atom_basis:
+                max_exponent = orbital_basis.max()
+                extent = BOHR_EXTENT_FACTOR / np.sqrt(max_exponent)
+                basis_extents.append(extent)
 
-        Basis_max = []
-        for i in range(len(basis)):
-            for j in range(len(basis[i])):
-                Basis_max.append(1.64526336574595 / self.np.sqrt(( basis[i][j] ).max()))
+        R_max = self.R_max_multip * np.max(basis_extents)
 
-        R_max = self.R_max_multip * self.np.max(Basis_max)
+        self.x_max = np.max(atoms_R[:, 0]) + R_max
+        self.x_min = np.min(atoms_R[:, 0]) - R_max
 
-        self.x_max = self.np.max( atoms_R[:, 0]) + R_max
-        self.x_min = self.np.min( atoms_R[:, 0]) - R_max
+        self.y_max = np.max(atoms_R[:, 1]) + R_max
+        self.y_min = np.min(atoms_R[:, 1]) - R_max
 
-        self.y_max = self.np.max( atoms_R[:, 1]) + R_max
-        self.y_min = self.np.min( atoms_R[:, 1]) - R_max
-
-        self.z_max = self.np.max( atoms_R[:, 2]) + R_max
-        self.z_min = self.np.min( atoms_R[:, 2]) - R_max
-
-    # def generate_grid_boundaries_obsolete(self, basis, Atoms_R):
-
-    #     Basis_max = []
-    #     for i in range(len(basis)):
-    #         for j in range(len(basis[i])):
-    #             Basis_max.append(1.64526336574595 / self.np.sqrt(( basis[i][j] ).max()))
-
-    #     R_max = self.R_max_multip * self.np.max(Basis_max)
-
-    #     if self.x_max is None:
-    #         self.x_max = self.np.max( Atoms_R[:, 0]) + R_max
-    #     if self.x_min is None:
-    #         self.x_min = self.np.min( Atoms_R[:, 0]) - R_max
-
-    #     if self.y_max is None:
-    #         self.y_max = self.np.max( Atoms_R[:, 1]) + R_max
-    #     if self.y_min is None:
-    #         self.y_min = self.np.min( Atoms_R[:, 1]) - R_max
-
-    #     if self.z_max is None:
-    #         self.z_max = self.np.max( Atoms_R[:, 2]) + R_max
-    #     if self.z_min is None:
-    #         self.z_min = self.np.min( Atoms_R[:, 2]) - R_max
+        self.z_max = np.max(atoms_R[:, 2]) + R_max
+        self.z_min = np.min(atoms_R[:, 2]) - R_max
