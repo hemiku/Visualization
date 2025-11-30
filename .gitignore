@@ -38,7 +38,10 @@ dmypy.json
 
 # Temporary visualization outputs (test artifacts in root)
 water_dimer_output.png
+water_dimer_orbitals.png
+water_MO_*.png
 *_output.png
+*_hires.png
 test_*.png
 
 # AI conversation logs (development notes, not for commit)
