@@ -45,9 +45,9 @@ class Grid:
     def return_grid_arrays(self) -> np.ndarray:
         """Return 3D meshgrid arrays for X, Y, Z coordinates."""
         return np.mgrid[
-            self.x_min:self.x_max:self.x_n*1j,
-            self.y_min:self.y_max:self.y_n*1j,
-            self.z_min:self.z_max:self.z_n*1j
+            self.x_min : self.x_max : self.x_n * 1j,
+            self.y_min : self.y_max : self.y_n * 1j,
+            self.z_min : self.z_max : self.z_n * 1j,
         ]
 
     def generate_grid_boundaries(self, basis: List, atoms_R: np.ndarray) -> None:

@@ -54,9 +54,7 @@ def get_backend(name: Optional[str] = None) -> VisualizationBackend:
 
         _backend_instance = PyVistaBackend()
     else:
-        raise ValueError(
-            f"Unknown backend: '{name}'. Available: 'pyvista', 'mayavi'"
-        )
+        raise ValueError(f"Unknown backend: '{name}'. Available: 'pyvista', 'mayavi'")
 
     return _backend_instance
 

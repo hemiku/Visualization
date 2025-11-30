@@ -24,13 +24,9 @@ class TestWaterVisualization:
         import visualization.visualization as V
 
         # Load water dimer
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = V.Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = V.Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         # Get geometry
         vis.get_geometry()
@@ -39,11 +35,7 @@ class TestWaterVisualization:
         output_file = tmp_path / "test_water.png"
 
         figure = vis.plot_geometry(
-            plot_atoms=True,
-            atom_scaling=0.5,
-            atom_names=True,
-            plot_bonds=True,
-            auto_show=False
+            plot_atoms=True, atom_scaling=0.5, atom_names=True, plot_bonds=True, auto_show=False
         )
 
         mlab.savefig(str(output_file))
@@ -58,24 +50,16 @@ class TestWaterVisualization:
         from PIL import Image
 
         # Load and render
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = V.Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = V.Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_geometry()
 
         output_file = tmp_path / "test_water.png"
 
         figure = vis.plot_geometry(
-            plot_atoms=True,
-            atom_scaling=0.5,
-            atom_names=True,
-            plot_bonds=True,
-            auto_show=False
+            plot_atoms=True, atom_scaling=0.5, atom_names=True, plot_bonds=True, auto_show=False
         )
 
         # Use backend's save method to ensure correct size in offscreen mode
@@ -97,8 +81,7 @@ class TestWaterVisualization:
 
         # Test 3: Image is not all black (allow mostly white backgrounds)
         mean_color = img_array.mean()
-        assert mean_color > 30, \
-            f"Image appears all black: mean={mean_color:.1f} (expected >30)"
+        assert mean_color > 30, f"Image appears all black: mean={mean_color:.1f} (expected >30)"
 
         # Test 4: Image has multiple colors (not monochrome)
         # Check RGB channels have different values
@@ -110,30 +93,27 @@ class TestWaterVisualization:
             # At least some color variation between channels
             # (relaxed threshold for white backgrounds with colored atoms)
             color_variation = max(r_mean, g_mean, b_mean) - min(r_mean, g_mean, b_mean)
-            assert color_variation > 1, \
-                f"Image appears monochrome (variation={color_variation:.1f})"
+            assert (
+                color_variation > 1
+            ), f"Image appears monochrome (variation={color_variation:.1f})"
 
     def test_molecular_data_loaded(self, water_dimer_tarball):
         """Test that molecular system data is loaded correctly."""
         import visualization.visualization as V
 
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = V.Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = V.Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_geometry()
 
         # Test molecular system properties
-        assert vis.molecular_system.nAtoms == 6, \
-            f"Expected 6 atoms, got {vis.molecular_system.nAtoms}"
+        assert (
+            vis.molecular_system.nAtoms == 6
+        ), f"Expected 6 atoms, got {vis.molecular_system.nAtoms}"
 
         assert vis.molecular_system.atoms_R is not None
-        assert vis.molecular_system.atoms_R.shape == (6, 3), \
-            "Atom positions should be 6x3 array"
+        assert vis.molecular_system.atoms_R.shape == (6, 3), "Atom positions should be 6x3 array"
 
         assert vis.molecular_system.atoms_Charge is not None
         assert len(vis.molecular_system.atoms_Charge) == 6
@@ -174,24 +154,16 @@ class TestVisualSimilarity:
             pytest.skip(f"Reference image not found: {reference_path}")
 
         # Load and render
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = V.Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = V.Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_geometry()
 
         output_file = tmp_path / "test_water.png"
 
         figure = vis.plot_geometry(
-            plot_atoms=True,
-            atom_scaling=0.5,
-            atom_names=True,
-            plot_bonds=True,
-            auto_show=False
+            plot_atoms=True, atom_scaling=0.5, atom_names=True, plot_bonds=True, auto_show=False
         )
 
         mlab.savefig(str(output_file))
@@ -202,8 +174,9 @@ class TestVisualSimilarity:
         test_output = np.array(Image.open(output_file))
 
         # Ensure same shape
-        assert reference.shape == test_output.shape, \
-            f"Shape mismatch: reference={reference.shape}, output={test_output.shape}"
+        assert (
+            reference.shape == test_output.shape
+        ), f"Shape mismatch: reference={reference.shape}, output={test_output.shape}"
 
         # Calculate structural similarity
         # Use channel_axis=2 for RGB images, channel_axis=-1 for RGBA
@@ -216,7 +189,8 @@ class TestVisualSimilarity:
         # SSIM of 1.0 = identical, 0.0 = completely different
         min_similarity = 0.90
 
-        assert similarity >= min_similarity, \
-            f"Image too different from reference: SSIM={similarity:.3f} (expected >={min_similarity})"
+        assert (
+            similarity >= min_similarity
+        ), f"Image too different from reference: SSIM={similarity:.3f} (expected >={min_similarity})"
 
         print(f"Visual similarity: {similarity:.3f}")

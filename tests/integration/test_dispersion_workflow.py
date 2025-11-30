@@ -23,18 +23,16 @@ class TestDispersionWorkflow:
         import visualization.dispersion_plot as disp
 
         # Use pathlib for path handling
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         # Load Dalton data
         visualization = disp.DispersionPlot(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         # Verify visualization object created
         assert visualization is not None
-        assert hasattr(visualization, 'molecular_system')
+        assert hasattr(visualization, "molecular_system")
 
     def test_ethylene_dispersion_calculation_small_grid(self, ethylene_dimer_dir):
         """Test dispersion calculation with small grid (fast test)."""
@@ -42,13 +40,11 @@ class TestDispersionWorkflow:
 
         # Use pathlib for all path operations
         ethylene_dir = Path(ethylene_dimer_dir)
-        ethylene_path = ethylene_dir / 'ethylene'
-        gammcor_file = ethylene_dir / 'ethylene_erpa.txt'
+        ethylene_path = ethylene_dir / "ethylene"
+        gammcor_file = ethylene_dir / "ethylene_erpa.txt"
 
         visualization = disp.DispersionPlot(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         # Check if GAMMCOR file exists before trying to load
@@ -58,17 +54,11 @@ class TestDispersionWorkflow:
         visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Calculate dispersion with small grid for speed
-        visualization.get_dispersion_index(
-            x_n=10,
-            y_n=10,
-            z_n=10,
-            monomer_A=1,
-            monomer_B=2
-        )
+        visualization.get_dispersion_index(x_n=10, y_n=10, z_n=10, monomer_A=1, monomer_B=2)
 
         # Verify dispersion data was calculated
-        assert hasattr(visualization, 'dispersion_A')
-        assert hasattr(visualization, 'dispersion_B')
+        assert hasattr(visualization, "dispersion_A")
+        assert hasattr(visualization, "dispersion_B")
         assert visualization.dispersion_A is not None
         assert visualization.dispersion_B is not None
 
@@ -81,9 +71,7 @@ class TestDispersionWorkflow:
         ethylene_path = ethylene_dir / "ethylene"
 
         visualization = disp.DispersionPlot(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         gammcor_file = Path(ethylene_dimer_dir) / "ethylene_erpa.txt"
@@ -93,13 +81,7 @@ class TestDispersionWorkflow:
         visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Calculate with medium grid (as in notebook: 50x50x50)
-        visualization.get_dispersion_index(
-            x_n=50,
-            y_n=50,
-            z_n=50,
-            monomer_A=1,
-            monomer_B=2
-        )
+        visualization.get_dispersion_index(x_n=50, y_n=50, z_n=50, monomer_A=1, monomer_B=2)
 
         # Verify grid dimensions
         assert visualization.dispersion_A.shape == (50, 50, 50)
@@ -119,9 +101,7 @@ class TestGeminalWorkflow:
         ethylene_path = ethylene_dir / "ethylene"
 
         visualization = disp.DispersionPlot(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         # Verify molecular system initialized
@@ -135,9 +115,7 @@ class TestGeminalWorkflow:
         ethylene_path = ethylene_dir / "ethylene"
 
         visualization = disp.DispersionPlot(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         gammcor_file = Path(ethylene_dimer_dir) / "ethylene_erpa.txt"
@@ -148,16 +126,11 @@ class TestGeminalWorkflow:
 
         # Small grid for fast testing
         visualization.get_dispersion_index(
-            x_n=10,
-            y_n=10,
-            z_n=10,
-            monomer_A=1,
-            monomer_B=2,
-            gpu=False
+            x_n=10, y_n=10, z_n=10, monomer_A=1, monomer_B=2, gpu=False
         )
 
         # Verify geminal data available
-        assert hasattr(visualization.molecular_system, 'geminals')
+        assert hasattr(visualization.molecular_system, "geminals")
 
 
 @pytest.mark.integration
@@ -171,18 +144,14 @@ class TestSAPTWorkflow:
 
         # benzene_output fixture returns Path with .out extension
         # Remove .out since MolproSapt adds it
-        benzene_path = Path(benzene_output).with_suffix('')
+        benzene_path = Path(benzene_output).with_suffix("")
 
         vis_A = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
 
         vis_B = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
         vis_B.data_input.monomer = 1
 
@@ -195,12 +164,10 @@ class TestSAPTWorkflow:
         """Test SAPT geometry loading for both monomers."""
         import visualization.visualization as V
 
-        benzene_path = Path(benzene_output).with_suffix('')
+        benzene_path = Path(benzene_output).with_suffix("")
 
         vis_A = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
 
         vis_A.get_geometry()
@@ -214,12 +181,10 @@ class TestSAPTWorkflow:
         """Test SAPT orbital data loading."""
         import visualization.visualization as V
 
-        benzene_path = Path(benzene_output).with_suffix('')
+        benzene_path = Path(benzene_output).with_suffix("")
 
         vis_A = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
 
         vis_A.get_geometry()
@@ -234,12 +199,10 @@ class TestSAPTWorkflow:
         """Test SAPT grid initialization with small grid."""
         import visualization.visualization as V
 
-        benzene_path = Path(benzene_output).with_suffix('')
+        benzene_path = Path(benzene_output).with_suffix("")
 
         vis_A = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
 
         vis_A.get_geometry()
@@ -264,8 +227,9 @@ class TestSAPTWorkflow:
         """Test reading SAPTVIS binary file."""
         import visualization.utils as utils
 
-        ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat = \
-            utils.read_SAPTVIS(str(benzene_saptvis_binary))
+        ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat = utils.read_SAPTVIS(
+            str(benzene_saptvis_binary)
+        )
 
         # Verify SAPTVIS data loaded
         assert ANBasis > 0
@@ -285,20 +249,16 @@ class TestSAPTWorkflow:
         import visualization.utils as utils
         import numpy as np
 
-        benzene_path = Path(benzene_output).with_suffix('')
+        benzene_path = Path(benzene_output).with_suffix("")
 
         # Load data for monomer A
         vis_A = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
 
         # Load data for monomer B
         vis_B = V.Visualization(
-            input_type='MolproSapt',
-            input_sub_type='output',
-            input_name=str(benzene_path)
+            input_type="MolproSapt", input_sub_type="output", input_name=str(benzene_path)
         )
         vis_B.data_input.monomer = 1
 
@@ -319,8 +279,9 @@ class TestSAPTWorkflow:
             vis.orbital_generator.spherical = 1
 
         # Read SAPTVIS data
-        ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat = \
-            utils.read_SAPTVIS(str(benzene_saptvis_binary))
+        ANBasis, BNBasis, NOccupA, NOccupB, A_Occ, B_Occ, ACMO, BCMO, Qmat = utils.read_SAPTVIS(
+            str(benzene_saptvis_binary)
+        )
 
         # Set coefficients
         vis_A.molecular_system.Coeff[:, :] = ACMO
@@ -340,8 +301,8 @@ class TestSAPTWorkflow:
 
         for i in range(NOccupA):
             for j in range(NOccupB):
-                sapt_dispersion_A += Qmat_tmp[i, j] * A_Occ[i] * vis_A.molecular_system.MOs[i]**2
-                sapt_dispersion_B += Qmat_tmp[i, j] * B_Occ[j] * vis_B.molecular_system.MOs[j]**2
+                sapt_dispersion_A += Qmat_tmp[i, j] * A_Occ[i] * vis_A.molecular_system.MOs[i] ** 2
+                sapt_dispersion_B += Qmat_tmp[i, j] * B_Occ[j] * vis_B.molecular_system.MOs[j] ** 2
 
         sapt_dispersion_AB = -0.5 * (sapt_dispersion_A + sapt_dispersion_B)
 

@@ -121,7 +121,7 @@ class MayaviBackend(VisualizationBackend):
     def save(self, filename: str) -> None:
         """Save the visualization to an image file."""
         # Use stored size to ensure correct output dimensions in offscreen mode
-        if hasattr(self, '_size') and self._size:
+        if hasattr(self, "_size") and self._size:
             self.mlab.savefig(filename, size=self._size)
         else:
             self.mlab.savefig(filename)

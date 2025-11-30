@@ -69,13 +69,13 @@ class TestSOrbitalAtOrigin:
         grid.z_min, grid.z_max = -5.0, 5.0
 
         return {
-            'nAtoms': nAtoms,
-            'atoms_R': atoms_R,
-            'spherical': spherical,
-            'nb': nb,
-            'basis': basis,
-            'basis_norm': basis_norm,
-            'grid': grid,
+            "nAtoms": nAtoms,
+            "atoms_R": atoms_R,
+            "spherical": spherical,
+            "nb": nb,
+            "basis": basis,
+            "basis_norm": basis_norm,
+            "grid": grid,
         }
 
     def test_s_orbital_value_at_origin(self, simple_s_orbital_system):
@@ -83,28 +83,28 @@ class TestSOrbitalAtOrigin:
         config = simple_s_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
         # Find origin indices (center of grid)
-        center_idx = config['grid'].x_n // 2
+        center_idx = config["grid"].x_n // 2
 
         # Expected value: N = (2*alpha/pi)^(3/4) for alpha=1.0
         expected = (2.0 / np.pi) ** 0.75  # = 0.7127054703549901
         actual = gen.AOs[0, center_idx, center_idx, center_idx]
 
-        assert np.isclose(actual, expected, rtol=1e-10), (
-            f"S-orbital at origin: expected {expected}, got {actual}"
-        )
+        assert np.isclose(
+            actual, expected, rtol=1e-10
+        ), f"S-orbital at origin: expected {expected}, got {actual}"
 
     def test_s_orbital_value_at_origin_alpha_2(self):
         """Test S-orbital (alpha=2.0) gives (4/pi)^(3/4) at origin."""
@@ -122,8 +122,13 @@ class TestSOrbitalAtOrigin:
         grid.z_min, grid.z_max = -5.0, 5.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=1,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atoms_R,
+            spherical=1,
+            nb=1,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -140,30 +145,26 @@ class TestSOrbitalAtOrigin:
         config = simple_s_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
         # Get values along x-axis (y=0, z=0)
-        center_idx = config['grid'].x_n // 2
+        center_idx = config["grid"].x_n // 2
 
         # Value at origin
         val_origin = gen.AOs[0, center_idx, center_idx, center_idx]
 
         # Value at x=1 (one grid step from center depends on grid spacing)
-        x_vals = np.linspace(
-            config['grid'].x_min,
-            config['grid'].x_max,
-            config['grid'].x_n
-        )
+        x_vals = np.linspace(config["grid"].x_min, config["grid"].x_max, config["grid"].x_n)
         dx = x_vals[1] - x_vals[0]
 
         # Value at some distance from origin
@@ -198,8 +199,13 @@ class TestSOrbitalNormalization:
         grid.z_min, grid.z_max = -6.0, 6.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=1,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atoms_R,
+            spherical=1,
+            nb=1,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -211,13 +217,13 @@ class TestSOrbitalNormalization:
         dz = (grid.z_max - grid.z_min) / (grid.z_n - 1)
         dv = dx * dy * dz
 
-        integral = np.sum(gen.AOs[0]**2) * dv
+        integral = np.sum(gen.AOs[0] ** 2) * dv
 
         # For a normalized Gaussian, integral should be 1
         # Allow some tolerance due to grid truncation
-        assert np.isclose(integral, 1.0, rtol=0.05), (
-            f"S-orbital normalization integral: expected ~1.0, got {integral}"
-        )
+        assert np.isclose(
+            integral, 1.0, rtol=0.05
+        ), f"S-orbital normalization integral: expected ~1.0, got {integral}"
 
 
 class TestPOrbitalAnalyticalValues:
@@ -249,19 +255,19 @@ class TestPOrbitalAnalyticalValues:
         grid.z_min, grid.z_max = -5.0, 5.0
 
         return {
-            'nAtoms': nAtoms,
-            'atoms_R': atoms_R,
-            'spherical': spherical,
-            'nb': nb,
-            'basis': basis,
-            'basis_norm': basis_norm,
-            'grid': grid,
+            "nAtoms": nAtoms,
+            "atoms_R": atoms_R,
+            "spherical": spherical,
+            "nb": nb,
+            "basis": basis,
+            "basis_norm": basis_norm,
+            "grid": grid,
         }
 
     def test_p_orbital_normalization_constant(self):
         """Verify P-orbital normalization constant: N_p = 2*(2/pi)^(3/4) for alpha=1."""
         alpha = 1.0
-        N_p_expected = 2.0 * (2.0 * alpha / np.pi) ** 0.75 * (alpha ** 0.5)
+        N_p_expected = 2.0 * (2.0 * alpha / np.pi) ** 0.75 * (alpha**0.5)
         assert np.isclose(N_p_expected, 1.4254109407099802, rtol=1e-10)
 
     def test_px_orbital_at_x_equals_1(self, p_orbital_system):
@@ -269,25 +275,23 @@ class TestPOrbitalAnalyticalValues:
         config = p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
         # Find grid point closest to x=1
-        x_vals = np.linspace(
-            config['grid'].x_min, config['grid'].x_max, config['grid'].x_n
-        )
+        x_vals = np.linspace(config["grid"].x_min, config["grid"].x_max, config["grid"].x_n)
         x_idx = np.argmin(np.abs(x_vals - 1.0))
-        center_y = config['grid'].y_n // 2
-        center_z = config['grid'].z_n // 2
+        center_y = config["grid"].y_n // 2
+        center_z = config["grid"].z_n // 2
 
         # Analytical value: N_p * x * exp(-alpha * x^2) for x=1, alpha=1
         N_p = 2.0 * (2.0 / np.pi) ** 0.75
@@ -297,33 +301,31 @@ class TestPOrbitalAnalyticalValues:
         # Px is orbital index 1 (after S)
         actual = gen.AOs[1, x_idx, center_y, center_z]
 
-        assert np.isclose(actual, expected, rtol=1e-6), (
-            f"Px at ({x_actual},0,0): expected {expected}, got {actual}"
-        )
+        assert np.isclose(
+            actual, expected, rtol=1e-6
+        ), f"Px at ({x_actual},0,0): expected {expected}, got {actual}"
 
     def test_py_orbital_at_y_equals_1(self, p_orbital_system):
         """Test Py at (0,1,0): N_p * 1 * exp(-1)."""
         config = p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        y_vals = np.linspace(
-            config['grid'].y_min, config['grid'].y_max, config['grid'].y_n
-        )
+        y_vals = np.linspace(config["grid"].y_min, config["grid"].y_max, config["grid"].y_n)
         y_idx = np.argmin(np.abs(y_vals - 1.0))
-        center_x = config['grid'].x_n // 2
-        center_z = config['grid'].z_n // 2
+        center_x = config["grid"].x_n // 2
+        center_z = config["grid"].z_n // 2
 
         N_p = 2.0 * (2.0 / np.pi) ** 0.75
         y_actual = y_vals[y_idx]
@@ -339,24 +341,22 @@ class TestPOrbitalAnalyticalValues:
         config = p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        z_vals = np.linspace(
-            config['grid'].z_min, config['grid'].z_max, config['grid'].z_n
-        )
+        z_vals = np.linspace(config["grid"].z_min, config["grid"].z_max, config["grid"].z_n)
         z_idx = np.argmin(np.abs(z_vals - 1.0))
-        center_x = config['grid'].x_n // 2
-        center_y = config['grid'].y_n // 2
+        center_x = config["grid"].x_n // 2
+        center_y = config["grid"].y_n // 2
 
         N_p = 2.0 * (2.0 / np.pi) ** 0.75
         z_actual = z_vals[z_idx]
@@ -372,13 +372,13 @@ class TestPOrbitalAnalyticalValues:
         config = p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
@@ -389,20 +389,18 @@ class TestPOrbitalAnalyticalValues:
         alpha = 1.0
         x_max_expected = 1.0 / np.sqrt(2.0 * alpha)
 
-        x_vals = np.linspace(
-            config['grid'].x_min, config['grid'].x_max, config['grid'].x_n
-        )
-        center_y = config['grid'].y_n // 2
-        center_z = config['grid'].z_n // 2
+        x_vals = np.linspace(config["grid"].x_min, config["grid"].x_max, config["grid"].x_n)
+        center_y = config["grid"].y_n // 2
+        center_z = config["grid"].z_n // 2
 
         # Find max along positive x-axis
         px_along_x = gen.AOs[1, :, center_y, center_z]
         x_max_idx = np.argmax(px_along_x)
         x_max_actual = x_vals[x_max_idx]
 
-        assert np.isclose(x_max_actual, x_max_expected, atol=0.3), (
-            f"Px maximum at x={x_max_actual}, expected {x_max_expected}"
-        )
+        assert np.isclose(
+            x_max_actual, x_max_expected, atol=0.3
+        ), f"Px maximum at x={x_max_actual}, expected {x_max_expected}"
 
 
 class TestDOrbitalAnalyticalValues:
@@ -434,13 +432,13 @@ class TestDOrbitalAnalyticalValues:
         grid.z_min, grid.z_max = -4.0, 4.0
 
         return {
-            'nAtoms': nAtoms,
-            'atoms_R': atoms_R,
-            'spherical': spherical,
-            'nb': nb,
-            'basis': basis,
-            'basis_norm': basis_norm,
-            'grid': grid,
+            "nAtoms": nAtoms,
+            "atoms_R": atoms_R,
+            "spherical": spherical,
+            "nb": nb,
+            "basis": basis,
+            "basis_norm": basis_norm,
+            "grid": grid,
         }
 
     def test_d_orbital_zero_at_origin(self, d_orbital_system_cartesian):
@@ -448,45 +446,45 @@ class TestDOrbitalAnalyticalValues:
         config = d_orbital_system_cartesian
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        center = config['grid'].x_n // 2
+        center = config["grid"].x_n // 2
 
         # D orbitals are indices 4-9 (after 1 S + 3 P)
         for d_idx in range(4, 10):
             value = gen.AOs[d_idx, center, center, center]
-            assert np.isclose(value, 0.0, atol=1e-12), (
-                f"D-orbital {d_idx} at origin: expected 0, got {value}"
-            )
+            assert np.isclose(
+                value, 0.0, atol=1e-12
+            ), f"D-orbital {d_idx} at origin: expected 0, got {value}"
 
     def test_d_xy_symmetry(self, d_orbital_system_cartesian):
         """Test d_xy symmetry: d_xy(x,y) = d_xy(-x,-y) and d_xy(x,-y) = -d_xy(x,y)."""
         config = d_orbital_system_cartesian
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        center = config['grid'].x_n // 2
+        center = config["grid"].x_n // 2
         offset = 3
 
         # d_xy is orbital index 7 (after xx=4, yy=5, zz=6, xy=7)
@@ -496,15 +494,15 @@ class TestDOrbitalAnalyticalValues:
         # d_xy(x,y,0) should equal d_xy(-x,-y,0)
         val_pp = gen.AOs[d_xy_idx, center + offset, center + offset, center]
         val_mm = gen.AOs[d_xy_idx, center - offset, center - offset, center]
-        assert np.isclose(val_pp, val_mm, rtol=1e-10), (
-            f"d_xy symmetry: d_xy(+,+)={val_pp}, d_xy(-,-)={val_mm}"
-        )
+        assert np.isclose(
+            val_pp, val_mm, rtol=1e-10
+        ), f"d_xy symmetry: d_xy(+,+)={val_pp}, d_xy(-,-)={val_mm}"
 
         # d_xy(x,-y,0) should equal -d_xy(x,y,0)
         val_pm = gen.AOs[d_xy_idx, center + offset, center - offset, center]
-        assert np.isclose(val_pm, -val_pp, rtol=1e-10), (
-            f"d_xy antisymmetry: d_xy(+,-)={val_pm}, -d_xy(+,+)={-val_pp}"
-        )
+        assert np.isclose(
+            val_pm, -val_pp, rtol=1e-10
+        ), f"d_xy antisymmetry: d_xy(+,-)={val_pm}, -d_xy(+,+)={-val_pp}"
 
 
 class TestDOrbitalSpherical:
@@ -530,13 +528,13 @@ class TestDOrbitalSpherical:
         grid.z_min, grid.z_max = -4.0, 4.0
 
         return {
-            'nAtoms': nAtoms,
-            'atoms_R': atoms_R,
-            'spherical': spherical,
-            'nb': nb,
-            'basis': basis,
-            'basis_norm': basis_norm,
-            'grid': grid,
+            "nAtoms": nAtoms,
+            "atoms_R": atoms_R,
+            "spherical": spherical,
+            "nb": nb,
+            "basis": basis,
+            "basis_norm": basis_norm,
+            "grid": grid,
         }
 
     def test_d_spherical_zero_at_origin(self, d_orbital_system_spherical):
@@ -544,45 +542,45 @@ class TestDOrbitalSpherical:
         config = d_orbital_system_spherical
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        center = config['grid'].x_n // 2
+        center = config["grid"].x_n // 2
 
         # D orbitals are indices 4-8 (after 1 S + 3 P, 5 spherical D)
         for d_idx in range(4, 9):
             value = gen.AOs[d_idx, center, center, center]
-            assert np.isclose(value, 0.0, atol=1e-12), (
-                f"Spherical D-orbital {d_idx} at origin: expected 0, got {value}"
-            )
+            assert np.isclose(
+                value, 0.0, atol=1e-12
+            ), f"Spherical D-orbital {d_idx} at origin: expected 0, got {value}"
 
     def test_d_z2_axial_symmetry(self, d_orbital_system_spherical):
         """Test d_z2 (m=0) has axial symmetry: same value at (x,0,z) and (0,y,z)."""
         config = d_orbital_system_spherical
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        center = config['grid'].x_n // 2
+        center = config["grid"].x_n // 2
         offset = 3
 
         # d_z2 (m=0) is orbital index 6 (after S, Px, Py, Pz, d_{-2}, d_{-1})
@@ -594,9 +592,9 @@ class TestDOrbitalSpherical:
         val_xz = gen.AOs[d_z2_idx, center + offset, center, center + offset]
         val_yz = gen.AOs[d_z2_idx, center, center + offset, center + offset]
 
-        assert np.isclose(val_xz, val_yz, rtol=1e-8), (
-            f"d_z2 axial symmetry: val(x,0,z)={val_xz}, val(0,y,z)={val_yz}"
-        )
+        assert np.isclose(
+            val_xz, val_yz, rtol=1e-8
+        ), f"d_z2 axial symmetry: val(x,0,z)={val_xz}, val(0,y,z)={val_yz}"
 
 
 class TestPOrbitalSymmetry:
@@ -623,13 +621,13 @@ class TestPOrbitalSymmetry:
         grid.z_min, grid.z_max = -5.0, 5.0
 
         return {
-            'nAtoms': nAtoms,
-            'atoms_R': atoms_R,
-            'spherical': spherical,
-            'nb': nb,
-            'basis': basis,
-            'basis_norm': basis_norm,
-            'grid': grid,
+            "nAtoms": nAtoms,
+            "atoms_R": atoms_R,
+            "spherical": spherical,
+            "nb": nb,
+            "basis": basis,
+            "basis_norm": basis_norm,
+            "grid": grid,
         }
 
     def test_px_orbital_antisymmetry(self, simple_p_orbital_system):
@@ -637,13 +635,13 @@ class TestPOrbitalSymmetry:
         config = simple_p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
@@ -653,29 +651,29 @@ class TestPOrbitalSymmetry:
         px = gen.AOs[1]
 
         # Check antisymmetry: px(-x) = -px(x)
-        center = config['grid'].x_n // 2
+        center = config["grid"].x_n // 2
         offset = 3
 
         # px at (x, 0, 0) and (-x, 0, 0)
         px_positive = px[center + offset, center, center]
         px_negative = px[center - offset, center, center]
 
-        assert np.isclose(px_positive, -px_negative, rtol=1e-10), (
-            f"Px antisymmetry failed: px(+x)={px_positive}, px(-x)={px_negative}"
-        )
+        assert np.isclose(
+            px_positive, -px_negative, rtol=1e-10
+        ), f"Px antisymmetry failed: px(+x)={px_positive}, px(-x)={px_negative}"
 
     def test_py_orbital_antisymmetry(self, simple_p_orbital_system):
         """Test Py orbital: phi(x,-y,z) = -phi(x,y,z)."""
         config = simple_p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
@@ -684,7 +682,7 @@ class TestPOrbitalSymmetry:
         # Py is orbital index 2
         py = gen.AOs[2]
 
-        center = config['grid'].y_n // 2
+        center = config["grid"].y_n // 2
         offset = 3
 
         py_positive = py[center, center + offset, center]
@@ -697,13 +695,13 @@ class TestPOrbitalSymmetry:
         config = simple_p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
@@ -712,7 +710,7 @@ class TestPOrbitalSymmetry:
         # Pz is orbital index 3
         pz = gen.AOs[3]
 
-        center = config['grid'].z_n // 2
+        center = config["grid"].z_n // 2
         offset = 3
 
         pz_positive = pz[center, center, center + offset]
@@ -725,26 +723,26 @@ class TestPOrbitalSymmetry:
         config = simple_p_orbital_system
 
         gen = OrbitalsGenerator(
-            nAtoms=config['nAtoms'],
-            atoms_R=config['atoms_R'],
-            spherical=config['spherical'],
-            nb=config['nb'],
-            basis=config['basis'],
-            basis_norm=config['basis_norm'],
-            grid=config['grid'],
+            nAtoms=config["nAtoms"],
+            atoms_R=config["atoms_R"],
+            spherical=config["spherical"],
+            nb=config["nb"],
+            basis=config["basis"],
+            basis_norm=config["basis_norm"],
+            grid=config["grid"],
         )
 
         gen.init_aos()
         gen.calc_aos(gen.AOs)
 
-        center = config['grid'].x_n // 2
+        center = config["grid"].x_n // 2
 
         # All P orbitals (indices 1, 2, 3) should be zero at origin
         for p_idx in [1, 2, 3]:
             value_at_origin = gen.AOs[p_idx, center, center, center]
-            assert np.isclose(value_at_origin, 0.0, atol=1e-14), (
-                f"P-orbital {p_idx} at origin: expected 0, got {value_at_origin}"
-            )
+            assert np.isclose(
+                value_at_origin, 0.0, atol=1e-14
+            ), f"P-orbital {p_idx} at origin: expected 0, got {value_at_origin}"
 
 
 class TestGridConvergence:
@@ -771,8 +769,13 @@ class TestGridConvergence:
             grid.z_min, grid.z_max = -5.0, 5.0
 
             gen = OrbitalsGenerator(
-                nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=1,
-                basis=basis, basis_norm=basis_norm, grid=grid,
+                nAtoms=nAtoms,
+                atoms_R=atoms_R,
+                spherical=1,
+                nb=1,
+                basis=basis,
+                basis_norm=basis_norm,
+                grid=grid,
             )
 
             gen.init_aos()
@@ -783,9 +786,9 @@ class TestGridConvergence:
 
         # All values should be close to expected (grid origin is exact)
         for i, val in enumerate(values):
-            assert np.isclose(val, expected, rtol=1e-10), (
-                f"Resolution {resolutions[i]}: expected {expected}, got {val}"
-            )
+            assert np.isclose(
+                val, expected, rtol=1e-10
+            ), f"Resolution {resolutions[i]}: expected {expected}, got {val}"
 
 
 class TestAtomPositioning:
@@ -808,8 +811,13 @@ class TestAtomPositioning:
         grid.z_min, grid.z_max = -5.0, 5.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atom_pos, spherical=1, nb=1,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atom_pos,
+            spherical=1,
+            nb=1,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -831,10 +839,12 @@ class TestAtomPositioning:
     def test_two_atoms(self):
         """Test system with two atoms at different positions."""
         # Two hydrogen-like atoms
-        atoms_R = np.array([
-            [-1.5, 0.0, 0.0],
-            [1.5, 0.0, 0.0],
-        ])
+        atoms_R = np.array(
+            [
+                [-1.5, 0.0, 0.0],
+                [1.5, 0.0, 0.0],
+            ]
+        )
 
         nAtoms = 2
         nb = 2  # One S per atom
@@ -849,8 +859,13 @@ class TestAtomPositioning:
         grid.z_min, grid.z_max = -4.0, 4.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=nb,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atoms_R,
+            spherical=1,
+            nb=nb,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -893,8 +908,13 @@ class TestEdgeCases:
         grid.z_min, grid.z_max = -1.0, 1.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=1,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atoms_R,
+            spherical=1,
+            nb=1,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -924,8 +944,13 @@ class TestEdgeCases:
         grid.z_min, grid.z_max = -15.0, 15.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=1,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atoms_R,
+            spherical=1,
+            nb=1,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -945,11 +970,13 @@ class TestEdgeCases:
         atoms_R = np.array([[0.0, 0.0, 0.0]])
 
         # Multiple primitives for one contracted function
-        s_data = np.array([
-            [3.42525091, 0.15432897],
-            [0.62391373, 0.53532814],
-            [0.16885540, 0.44463454],
-        ])
+        s_data = np.array(
+            [
+                [3.42525091, 0.15432897],
+                [0.62391373, 0.53532814],
+                [0.16885540, 0.44463454],
+            ]
+        )
         basis = [[s_data]]
         basis_norm = [[[1.0]]]
 
@@ -959,8 +986,13 @@ class TestEdgeCases:
         grid.z_min, grid.z_max = -5.0, 5.0
 
         gen = OrbitalsGenerator(
-            nAtoms=nAtoms, atoms_R=atoms_R, spherical=1, nb=1,
-            basis=basis, basis_norm=basis_norm, grid=grid,
+            nAtoms=nAtoms,
+            atoms_R=atoms_R,
+            spherical=1,
+            nb=1,
+            basis=basis,
+            basis_norm=basis_norm,
+            grid=grid,
         )
 
         gen.init_aos()
@@ -970,10 +1002,7 @@ class TestEdgeCases:
         value_at_origin = gen.AOs[0, center, center, center]
 
         # Should be sum of primitives
-        expected = sum(
-            (2.0 * s_data[i, 0] / np.pi) ** 0.75 * s_data[i, 1]
-            for i in range(3)
-        )
+        expected = sum((2.0 * s_data[i, 0] / np.pi) ** 0.75 * s_data[i, 1] for i in range(3))
 
         assert np.isclose(value_at_origin, expected, rtol=1e-10)
         assert np.isfinite(value_at_origin)

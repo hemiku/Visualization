@@ -19,7 +19,8 @@ class TestMolproInputBasic:
     def molpro_input(self, benzene_output):
         """Create MolproInput for benzene-cyclohexane."""
         from visualization.input_molpro import MolproInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         return MolproInput(input_name=input_path)
 
     def test_get_nb(self, molpro_input):
@@ -48,7 +49,8 @@ class TestMolproInputAtoms:
     def molpro_input(self, benzene_output):
         """Create MolproInput for benzene-cyclohexane."""
         from visualization.input_molpro import MolproInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         molpro = MolproInput(input_name=input_path)
         molpro.get_nAtoms()
         return molpro
@@ -95,7 +97,8 @@ class TestMolproInputBonds:
     def molpro_input(self, benzene_output):
         """Create MolproInput for benzene-cyclohexane."""
         from visualization.input_molpro import MolproInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         molpro = MolproInput(input_name=input_path)
         molpro.get_nAtoms()
         molpro.get_atoms()
@@ -128,7 +131,8 @@ class TestMolproInputBasis:
     def molpro_input(self, benzene_output):
         """Create MolproInput for benzene-cyclohexane."""
         from visualization.input_molpro import MolproInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         molpro = MolproInput(input_name=input_path)
         molpro.get_nAtoms()
         molpro.get_atoms()
@@ -157,7 +161,8 @@ class TestMolproInputElectrons:
     def molpro_input(self, benzene_output):
         """Create MolproInput for benzene-cyclohexane."""
         from visualization.input_molpro import MolproInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         return MolproInput(input_name=input_path)
 
     def test_get_electrons(self, molpro_input):
@@ -174,7 +179,8 @@ class TestMolproSaptInput:
     def molpro_sapt_input(self, benzene_output):
         """Create MolproSaptInput for benzene-cyclohexane SAPT."""
         from visualization.input_molpro import MolproSaptInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         return MolproSaptInput(input_name=input_path)
 
     def test_default_monomer_is_zero(self, molpro_sapt_input):
@@ -214,7 +220,8 @@ class TestMolproInputErrorHandling:
     def test_missing_file(self):
         """Test handling of missing file."""
         from visualization.input_molpro import MolproInput
-        molpro = MolproInput(input_name='/nonexistent/path')
+
+        molpro = MolproInput(input_name="/nonexistent/path")
         with pytest.raises(FileNotFoundError):
             molpro.get_output()
 
@@ -226,7 +233,8 @@ class TestMolproInputOutput:
     def molpro_input(self, benzene_output):
         """Create MolproInput for benzene-cyclohexane."""
         from visualization.input_molpro import MolproInput
-        input_path = str(benzene_output).replace('.out', '')
+
+        input_path = str(benzene_output).replace(".out", "")
         return MolproInput(input_name=input_path)
 
     def test_get_output(self, molpro_input):
@@ -239,4 +247,4 @@ class TestMolproInputOutput:
         """Test output contains SEWARD section."""
         output = molpro_input.get_output()
         # The output should be split at SEWARD
-        assert 'ATOMIC COORDINATES' in output or 'BASIS DATA' in output
+        assert "ATOMIC COORDINATES" in output or "BASIS DATA" in output

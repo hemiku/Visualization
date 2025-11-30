@@ -20,8 +20,9 @@ class TestDaltonInputBasic:
     def dalton_input(self, water_dimer_output):
         """Create DaltonInput for water dimer output file."""
         from visualization.inputs import DaltonInput
-        input_path = str(water_dimer_output).replace('.out', '')
-        return DaltonInput(input_type='Output', input_name=input_path)
+
+        input_path = str(water_dimer_output).replace(".out", "")
+        return DaltonInput(input_type="Output", input_name=input_path)
 
     def test_get_nb(self, dalton_input):
         """Test number of basis functions extraction."""
@@ -48,8 +49,9 @@ class TestDaltonInputAtoms:
     def dalton_input(self, water_dimer_tarball):
         """Create DaltonInput for water dimer tar archive."""
         from visualization.inputs import DaltonInput
-        input_path = str(water_dimer_tarball).replace('.tar.gz', '')
-        dalton = DaltonInput(input_type='tar', input_name=input_path)
+
+        input_path = str(water_dimer_tarball).replace(".tar.gz", "")
+        dalton = DaltonInput(input_type="tar", input_name=input_path)
         dalton.get_nAtoms()
         return dalton
 
@@ -81,7 +83,7 @@ class TestDaltonInputAtoms:
     def test_get_atoms_names(self, dalton_input):
         """Test atom names for water dimer."""
         _, _, atoms_Name = dalton_input.get_atoms()
-        expected = ['O1', 'H1', 'H2', 'O2', 'H3', 'H4']
+        expected = ["O1", "H1", "H2", "O2", "H3", "H4"]
         assert atoms_Name == expected
 
     def test_get_atoms_coordinates_first_oxygen(self, dalton_input):
@@ -100,8 +102,9 @@ class TestDaltonInputBonds:
     def dalton_input(self, water_dimer_tarball):
         """Create DaltonInput for water dimer (tar archive required for atoms/bonds)."""
         from visualization.inputs import DaltonInput
-        input_path = str(water_dimer_tarball).replace('.tar.gz', '')
-        dalton = DaltonInput(input_type='tar', input_name=input_path)
+
+        input_path = str(water_dimer_tarball).replace(".tar.gz", "")
+        dalton = DaltonInput(input_type="tar", input_name=input_path)
         dalton.get_nAtoms()
         dalton.get_atoms()
         return dalton
@@ -133,8 +136,9 @@ class TestDaltonInputCoefficients:
     def dalton_input(self, water_dimer_tarball):
         """Create DaltonInput for water dimer tar archive."""
         from visualization.inputs import DaltonInput
-        input_path = str(water_dimer_tarball).replace('.tar.gz', '')
-        dalton = DaltonInput(input_type='tar', input_name=input_path)
+
+        input_path = str(water_dimer_tarball).replace(".tar.gz", "")
+        dalton = DaltonInput(input_type="tar", input_name=input_path)
         dalton.get_nb()  # Required before get_coeff
         return dalton
 
@@ -159,8 +163,9 @@ class TestDaltonInputBasis:
     def dalton_input(self, water_dimer_tarball):
         """Create DaltonInput for water dimer tar archive."""
         from visualization.inputs import DaltonInput
-        input_path = str(water_dimer_tarball).replace('.tar.gz', '')
-        dalton = DaltonInput(input_type='tar', input_name=input_path)
+
+        input_path = str(water_dimer_tarball).replace(".tar.gz", "")
+        dalton = DaltonInput(input_type="tar", input_name=input_path)
         dalton.get_nAtoms()
         dalton.get_atoms()
         return dalton
@@ -189,8 +194,9 @@ class TestDaltonInputEthylene:
     def dalton_input(self, ethylene_tarball):
         """Create DaltonInput for ethylene dimer (tar for geminal data)."""
         from visualization.inputs import DaltonInput
-        input_path = str(ethylene_tarball).replace('.tar.gz', '')
-        return DaltonInput(input_type='tar', input_name=input_path)
+
+        input_path = str(ethylene_tarball).replace(".tar.gz", "")
+        return DaltonInput(input_type="tar", input_name=input_path)
 
     def test_get_nb(self, dalton_input):
         """Test basis function count for ethylene dimer."""
@@ -223,8 +229,9 @@ class TestDaltonInputEthyleneGeminals:
     def dalton_input(self, ethylene_tarball):
         """Create DaltonInput for ethylene dimer tar archive."""
         from visualization.inputs import DaltonInput
-        input_path = str(ethylene_tarball).replace('.tar.gz', '')
-        return DaltonInput(input_type='tar', input_name=input_path)
+
+        input_path = str(ethylene_tarball).replace(".tar.gz", "")
+        return DaltonInput(input_type="tar", input_name=input_path)
 
     def test_get_g_coeff(self, dalton_input):
         """Test geminal coefficient extraction."""
@@ -258,13 +265,15 @@ class TestDaltonInputErrorHandling:
     def test_missing_file(self):
         """Test handling of missing file."""
         from visualization.inputs import DaltonInput
-        dalton = DaltonInput(input_name='/nonexistent/path')
+
+        dalton = DaltonInput(input_name="/nonexistent/path")
         with pytest.raises(FileNotFoundError):
             dalton.get_dalton_output()
 
     def test_missing_tar_file(self):
         """Test handling of missing tar archive."""
         from visualization.inputs import DaltonInput
-        dalton = DaltonInput(input_type='tar', input_name='/nonexistent/path')
+
+        dalton = DaltonInput(input_type="tar", input_name="/nonexistent/path")
         with pytest.raises(FileNotFoundError):
             dalton.get_coeff()

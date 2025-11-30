@@ -24,10 +24,10 @@ class TestGridInitialization:
         grid = Grid()
 
         # Verify default attributes exist
-        assert hasattr(grid, 'x_n')
-        assert hasattr(grid, 'y_n')
-        assert hasattr(grid, 'z_n')
-        assert hasattr(grid, 'R_max_multip')
+        assert hasattr(grid, "x_n")
+        assert hasattr(grid, "y_n")
+        assert hasattr(grid, "z_n")
+        assert hasattr(grid, "R_max_multip")
 
     def test_grid_creation_custom(self):
         """Test creating grid with custom parameters."""
@@ -46,12 +46,10 @@ class TestGridInitialization:
         from visualization.visualization import Visualization
 
         # Need molecular system to initialize grid properly
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -76,12 +74,10 @@ class TestAOGeneration:
         """Test AO generation for ethylene with small grid."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -100,12 +96,10 @@ class TestAOGeneration:
         """Test that all AOs have consistent shape."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -118,19 +112,18 @@ class TestAOGeneration:
 
         # Check all AOs have same shape
         for i, ao in enumerate(vis.molecular_system.AOs):
-            assert ao.shape == expected_shape, \
-                f"AO {i} has shape {ao.shape}, expected {expected_shape}"
+            assert (
+                ao.shape == expected_shape
+            ), f"AO {i} has shape {ao.shape}, expected {expected_shape}"
 
     def test_ao_not_all_zero(self, ethylene_dimer_dir, test_grid_small):
         """Test that AOs contain non-zero values."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -149,12 +142,10 @@ class TestAOGeneration:
         """Test that number of AOs matches basis set size."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -164,8 +155,9 @@ class TestAOGeneration:
         vis.generate_ao_orbitals()
 
         # Number of AOs should equal number of basis functions
-        assert len(vis.molecular_system.AOs) == vis.molecular_system.nb, \
-            f"Expected {vis.molecular_system.nb} AOs, got {len(vis.molecular_system.AOs)}"
+        assert (
+            len(vis.molecular_system.AOs) == vis.molecular_system.nb
+        ), f"Expected {vis.molecular_system.nb} AOs, got {len(vis.molecular_system.AOs)}"
 
 
 @pytest.mark.unit
@@ -177,12 +169,10 @@ class TestMOGeneration:
         """Test MO generation from AOs."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -202,12 +192,10 @@ class TestMOGeneration:
         """Test that all MOs have consistent shape."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -221,19 +209,18 @@ class TestMOGeneration:
 
         # Check all MOs have same shape
         for i, mo in enumerate(vis.molecular_system.MOs):
-            assert mo.shape == expected_shape, \
-                f"MO {i} has shape {mo.shape}, expected {expected_shape}"
+            assert (
+                mo.shape == expected_shape
+            ), f"MO {i} has shape {mo.shape}, expected {expected_shape}"
 
     def test_mo_not_all_zero(self, ethylene_dimer_dir, test_grid_small):
         """Test that MOs contain non-zero values."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -253,12 +240,10 @@ class TestMOGeneration:
         """Test that number of MOs equals number of AOs."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         vis.get_orbital_data()
@@ -269,8 +254,9 @@ class TestMOGeneration:
         vis.generate_mo_orbitals()
 
         # Number of MOs should equal number of AOs/basis functions
-        assert len(vis.molecular_system.MOs) == len(vis.molecular_system.AOs), \
-            f"MO count ({len(vis.molecular_system.MOs)}) != AO count ({len(vis.molecular_system.AOs)})"
+        assert len(vis.molecular_system.MOs) == len(
+            vis.molecular_system.AOs
+        ), f"MO count ({len(vis.molecular_system.MOs)}) != AO count ({len(vis.molecular_system.AOs)})"
 
 
 @pytest.mark.unit
@@ -283,12 +269,10 @@ class TestOrbitalCalculationWorkflow:
         from visualization.visualization import Visualization
         from visualization.grid import Grid
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         # Use tiny grid for speed
@@ -311,12 +295,10 @@ class TestOrbitalCalculationWorkflow:
         """Test the get_orbitals() convenience method."""
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         # Use convenience method (includes all steps)
@@ -340,12 +322,10 @@ class TestOrbitalPerformance:
         import time
         from visualization.visualization import Visualization
 
-        ethylene_path = Path(ethylene_dimer_dir) / 'ethylene'
+        ethylene_path = Path(ethylene_dimer_dir) / "ethylene"
 
         vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
         # Small grid should complete in < 10 seconds
@@ -353,7 +333,8 @@ class TestOrbitalPerformance:
         vis.get_orbitals(x_n=10, y_n=10, z_n=10, gpu=False)
         elapsed = time.time() - start_time
 
-        assert elapsed < 10.0, \
-            f"Orbital calculation took {elapsed:.2f}s (expected <10s for 10x10x10 grid)"
+        assert (
+            elapsed < 10.0
+        ), f"Orbital calculation took {elapsed:.2f}s (expected <10s for 10x10x10 grid)"
 
         print(f"Orbital calculation time: {elapsed:.2f}s")

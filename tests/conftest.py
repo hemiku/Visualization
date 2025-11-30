@@ -17,6 +17,7 @@ from pathlib import Path
 # Path Fixtures
 # ==============================================================================
 
+
 @pytest.fixture(scope="session")
 def project_root():
     """Return path to project root directory."""
@@ -56,6 +57,7 @@ def benzene_cyclo_excite_dir(examples_dir):
 # ==============================================================================
 # Data File Fixtures
 # ==============================================================================
+
 
 @pytest.fixture(scope="session")
 def water_dimer_output(water_dimer_dir):
@@ -124,6 +126,7 @@ def benzene_saptvis_binary(benzene_cyclo_dir):
 # Numerical Tolerance Fixtures
 # ==============================================================================
 
+
 @pytest.fixture
 def default_tolerance():
     """Default numerical tolerance for comparisons."""
@@ -152,10 +155,12 @@ def orthogonality_tolerance():
 # Grid Fixtures
 # ==============================================================================
 
+
 @pytest.fixture
 def test_grid_small():
     """Small test grid for fast tests (10x10x10)."""
     from visualization.grid import Grid
+
     grid = Grid(R_max_multip=3.0, x_n=10, y_n=10, z_n=10)
     return grid
 
@@ -164,6 +169,7 @@ def test_grid_small():
 def test_grid_medium():
     """Medium test grid (30x30x30)."""
     from visualization.grid import Grid
+
     grid = Grid(R_max_multip=3.0, x_n=30, y_n=30, z_n=30)
     return grid
 
@@ -172,35 +178,43 @@ def test_grid_medium():
 # Helper Functions
 # ==============================================================================
 
+
 @pytest.fixture
 def assert_normalized():
     """Return function to check if orbital is normalized."""
+
     def _check(orbital, grid_spacing, tolerance=1e-3):
         """Check if ∫|ψ|²dV ≈ 1"""
         dv = grid_spacing[0] * grid_spacing[1] * grid_spacing[2]
         integral = np.sum(orbital**2) * dv
-        assert abs(integral - 1.0) < tolerance, \
-            f"Orbital not normalized: ∫ψ²dV = {integral:.6f} (expected 1.0)"
+        assert (
+            abs(integral - 1.0) < tolerance
+        ), f"Orbital not normalized: ∫ψ²dV = {integral:.6f} (expected 1.0)"
         return True
+
     return _check
 
 
 @pytest.fixture
 def assert_orthogonal():
     """Return function to check if two orbitals are orthogonal."""
+
     def _check(orbital1, orbital2, grid_spacing, tolerance=1e-6):
         """Check if ∫ψᵢψⱼdV ≈ 0"""
         dv = grid_spacing[0] * grid_spacing[1] * grid_spacing[2]
         integral = np.sum(orbital1 * orbital2) * dv
-        assert abs(integral) < tolerance, \
-            f"Orbitals not orthogonal: ∫ψᵢψⱼdV = {integral:.6e} (expected ~0)"
+        assert (
+            abs(integral) < tolerance
+        ), f"Orbitals not orthogonal: ∫ψᵢψⱼdV = {integral:.6e} (expected ~0)"
         return True
+
     return _check
 
 
 # ==============================================================================
 # Analytical Reference Values for Validation
 # ==============================================================================
+
 
 @pytest.fixture(scope="session")
 def s_orbital_reference_values():
@@ -211,8 +225,8 @@ def s_orbital_reference_values():
     - General formula: (2*alpha/pi)^(3/4)
     """
     return {
-        'alpha_1_at_origin': (2.0 / np.pi) ** 0.75,  # 0.7127054703549901
-        'normalization_formula': lambda alpha: (2.0 * alpha / np.pi) ** 0.75,
+        "alpha_1_at_origin": (2.0 / np.pi) ** 0.75,  # 0.7127054703549901
+        "normalization_formula": lambda alpha: (2.0 * alpha / np.pi) ** 0.75,
     }
 
 
@@ -223,7 +237,7 @@ def p_orbital_reference_values():
     P-orbital normalization: 2 * (2*alpha/pi)^(3/4) * alpha^(1/2)
     """
     return {
-        'normalization_formula': lambda alpha: 2.0 * (2.0 * alpha / np.pi) ** 0.75 * (alpha ** 0.5),
+        "normalization_formula": lambda alpha: 2.0 * (2.0 * alpha / np.pi) ** 0.75 * (alpha**0.5),
     }
 
 
@@ -234,12 +248,12 @@ def simple_s_basis():
     Single atom at origin with alpha=1.0, coeff=1.0.
     """
     return {
-        'nAtoms': 1,
-        'atoms_R': np.array([[0.0, 0.0, 0.0]]),
-        'spherical': 1,
-        'nb': 1,
-        'basis': [[np.array([[1.0, 1.0]])]],
-        'basis_norm': [[[1.0]]],
+        "nAtoms": 1,
+        "atoms_R": np.array([[0.0, 0.0, 0.0]]),
+        "spherical": 1,
+        "nb": 1,
+        "basis": [[np.array([[1.0, 1.0]])]],
+        "basis_norm": [[[1.0]]],
     }
 
 
@@ -252,12 +266,12 @@ def simple_sp_basis():
     s_data = np.array([[1.0, 1.0]])
     p_data = np.array([[1.0, 1.0]])
     return {
-        'nAtoms': 1,
-        'atoms_R': np.array([[0.0, 0.0, 0.0]]),
-        'spherical': 1,
-        'nb': 4,  # 1 S + 3 P
-        'basis': [[s_data, p_data]],
-        'basis_norm': [[[1.0], [1.0]]],
+        "nAtoms": 1,
+        "atoms_R": np.array([[0.0, 0.0, 0.0]]),
+        "spherical": 1,
+        "nb": 4,  # 1 S + 3 P
+        "basis": [[s_data, p_data]],
+        "basis_norm": [[[1.0], [1.0]]],
     }
 
 
@@ -268,6 +282,7 @@ def centered_grid():
     21x21x21 grid from -5 to 5 in each dimension.
     """
     from visualization.grid import Grid
+
     grid = Grid(x_n=21, y_n=21, z_n=21)
     grid.x_min, grid.x_max = -5.0, 5.0
     grid.y_min, grid.y_max = -5.0, 5.0
@@ -282,6 +297,7 @@ def fine_centered_grid():
     51x51x51 grid from -6 to 6 in each dimension.
     """
     from visualization.grid import Grid
+
     grid = Grid(x_n=51, y_n=51, z_n=51)
     grid.x_min, grid.x_max = -6.0, 6.0
     grid.y_min, grid.y_max = -6.0, 6.0
@@ -293,17 +309,17 @@ def fine_centered_grid():
 # Skip Markers
 # ==============================================================================
 
+
 def pytest_configure(config):
     """Add custom markers."""
-    config.addinivalue_line(
-        "markers", "requires_gpu: mark test as requiring GPU/CuPy"
-    )
+    config.addinivalue_line("markers", "requires_gpu: mark test as requiring GPU/CuPy")
 
 
 def pytest_collection_modifyitems(config, items):
     """Automatically skip GPU tests if CuPy not available."""
     try:
         import cupy
+
         gpu_available = True
     except ImportError:
         gpu_available = False

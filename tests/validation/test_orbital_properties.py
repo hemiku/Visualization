@@ -17,19 +17,17 @@ import numpy as np
 class TestOrbitalNormalization:
     """Test orbital normalization for different systems."""
 
-    def test_water_dimer_orbital_normalization(self, water_dimer_tarball, test_grid_small, normalization_tolerance):
+    def test_water_dimer_orbital_normalization(
+        self, water_dimer_tarball, test_grid_small, normalization_tolerance
+    ):
         """Test orbital normalization for water dimer."""
         from visualization.visualization import Visualization
         from pathlib import Path
 
         # Load water dimer data (fixture returns full path with .tar.gz)
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
 
@@ -53,21 +51,18 @@ class TestOrbitalNormalization:
             integral = np.sum(orbital**2) * dv
 
             # Allow larger tolerance for small grid
-            assert abs(integral - 1.0) < 1.0, \
-                f"AO {i} not normalized: ∫ψ²dV = {integral:.6f} (expected ~1.0 for small grid)"
+            assert (
+                abs(integral - 1.0) < 1.0
+            ), f"AO {i} not normalized: ∫ψ²dV = {integral:.6f} (expected ~1.0 for small grid)"
 
     def test_mo_generation_from_aos(self, water_dimer_tarball, test_grid_small):
         """Test that MOs are correctly generated from AOs."""
         from visualization.visualization import Visualization
         from pathlib import Path
 
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
@@ -96,13 +91,9 @@ class TestGridAccuracy:
         from visualization.visualization import Visualization
         from pathlib import Path
 
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
         vis.orbital_generator.grid.R_max_multip = 3.0
@@ -124,13 +115,9 @@ class TestGridAccuracy:
         from visualization.visualization import Visualization
         from pathlib import Path
 
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
@@ -156,28 +143,20 @@ class TestDispersionProperties:
         from pathlib import Path
 
         ethylene_dir = Path(ethylene_dimer_dir)
-        ethylene_path = ethylene_dir / 'ethylene'
+        ethylene_path = ethylene_dir / "ethylene"
 
         visualization = disp.DispersionPlot(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(ethylene_path)
+            input_type="Dalton", input_sub_type="tar", input_name=str(ethylene_path)
         )
 
-        gammcor_file = ethylene_dir / 'ethylene_erpa.txt'
+        gammcor_file = ethylene_dir / "ethylene_erpa.txt"
         if not gammcor_file.exists():
             pytest.skip(f"GAMMCOR file not found: {gammcor_file}")
 
         visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Calculate with small grid
-        visualization.get_dispersion_index(
-            x_n=10,
-            y_n=10,
-            z_n=10,
-            monomer_A=1,
-            monomer_B=2
-        )
+        visualization.get_dispersion_index(x_n=10, y_n=10, z_n=10, monomer_A=1, monomer_B=2)
 
         # Test that dispersion is non-zero
         assert not np.all(visualization.dispersion_A == 0)
@@ -192,13 +171,9 @@ class TestDispersionProperties:
         from visualization.visualization import Visualization
         from pathlib import Path
 
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
@@ -207,10 +182,10 @@ class TestDispersionProperties:
         vis.generate_ao_orbitals()
 
         # Get first AO
-        cube = vis.molecular_system.AOs[0]**2  # Density
+        cube = vis.molecular_system.AOs[0] ** 2  # Density
 
         # Test percentage-based contour
-        contour_value = vis.contour_process('50%', cube)
+        contour_value = vis.contour_process("50%", cube)
 
         # Verify contour value is a list with one element
         assert isinstance(contour_value, list)
@@ -218,7 +193,7 @@ class TestDispersionProperties:
         assert contour_value[0] > 0
 
         # Test multiple contours
-        contours = vis.contour_process(['90%', '50%', '10%'], cube)
+        contours = vis.contour_process(["90%", "50%", "10%"], cube)
         assert isinstance(contours, list)
         assert len(contours) == 3
         # All contour values should be positive
@@ -234,18 +209,16 @@ class TestDispersionProperties:
 class TestOrbitalOrthogonality:
     """Test orbital orthogonality (slower tests)."""
 
-    def test_ao_orthogonality_water(self, water_dimer_tarball, test_grid_medium, orthogonality_tolerance):
+    def test_ao_orthogonality_water(
+        self, water_dimer_tarball, test_grid_medium, orthogonality_tolerance
+    ):
         """Test AO orthogonality for water dimer (requires larger grid)."""
         from visualization.visualization import Visualization
         from pathlib import Path
 
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_medium
@@ -278,8 +251,9 @@ class TestOrbitalOrthogonality:
                     continue
 
                 # For truly orthogonal pairs, check with generous tolerance
-                assert abs(integral) < 0.01, \
-                    f"AOs {i} and {j} not orthogonal: ∫ψᵢψⱼdV = {integral:.6e}"
+                assert (
+                    abs(integral) < 0.01
+                ), f"AOs {i} and {j} not orthogonal: ∫ψᵢψⱼdV = {integral:.6e}"
 
 
 @pytest.mark.validation
@@ -292,13 +266,9 @@ class TestMolecularSystemProperties:
         from pathlib import Path
 
         # Use tarball for complete Dalton data
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_geometry()
 
@@ -313,13 +283,9 @@ class TestMolecularSystemProperties:
         from pathlib import Path
 
         # Use tarball for complete Dalton data
-        input_path = Path(water_dimer_tarball).with_suffix('').with_suffix('')
+        input_path = Path(water_dimer_tarball).with_suffix("").with_suffix("")
 
-        vis = Visualization(
-            input_type='Dalton',
-            input_sub_type='tar',
-            input_name=str(input_path)
-        )
+        vis = Visualization(input_type="Dalton", input_sub_type="tar", input_name=str(input_path))
 
         vis.get_orbital_data()
 

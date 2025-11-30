@@ -20,16 +20,16 @@ from visualization.geminals import GeminalGenerator
 from visualization.visualization import Visualization
 
 __all__ = [
-    'Visualization',
-    'MolecularSystem',
-    'Grid',
-    'Input',
-    'DaltonInput',
-    'MoldenInput',
-    'MolproInput',
-    'MolproSaptInput',
-    'OrbitalsGenerator',
-    'GeminalGenerator',
+    "Visualization",
+    "MolecularSystem",
+    "Grid",
+    "Input",
+    "DaltonInput",
+    "MoldenInput",
+    "MolproInput",
+    "MolproSaptInput",
+    "OrbitalsGenerator",
+    "GeminalGenerator",
 ]
 
-__version__ = '0.0.1'
+__version__ = "0.0.1"

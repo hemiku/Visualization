@@ -55,21 +55,16 @@ class TestNormSContracted:
 
     def test_sto3g_hydrogen(self):
         """STO-3G hydrogen 1s contracted basis should give positive norm."""
-        data = np.array([
-            [3.42525091, 0.15432897],
-            [0.62391373, 0.53532814],
-            [0.16885540, 0.44463454]
-        ])
+        data = np.array(
+            [[3.42525091, 0.15432897], [0.62391373, 0.53532814], [0.16885540, 0.44463454]]
+        )
         norm = norm_s(data)
         assert norm[0] > 0
         assert np.isfinite(norm[0])
 
     def test_two_primitives_same_exponent(self):
         """Two primitives with same exponent, coefficients sum to 1."""
-        data = np.array([
-            [1.0, 0.5],
-            [1.0, 0.5]
-        ])
+        data = np.array([[1.0, 0.5], [1.0, 0.5]])
         norm = norm_s(data)
         # Should match single primitive since coeffs sum to 1
         expected = (2.0 / np.pi) ** 0.75
@@ -105,7 +100,7 @@ class TestNormP:
         norm = norm_p(data)
         # P-orbital normalization: 2 * (2*alpha)^(3/4) * alpha^(1/2) / pi^(3/4)
         # = 2 * 2^0.75 * 1^0.5 / pi^0.75 = 1.4254109407099802
-        expected = 2.0 * (2.0 ** 0.75) * (1.0 ** 0.5) / (np.pi ** 0.75)
+        expected = 2.0 * (2.0**0.75) * (1.0**0.5) / (np.pi**0.75)
         assert np.isclose(norm[0], expected, rtol=1e-6)
 
     def test_positive_finite(self):
@@ -191,9 +186,9 @@ class TestAllAngularMomenta:
         ]
         # Check that norms increase (or at least don't decrease drastically)
         for i in range(len(norms) - 1):
-            assert norms[i + 1] >= norms[i] * 0.5, (
-                f"norm_{chr(ord('s') + i + 1)} unexpectedly small compared to previous"
-            )
+            assert (
+                norms[i + 1] >= norms[i] * 0.5
+            ), f"norm_{chr(ord('s') + i + 1)} unexpectedly small compared to previous"
 
 
 class TestEdgeCases:
@@ -215,10 +210,7 @@ class TestEdgeCases:
 
     def test_multiple_contractions(self):
         """Multiple contracted functions from same primitives."""
-        data = np.array([
-            [10.0, 0.5, 0.3],
-            [1.0, 0.5, 0.7]
-        ])
+        data = np.array([[10.0, 0.5, 0.3], [1.0, 0.5, 0.7]])
         norm = norm_s(data)
         assert norm.shape == (2,)
         assert all(n > 0 for n in norm)
@@ -233,26 +225,18 @@ class TestNormalizationSummation:
         data = np.array([[1.0, 1.0]])
         result = normalization_summation(data, 1.5)
         # sum = 1*1 / (1+1)^1.5 = 1 / 2.828... = 0.3536...
-        expected = 1.0 / (2.0 ** 1.5)
+        expected = 1.0 / (2.0**1.5)
         assert np.isclose(result[0], expected, rtol=1e-10)
 
     def test_two_primitives(self):
         """Two primitives with different exponents."""
-        data = np.array([
-            [1.0, 0.5],
-            [2.0, 0.5]
-        ])
+        data = np.array([[1.0, 0.5], [2.0, 0.5]])
         result = normalization_summation(data, 1.5)
         # Manual calculation:
         # (0.5*0.5)/(1+1)^1.5 + (0.5*0.5)/(1+2)^1.5 + (0.5*0.5)/(2+1)^1.5 + (0.5*0.5)/(2+2)^1.5
         # = 0.25/2.828 + 0.25/5.196 + 0.25/5.196 + 0.25/8.0
         # = 0.0884 + 0.0481 + 0.0481 + 0.03125 = 0.2159
-        expected = (
-            0.25 / (2.0 ** 1.5) +
-            0.25 / (3.0 ** 1.5) +
-            0.25 / (3.0 ** 1.5) +
-            0.25 / (4.0 ** 1.5)
-        )
+        expected = 0.25 / (2.0**1.5) + 0.25 / (3.0**1.5) + 0.25 / (3.0**1.5) + 0.25 / (4.0**1.5)
         assert np.isclose(result[0], expected, rtol=1e-10)
 
 
@@ -289,10 +273,7 @@ class TestCalcNormFromBasis:
         """Two atoms with different basis sets."""
         s_data = np.array([[1.0, 1.0]])
         p_data = np.array([[1.0, 1.0]])
-        basis = [
-            [s_data],        # Atom 1: S only
-            [s_data, p_data] # Atom 2: S and P
-        ]
+        basis = [[s_data], [s_data, p_data]]  # Atom 1: S only  # Atom 2: S and P
         result = calc_norm_from_basis(basis)
 
         assert len(result) == 2
@@ -303,11 +284,7 @@ class TestCalcNormFromBasis:
         """Test with water-like basis structure (O + 2H)."""
         s_data = np.array([[5.0, 1.0], [1.0, 1.0]])
         p_data = np.array([[1.0, 1.0]])
-        basis = [
-            [s_data, p_data],  # Oxygen
-            [s_data],          # H1
-            [s_data]           # H2
-        ]
+        basis = [[s_data, p_data], [s_data], [s_data]]  # Oxygen  # H1  # H2
         result = calc_norm_from_basis(basis)
 
         assert len(result) == 3
