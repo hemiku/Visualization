@@ -188,9 +188,9 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		D_AB  = 0.5 *( D_A + D_B )
 
-		self.D_AB = D_AB
-		self.D_A = D_A
-		self.D_B = D_B
+		self.dispersion_AB = D_AB
+		self.dispersion_A = D_A
+		self.dispersion_B = D_B
 
 
 	def Plot_D_AB(self, plot_atoms = True, atom_names = True, atom_names_scaling = 1.0, plot_bonds = True , atom_scaling = 1.0, bond_scaling = 1.0, contours = 6, opacity = 0.5, background_color = None, scalarbar = False, auto_show = True, figure = None ):
@@ -214,8 +214,8 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-		contour_values = self.contour_process(contours, self.D_AB)
-		self._backend.add_contour3d(X, Y, Z, self.D_AB,
+		contour_values = self.contour_process(contours, self.dispersion_AB)
+		self._backend.add_contour3d(X, Y, Z, self.dispersion_AB,
 									contours=contour_values, opacity=opacity)
 
 		if scalarbar:
@@ -245,8 +245,8 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-		contour_values = self.contour_process(contours, self.D_A)
-		self._backend.add_contour3d(X, Y, Z, self.D_A,
+		contour_values = self.contour_process(contours, self.dispersion_A)
+		self._backend.add_contour3d(X, Y, Z, self.dispersion_A,
 									contours=contour_values, opacity=0.5)
 
 		if auto_show:
@@ -273,8 +273,8 @@ class DispersionPlot(visualization.visualization.Visualization):
 
 		X, Y, Z = self.orbital_generator.grid.return_grid_arrays()
 
-		contour_values = self.contour_process(contours, self.D_B)
-		self._backend.add_contour3d(X, Y, Z, self.D_B,
+		contour_values = self.contour_process(contours, self.dispersion_B)
+		self._backend.add_contour3d(X, Y, Z, self.dispersion_B,
 									contours=contour_values, opacity=0.5)
 
 		if auto_show:

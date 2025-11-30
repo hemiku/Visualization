@@ -78,8 +78,9 @@ class TestWaterVisualization:
             auto_show=False
         )
 
-        mlab.savefig(str(output_file))
-        mlab.close()
+        # Use backend's save method to ensure correct size in offscreen mode
+        vis._backend.save(str(output_file))
+        vis._backend.close()
 
         # Load image
         img = Image.open(output_file)

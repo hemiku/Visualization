@@ -39,6 +39,7 @@ class MayaviBackend(VisualizationBackend):
     ) -> None:
         """Create a new Mayavi figure."""
         self._figure = self.mlab.figure(title, bgcolor=bgcolor, size=size)
+        self._size = size
         self.mlab.clf()
 
     def clear(self) -> None:
@@ -119,7 +120,11 @@ class MayaviBackend(VisualizationBackend):
 
     def save(self, filename: str) -> None:
         """Save the visualization to an image file."""
-        self.mlab.savefig(filename)
+        # Use stored size to ensure correct output dimensions in offscreen mode
+        if hasattr(self, '_size') and self._size:
+            self.mlab.savefig(filename, size=self._size)
+        else:
+            self.mlab.savefig(filename)
 
     def close(self) -> None:
         """Close the visualization window."""
