@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "visualization"
-version = "0.0.1"
+version = "0.0.2"
 description = "General Visualization Tool for visualizing molecules and quantum chemistry calculations"
 authors = [
     {name = "Piotr Kowalski", email = "hemiku@gmail.com"}
