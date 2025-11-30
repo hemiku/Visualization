@@ -1,10 +1,22 @@
+"""Orbital generation for molecular visualization.
+
+This module provides classes for calculating atomic orbitals (AOs)
+and molecular orbitals (MOs) on 3D grids.
+"""
+
+from typing import List, Optional
+
 import numpy as np
+
 import visualization.grid
 
 
-class AOParameters():
+class AOParameters:
+	"""Pre-computed constants for atomic orbital calculations.
 
-	universal_norm = ( 2 / np.pi)**(3/4)
+	These constants avoid repeated computation during orbital evaluation.
+	"""
+	universal_norm = (2 / np.pi) ** (3/4)
 	sqrt3 = np.sqrt(3.0)
 	sqrt3p4 = np.sqrt(3.0 / 4.0)
 	sqrt5 = np.sqrt(5.0)
@@ -17,63 +29,123 @@ class AOParameters():
 	sqrt50p16 = np.sqrt(50.0 / 16.0)
 
 
-class OrbitalsGenerator( ):
+class OrbitalsGenerator:
+	"""Generator for atomic and molecular orbitals on 3D grids.
 
-	grid:visualization.grid.Grid
+	This class handles the computation of AOs from Gaussian basis functions
+	and MOs as linear combinations of AOs.
 
-	nAtoms: int
-	atoms_R:np.ndarray
+	Attributes
+	----------
+	grid : Grid
+		3D spatial grid for orbital evaluation
+	nAtoms : int
+		Number of atoms in the system
+	atoms_R : np.ndarray
+		Atomic positions (nAtoms x 3)
+	spherical : bool
+		True if using spherical harmonic basis
+	nb : int
+		Number of basis functions
+	coeff : np.ndarray
+		MO coefficient matrix (nb x nb)
+	basis : list
+		Basis set data per atom
+	basis_norm : list
+		Normalization factors per basis function
+	AOs : np.ndarray
+		Computed atomic orbitals (nb x x_n x y_n x z_n)
+	MOs : np.ndarray
+		Computed molecular orbitals (nb x x_n x y_n x z_n)
+	"""
 
-	spherical:bool
-	nb:int = None
-	coeff:np.ndarray
-	basis:list
-	basis_norm: list
+	def __init__(
+		self,
+		nAtoms: Optional[int] = None,
+		atoms_R: Optional[np.ndarray] = None,
+		spherical: Optional[bool] = None,
+		nb: Optional[int] = None,
+		coeff: Optional[np.ndarray] = None,
+		basis: Optional[List] = None,
+		basis_norm: Optional[List] = None,
+		grid: Optional[visualization.grid.Grid] = None,
+	) -> None:
+		"""Initialize the orbital generator.
 
-	AOs:np.ndarray
-	MOs:np.ndarray
-
-	def __init__(self, nAtoms = None, atoms_R = None, spherical=None, nb = None, coeff = None, basis = None, basis_norm = None, grid = None ):
-
+		Parameters
+		----------
+		nAtoms : int, optional
+			Number of atoms
+		atoms_R : np.ndarray, optional
+			Atomic positions (nAtoms x 3)
+		spherical : bool, optional
+			Use spherical harmonic basis
+		nb : int, optional
+			Number of basis functions
+		coeff : np.ndarray, optional
+			MO coefficient matrix
+		basis : list, optional
+			Basis set data
+		basis_norm : list, optional
+			Normalization factors
+		grid : Grid, optional
+			Pre-configured grid (creates default if None)
+		"""
 		self.nAtoms = nAtoms
 		self.atoms_R = atoms_R
-
-		self.spherical=spherical
+		self.spherical = spherical
 		self.nb = nb
 		self.coeff = coeff
 		self.basis = basis
 		self.basis_norm = basis_norm
+		self.grid = grid if grid is not None else visualization.grid.Grid()
+		self.AOs: Optional[np.ndarray] = None
+		self.MOs: Optional[np.ndarray] = None
 
-		if grid is None:
+	def set_atoms_r(self, atoms_r: np.ndarray) -> None:
+		"""Set atomic positions."""
+		self.atoms_R = atoms_r
 
-			self.grid = visualization.grid.Grid()
+	def init_grid(self) -> None:
+		"""Initialize grid boundaries from basis set and atomic positions."""
+		self.grid.generate_grid_boundaries(atoms_R=self.atoms_R, basis=self.basis)
 
-		else:
-
-			self.grid = grid
-
-
-	def set_atoms_r( self, atoms_r):
-
-		self.Atoms_R = atoms_r
-
-	def init_grid(self):
-
-		self.grid.generate_grid_boundaries( atoms_R= self.atoms_R, basis= self.basis )
-
-	def init_aos(self):
-
+	def init_aos(self) -> None:
+		"""Allocate array for atomic orbitals."""
 		X, Y, Z = self.grid.return_grid_arrays()
+		self.AOs = np.zeros(
+			[self.nb, np.shape(X)[0], np.shape(Y)[1], np.shape(Z)[2]],
+			dtype=np.float64
+		)
 
-		self.AOs = np.zeros([self.nb, np.shape(X)[0], np.shape(Y)[1], np.shape(Z)[2]], dtype=np.float64)
-
-	def init_mos(self):
-
+	def init_mos(self) -> None:
+		"""Allocate array for molecular orbitals."""
 		X, Y, Z = self.grid.return_grid_arrays()
+		self.MOs = np.zeros(
+			[self.nb, np.shape(X)[0], np.shape(Y)[1], np.shape(Z)[2]],
+			dtype=np.float64
+		)
 
-		self.MOs = np.zeros([self.nb, np.shape(X)[0], np.shape(Y)[1], np.shape(Z)[2]], dtype=np.float64)
+	def calc_mos(
+		self,
+		start: Optional[int] = None,
+		stop: Optional[int] = None,
+		MOs_limit: Optional[int] = None,
+	) -> None:
+		"""Calculate molecular orbitals from atomic orbitals (CPU).
 
-	def calc_mos(self, start = None, stop = None , MOs_limit = None ):
+		MOs are computed as linear combinations of AOs weighted by
+		the coefficient matrix.
+
+		Parameters
+		----------
+		start : int, optional
+			Starting orbital index (not used)
+		stop : int, optional
+			Stopping orbital index (not used)
+		MOs_limit : int, optional
+			Maximum number of MOs to compute (default: all)
+		"""
 
 		import time
 

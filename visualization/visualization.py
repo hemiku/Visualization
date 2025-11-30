@@ -24,29 +24,75 @@ class VisualizationData:
     Name_to_Atom_Number = ELEMENT_TO_ATOMIC_NUMBER
 
 
-class Visualization():
+class Visualization:
+	"""Main class for molecular orbital visualization.
 
-	input_type: str
-	input_sub_type: str
-	input_name: str
-	file_string = None
-	BAS_filename = None
-	data_source = None
+	This class orchestrates the complete visualization pipeline:
+	1. Parse input files (Dalton, Molpro, Molden)
+	2. Generate 3D grids
+	3. Calculate atomic and molecular orbitals
+	4. Render visualizations
 
-	data_input:Input
-	molecular_system: MolecularSystem
-	orbital_generator: OrbitalsGenerator
+	Attributes
+	----------
+	input_type : str
+		Type of input file ('Dalton', 'Molpro', 'MolproSapt')
+	input_name : str
+		Base name of input file (without extension)
+	data_input : Input
+		Parsed input file data
+	molecular_system : MolecularSystem
+		Container for molecular structure and orbital data
+	orbital_generator : OrbitalsGenerator
+		Calculator for AOs and MOs
 
-	visualization_data = VisualizationData()
+	Examples
+	--------
+	>>> vis = Visualization(input_type='Dalton', input_name='water')
+	>>> vis.get_orbitals(x_n=50, y_n=50, z_n=50)
+	>>> vis.plot_Orbitals(orbital_numbers=[0, 1, 2])
+	"""
 
-	def __init__(self, input_type=None, input_sub_type='Output', input_name=None, file_string=None, BAS_filename=None, data_source=None, backend: Optional[str] = None):
-		# Always set attributes (defaults to None if not provided)
+	def __init__(
+		self,
+		input_type: Optional[str] = None,
+		input_sub_type: str = 'Output',
+		input_name: Optional[str] = None,
+		file_string: Optional[str] = None,
+		BAS_filename: Optional[str] = None,
+		data_source: Optional[str] = None,
+		backend: Optional[str] = None,
+	) -> None:
+		"""Initialize the visualization system.
+
+		Parameters
+		----------
+		input_type : str, optional
+			Input file type ('Dalton', 'Molpro', 'MolproSapt')
+		input_sub_type : str, default 'Output'
+			Sub-type for input parsing
+		input_name : str, optional
+			Base name of input file
+		file_string : str, optional
+			Raw file content (alternative to file)
+		BAS_filename : str, optional
+			Basis set file name
+		data_source : str, optional
+			Data source identifier
+		backend : str, optional
+			Visualization backend ('pyvista' or 'mayavi')
+		"""
 		self.input_type = input_type
 		self.input_sub_type = input_sub_type
 		self.input_name = input_name
 		self.file_string = file_string
 		self.BAS_filename = BAS_filename
 		self.data_source = data_source
+
+		self.data_input: Optional[Input] = None
+		self.molecular_system: Optional[MolecularSystem] = None
+		self.orbital_generator: Optional[OrbitalsGenerator] = None
+		self.visualization_data = VisualizationData()
 
 		# Initialize visualization backend (default: pyvista)
 		self._backend: VisualizationBackend = get_backend(backend)
