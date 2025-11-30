@@ -270,7 +270,7 @@ class DaltonInput(Input):
 			return self.F_BAS
 
 
-	def find_header_end_line(self, lines , Atom_header_pattern = ' {1,9}\d{1,9}\. ' ):
+	def find_header_end_line(self, lines , Atom_header_pattern = r' {1,9}\d{1,9}\. ' ):
 
 		import re
 
@@ -289,9 +289,9 @@ class DaltonInput(Input):
 		F_BAS = self.get_basis_file()
 		F_BAS_split_lines = F_BAS.splitlines()
 
-		Atom_header_pattern = ' {1,9}\d{1,9}\. '
-		Atom_Geometries_pattern = '^\w{1,6} \D \D \D'
-		Basis_header_pattern = '^H {1,3}\d{1,3} {1,4}\d{1,3}$'
+		Atom_header_pattern = r' {1,9}\d{1,9}\. '
+		Atom_Geometries_pattern = r'^\w{1,6} \D \D \D'
+		Basis_header_pattern = r'^H {1,3}\d{1,3} {1,4}\d{1,3}$'
 
 		Atoms_Groups = []
 
@@ -365,9 +365,9 @@ class DaltonInput(Input):
 		F_BAS = self.get_basis_file()
 		F_BAS_split_lines = F_BAS.splitlines()
 
-		Atom_header_pattern = ' {1,9}\d{1,9}\. '
-		Atom_Geometries_pattern = '^\w{1,6} \D \D \D'
-		Basis_header_pattern = '^H {1,3}\d{1,3} {1,4}\d{1,3}$'
+		Atom_header_pattern = r' {1,9}\d{1,9}\. '
+		Atom_Geometries_pattern = r'^\w{1,6} \D \D \D'
+		Basis_header_pattern = r'^H {1,3}\d{1,3} {1,4}\d{1,3}$'
 
 		Atoms_Groups:list = []
 		Atoms_Group:dict

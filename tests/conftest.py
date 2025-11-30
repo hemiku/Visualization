@@ -199,6 +199,97 @@ def assert_orthogonal():
 
 
 # ==============================================================================
+# Analytical Reference Values for Validation
+# ==============================================================================
+
+@pytest.fixture(scope="session")
+def s_orbital_reference_values():
+    """Analytical reference values for S-orbital validation.
+
+    Returns dict with expected values for S-orbitals:
+    - alpha=1.0 at origin: (2/pi)^(3/4) = 0.7127054703549901
+    - General formula: (2*alpha/pi)^(3/4)
+    """
+    return {
+        'alpha_1_at_origin': (2.0 / np.pi) ** 0.75,  # 0.7127054703549901
+        'normalization_formula': lambda alpha: (2.0 * alpha / np.pi) ** 0.75,
+    }
+
+
+@pytest.fixture(scope="session")
+def p_orbital_reference_values():
+    """Analytical reference values for P-orbital validation.
+
+    P-orbital normalization: 2 * (2*alpha/pi)^(3/4) * alpha^(1/2)
+    """
+    return {
+        'normalization_formula': lambda alpha: 2.0 * (2.0 * alpha / np.pi) ** 0.75 * (alpha ** 0.5),
+    }
+
+
+@pytest.fixture
+def simple_s_basis():
+    """Simple S-orbital basis for testing.
+
+    Single atom at origin with alpha=1.0, coeff=1.0.
+    """
+    return {
+        'nAtoms': 1,
+        'atoms_R': np.array([[0.0, 0.0, 0.0]]),
+        'spherical': 1,
+        'nb': 1,
+        'basis': [[np.array([[1.0, 1.0]])]],
+        'basis_norm': [[[1.0]]],
+    }
+
+
+@pytest.fixture
+def simple_sp_basis():
+    """Simple S+P orbital basis for testing.
+
+    Single atom at origin with S and P orbitals (alpha=1.0).
+    """
+    s_data = np.array([[1.0, 1.0]])
+    p_data = np.array([[1.0, 1.0]])
+    return {
+        'nAtoms': 1,
+        'atoms_R': np.array([[0.0, 0.0, 0.0]]),
+        'spherical': 1,
+        'nb': 4,  # 1 S + 3 P
+        'basis': [[s_data, p_data]],
+        'basis_norm': [[[1.0], [1.0]]],
+    }
+
+
+@pytest.fixture
+def centered_grid():
+    """Grid centered at origin with origin as a grid point.
+
+    21x21x21 grid from -5 to 5 in each dimension.
+    """
+    from visualization.grid import Grid
+    grid = Grid(x_n=21, y_n=21, z_n=21)
+    grid.x_min, grid.x_max = -5.0, 5.0
+    grid.y_min, grid.y_max = -5.0, 5.0
+    grid.z_min, grid.z_max = -5.0, 5.0
+    return grid
+
+
+@pytest.fixture
+def fine_centered_grid():
+    """Fine grid for accurate integration tests.
+
+    51x51x51 grid from -6 to 6 in each dimension.
+    """
+    from visualization.grid import Grid
+    grid = Grid(x_n=51, y_n=51, z_n=51)
+    grid.x_min, grid.x_max = -6.0, 6.0
+    grid.y_min, grid.y_max = -6.0, 6.0
+    grid.z_min, grid.z_max = -6.0, 6.0
+    return grid
+
+
+# ==============================================================================
 # Skip Markers
 # ==============================================================================
 

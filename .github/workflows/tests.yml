@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         lfs: true  # Enable Git LFS for large example files
 
@@ -45,15 +45,26 @@ jobs:
       run: |
         uv pip install --system -e ".[dev]"
 
+    - name: Check for Python 3.12 regex deprecation warnings
+      if: matrix.python-version == '3.12'
+      shell: bash -l {0}
+      run: |
+        python -W error::SyntaxWarning -c "from visualization.inputs import DaltonInput, MolproInput"
+
     - name: Run smoke tests
       shell: bash -l {0}
       run: |
         pytest tests/unit/test_smoke.py -v
 
-    - name: Run unit tests
+    - name: Run core unit tests (hard-fail)
       shell: bash -l {0}
       run: |
-        pytest tests/unit/ -v -m "unit and not gpu"
+        pytest tests/unit/test_basis_normalization.py tests/unit/test_input_dalton.py tests/unit/test_input_molpro.py -v
+
+    - name: Run other unit tests
+      shell: bash -l {0}
+      run: |
+        pytest tests/unit/ -v -m "unit and not gpu" --ignore=tests/unit/test_basis_normalization.py --ignore=tests/unit/test_input_dalton.py --ignore=tests/unit/test_input_molpro.py
 
     - name: Run integration tests
       shell: bash -l {0}
@@ -61,17 +72,22 @@ jobs:
         pytest tests/integration/ -v -m "integration and not slow and not gpu"
       continue-on-error: true  # Allow failures until tests are fully implemented
 
-    - name: Run validation tests
+    - name: Run AO validation tests (hard-fail)
       shell: bash -l {0}
       run: |
-        pytest tests/validation/ -v -m "validation and not slow and not gpu"
+        pytest tests/validation/test_ao_known_answer.py -v
+
+    - name: Run other validation tests
+      shell: bash -l {0}
+      run: |
+        pytest tests/validation/ -v -m "validation and not slow and not gpu" --ignore=tests/validation/test_ao_known_answer.py
       continue-on-error: true  # Allow failures until tests are fully implemented
 
   code-quality:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -106,20 +122,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         lfs: true
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Set up Conda
       uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
-        python-version: '3.10'
+        python-version: '3.11'
         channels: conda-forge
 
     - name: Install Mayavi via Conda
@@ -144,10 +160,10 @@ jobs:
       continue-on-error: true  # Allow failures during initial setup
 
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: always()
       with:
-        file: ./coverage.xml
+        files: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
       continue-on-error: true  # Don't fail if codecov upload fails
