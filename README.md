@@ -13,24 +13,42 @@ Quantum chemistry visualization tool for molecular orbitals, dispersion interact
 
 ## Installation
 
-### Quick Start (Recommended)
-
-Use the automated setup script for Conda + UV hybrid environment:
+### Option A: Fresh Environment (Recommended for Development)
 
 ```bash
 git clone https://github.com/hemiku/Visualization.git
 cd Visualization
-bash setup_environment.sh
+uv sync                    # Creates .venv with all dependencies
+uv run pytest tests/ -v    # Verify installation
 ```
 
-This creates a conda environment with Mayavi and installs the package with UV.
+### Option B: Into Existing Conda/Venv Environment
 
-### Manual Installation
+```bash
+conda activate my-env      # Or: source .venv/bin/activate
+git clone https://github.com/hemiku/Visualization.git
+cd Visualization
+uv pip install --system -e .
+pytest tests/ -v           # Verify installation
+```
 
-See [UV_SETUP.md](UV_SETUP.md) for detailed installation options including:
-- Pure UV installation (if Mayavi wheels available)
-- Conda + UV hybrid (recommended)
-- System site-packages approach
+### With Jupyter Notebook Support (Interactive 3D)
+
+```bash
+# Option A:
+uv sync --extra notebook
+uv run jupyter lab
+
+# Option B:
+uv pip install --system -e ".[notebook]"
+jupyter lab
+```
+
+### For Development
+
+```bash
+uv sync --extra dev
+```
 
 ## Quick Example
 
@@ -46,39 +64,39 @@ vis = V.Visualization(
 
 # Visualize geometry
 vis.get_geometry()
-vis.plot_Geometry(
+vis.plot_geometry(
     plot_atoms=True,
     atom_names=True,
     plot_bonds=True
 )
 ```
 
-Or use the verification script:
+### In Jupyter Notebooks
 
-```bash
-conda activate viz-env
-python show_water.py  # Opens 3D interactive window
+```python
+import pyvista as pv
+pv.set_jupyter_backend('trame')  # Enable interactive 3D
+
+import visualization.visualization as V
+vis = V.Visualization(...)
+vis.get_geometry()
+vis.plot_geometry()  # Interactive 3D in notebook!
 ```
 
 ## Testing
 
-Run the test suite:
-
 ```bash
 # All tests
-pytest tests/ -v
+uv run pytest tests/ -v
 
-# Quick tests only (skip slow tests)
-pytest tests/ -v -k "not slow"
+# Quick tests only
+uv run pytest tests/ -v -m "not slow"
 
-# Specific test category
-pytest -m unit -v          # Unit tests
-pytest -m integration -v   # Integration tests
-pytest -m validation -v    # Scientific validation
-pytest -m visual -v        # Visual output tests
+# Specific categories
+uv run pytest -m unit -v          # Unit tests
+uv run pytest -m integration -v   # Integration tests
+uv run pytest -m validation -v    # Scientific validation
 ```
-
-See [TESTING.md](TESTING.md) for comprehensive testing documentation.
 
 ## Supported Input Formats
 
@@ -87,69 +105,37 @@ See [TESTING.md](TESTING.md) for comprehensive testing documentation.
 - **GAMMCOR**: EERPA-GVB results (.txt files, SAPTVIS binary)
 - **SAPTVIS**: Binary files for SAPT(CAS) calculations
 
-## Documentation
-
-- [UV_SETUP.md](UV_SETUP.md) - Installation and environment setup
-- [TESTING.md](TESTING.md) - Testing guide and test categories
-- `example_pl.ipynb` - Jupyter notebook with detailed examples
-
 ## Requirements
 
-- Python ≥ 3.8
-- NumPy ≥ 1.20
-- SciPy ≥ 1.6
-- Mayavi (for 3D visualization)
-- Optional: CuPy ≥ 10.0 (for GPU acceleration)
+- Python >= 3.9
+- NumPy >= 1.20
+- SciPy >= 1.6
+- PyVista >= 0.38 (default visualization backend)
+- Optional: CuPy >= 10.0 (GPU acceleration)
+- Optional: Mayavi >= 4.7 (alternative backend, install via conda)
 
-## Development
-
-### Running Tests
-
-```bash
-conda activate viz-env
-pytest tests/ -v
-```
-
-### Package Structure
+## Package Structure
 
 ```
 visualization/
 ├── visualization.py      # Main visualization class
-├── dispersion_plot.py   # Dispersion calculations
-├── inputs.py            # Input file parsers
-├── input_molpro.py      # Molpro-specific parsers
-├── orbitals.py          # Orbital generation
-├── grid.py              # 3D grid handling
-├── geminals.py          # Geminal calculations
-├── molecular_system.py  # Molecular data structures
-└── utils.py             # Utilities
+├── dispersion_plot.py    # Dispersion calculations
+├── inputs.py             # Input file parsers
+├── input_molpro.py       # Molpro-specific parsers
+├── orbitals.py           # Orbital generation
+├── grid.py               # 3D grid handling
+├── geminals.py           # Geminal calculations
+├── molecular_system.py   # Molecular data structures
+└── backends/             # Visualization backends (pyvista, mayavi)
 ```
-
-### Test Categories
-
-- **Unit tests** (`tests/unit/`): Individual component testing
-- **Integration tests** (`tests/integration/`): Workflow testing
-- **Validation tests** (`tests/validation/`): Scientific correctness
-- **Visual tests** (`tests/visual/`): Rendering validation
 
 ## License
 
-Specified in LICENSE file.
-
-## Citation
-
-If you use this tool in your research, please cite:
-
-[Citation information to be added]
+MIT License - see LICENSE file.
 
 ## Contributing
 
 Contributions are welcome! Please ensure:
-- All tests pass: `pytest tests/`
+- All tests pass: `uv run pytest tests/`
 - Code follows existing style
 - New features include tests
-- Update documentation as needed
-
-## Acknowledgments
-
-Developed for visualizing quantum chemistry calculations from Dalton, Molpro, and GAMMCOR.

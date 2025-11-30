@@ -16,24 +16,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        lfs: true  # Enable Git LFS for large example files
+        lfs: true
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-
-    - name: Install Mayavi via Conda
-      shell: bash -l {0}
-      run: |
-        conda install -y mayavi
 
     - name: Install UV
       uses: astral-sh/setup-uv@v5
@@ -41,47 +29,39 @@ jobs:
         enable-cache: true
 
     - name: Install dependencies
-      shell: bash -l {0}
       run: |
         uv pip install --system -e ".[dev]"
 
     - name: Check for Python 3.12 regex deprecation warnings
       if: matrix.python-version == '3.12'
-      shell: bash -l {0}
       run: |
         python -W error::SyntaxWarning -c "from visualization.inputs import DaltonInput, MolproInput"
 
     - name: Run smoke tests
-      shell: bash -l {0}
       run: |
         pytest tests/unit/test_smoke.py -v
 
-    - name: Run core unit tests (hard-fail)
-      shell: bash -l {0}
+    - name: Run core unit tests
       run: |
         pytest tests/unit/test_basis_normalization.py tests/unit/test_input_dalton.py tests/unit/test_input_molpro.py -v
 
     - name: Run other unit tests
-      shell: bash -l {0}
       run: |
         pytest tests/unit/ -v -m "unit and not gpu" --ignore=tests/unit/test_basis_normalization.py --ignore=tests/unit/test_input_dalton.py --ignore=tests/unit/test_input_molpro.py
 
     - name: Run integration tests
-      shell: bash -l {0}
       run: |
         pytest tests/integration/ -v -m "integration and not slow and not gpu"
-      continue-on-error: true  # Allow failures until tests are fully implemented
+      continue-on-error: true
 
-    - name: Run AO validation tests (hard-fail)
-      shell: bash -l {0}
+    - name: Run AO validation tests
       run: |
         pytest tests/validation/test_ao_known_answer.py -v
 
     - name: Run other validation tests
-      shell: bash -l {0}
       run: |
-        pytest tests/validation/ -v -m "validation and not slow and not gpu" --ignore=tests/validation/test_ao_known_answer.py
-      continue-on-error: true  # Allow failures until tests are fully implemented
+        pytest tests/validation/ -v -m "validation and not slow and not gpu and not mayavi" --ignore=tests/validation/test_ao_known_answer.py
+      continue-on-error: true
 
   code-quality:
     runs-on: ubuntu-latest
@@ -92,7 +72,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Install UV
       uses: astral-sh/setup-uv@v5
@@ -106,17 +86,17 @@ jobs:
     - name: Check code formatting with black
       run: |
         uv run black --check visualization/ tests/
-      continue-on-error: true  # Don't fail CI on formatting issues yet
+      continue-on-error: true
 
     - name: Lint with flake8
       run: |
         uv run flake8 visualization/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
-      continue-on-error: true  # Don't fail CI on linting issues yet
+      continue-on-error: true
 
     - name: Type check with mypy
       run: |
         uv run mypy visualization/ --ignore-missing-imports
-      continue-on-error: true  # Don't fail CI on type errors yet
+      continue-on-error: true
 
   coverage:
     runs-on: ubuntu-latest
@@ -131,33 +111,19 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        auto-update-conda: true
-        python-version: '3.11'
-        channels: conda-forge
-
-    - name: Install Mayavi via Conda
-      shell: bash -l {0}
-      run: |
-        conda install -y mayavi
-
     - name: Install UV
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
 
     - name: Install dependencies
-      shell: bash -l {0}
       run: |
         uv pip install --system -e ".[dev]"
 
     - name: Run tests with coverage
-      shell: bash -l {0}
       run: |
-        pytest tests/ -v --cov=visualization --cov-report=xml --cov-report=term-missing -m "not gpu and not slow"
-      continue-on-error: true  # Allow failures during initial setup
+        pytest tests/ -v --cov=visualization --cov-report=xml --cov-report=term-missing -m "not gpu and not slow and not mayavi"
+      continue-on-error: true
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
@@ -166,4 +132,4 @@ jobs:
         files: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
-      continue-on-error: true  # Don't fail if codecov upload fails
+      continue-on-error: true

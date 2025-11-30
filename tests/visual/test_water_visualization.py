@@ -14,6 +14,7 @@ from pathlib import Path
 from mayavi import mlab
 
 
+@pytest.mark.mayavi
 @pytest.mark.visual
 @pytest.mark.requires_examples
 class TestWaterVisualization:
@@ -134,6 +135,7 @@ class TestWaterVisualization:
         assert hydrogen_count == 4, f"Expected 4 hydrogen atoms, got {hydrogen_count}"
 
 
+@pytest.mark.mayavi
 @pytest.mark.visual
 @pytest.mark.requires_examples
 @pytest.mark.requires_reference

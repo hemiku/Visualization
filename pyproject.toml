@@ -45,6 +45,15 @@ mayavi = [
     "mayavi>=4.7.0",
 ]
 
+# Jupyter notebook support (interactive 3D visualization)
+notebook = [
+    "jupyterlab>=4.0.0",
+    "ipywidgets>=8.0.0",
+    "trame>=3.0.0",
+    "trame-vtk>=2.0.0",
+    "trame-vuetify>=2.0.0",
+]
+
 # Development dependencies
 dev = [
     # Testing
@@ -57,25 +66,12 @@ dev = [
     "flake8>=3.9.0",
     "mypy>=0.910",
 
-    # Jupyter support
-    "ipykernel>=6.0.0",
-
-    # Runtime deps (explicitly included for dev)
-    "numpy>=1.20.0",
-    "scipy>=1.6.0",
-]
-
-# All optional dependencies combined
-all = [
-    "cupy-cuda11x>=10.0",
-    "mayavi>=4.7.0",
-    "pytest>=6.2.0",
-    "pytest-cov>=2.12.0",
-    "pytest-xdist>=2.3.0",
-    "black>=21.6b0",
-    "flake8>=3.9.0",
-    "mypy>=0.910",
-    "ipykernel>=6.0.0",
+    # Jupyter/notebook support
+    "jupyterlab>=4.0.0",
+    "ipywidgets>=8.0.0",
+    "trame>=3.0.0",
+    "trame-vtk>=2.0.0",
+    "trame-vuetify>=2.0.0",
 ]
 
 [project.urls]
@@ -102,9 +98,11 @@ markers = [
     "unit: Unit tests for individual components",
     "integration: Integration tests for workflows",
     "validation: Scientific correctness validation tests",
+    "visual: Visual output tests",
     "slow: Tests that take significant time to run",
     "gpu: Tests requiring GPU/CuPy",
     "requires_examples: Tests requiring example data files",
+    "mayavi: Tests requiring mayavi backend (skip in CI)",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
