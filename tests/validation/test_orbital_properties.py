@@ -168,7 +168,7 @@ class TestDispersionProperties:
         if not gammcor_file.exists():
             pytest.skip(f"GAMMCOR file not found: {gammcor_file}")
 
-        visualization.set_GAMMCOR_filename(filename=str(gammcor_file))
+        visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Calculate with small grid
         visualization.get_dispersion_index(

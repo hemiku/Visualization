@@ -11,6 +11,7 @@ Tests verify that:
 import pytest
 import numpy as np
 from pathlib import Path
+from mayavi import mlab
 
 
 @pytest.mark.visual
@@ -37,7 +38,7 @@ class TestWaterVisualization:
         # Render to file (headless)
         output_file = tmp_path / "test_water.png"
 
-        figure = vis.plot_Geometry(
+        figure = vis.plot_geometry(
             plot_atoms=True,
             atom_scaling=0.5,
             atom_names=True,
@@ -45,8 +46,8 @@ class TestWaterVisualization:
             auto_show=False
         )
 
-        vis.mlab.savefig(str(output_file))
-        vis.mlab.close()
+        mlab.savefig(str(output_file))
+        mlab.close()
 
         # Verify file was created
         assert output_file.exists(), "Output image was not created"
@@ -69,7 +70,7 @@ class TestWaterVisualization:
 
         output_file = tmp_path / "test_water.png"
 
-        figure = vis.plot_Geometry(
+        figure = vis.plot_geometry(
             plot_atoms=True,
             atom_scaling=0.5,
             atom_names=True,
@@ -77,8 +78,8 @@ class TestWaterVisualization:
             auto_show=False
         )
 
-        vis.mlab.savefig(str(output_file))
-        vis.mlab.close()
+        mlab.savefig(str(output_file))
+        mlab.close()
 
         # Load image
         img = Image.open(output_file)
@@ -184,7 +185,7 @@ class TestVisualSimilarity:
 
         output_file = tmp_path / "test_water.png"
 
-        figure = vis.plot_Geometry(
+        figure = vis.plot_geometry(
             plot_atoms=True,
             atom_scaling=0.5,
             atom_names=True,
@@ -192,8 +193,8 @@ class TestVisualSimilarity:
             auto_show=False
         )
 
-        vis.mlab.savefig(str(output_file))
-        vis.mlab.close()
+        mlab.savefig(str(output_file))
+        mlab.close()
 
         # Load images
         reference = np.array(Image.open(reference_path))

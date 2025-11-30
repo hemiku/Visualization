@@ -1,5 +1,7 @@
+import numpy as np
 
 from visualization.inputs import Input
+
 
 class MolproInput(Input):
 	"""
@@ -110,12 +112,12 @@ class MolproInput(Input):
 
 		return self.electrons
 
-	def get_Occ(self):
+	def get_occ(self):
 
 		if self.Occ is not None:
 			return self.Occ
 
-		self.Occ = self.np.zeros([self.nb], dtype=self.np.float64)
+		self.Occ = np.zeros([self.nb], dtype=np.float64)
 
 		_output = self.get_output()
 
@@ -143,9 +145,9 @@ class MolproInput(Input):
 		return self.Occ
 
 
-	def get_Coeff(self):
+	def get_coeff(self):
 
-		self.Coeff = self.np.zeros([self.nb, self.nb], dtype=self.np.float64)
+		self.Coeff = np.zeros([self.nb, self.nb], dtype=np.float64)
 
 		_output = self.get_output()
 
@@ -168,20 +170,20 @@ class MolproInput(Input):
 			orbital_split = orbital.split()
 			Occ = orbital_split[1]
 			coeff = orbital_split[3:]
-			coeff_line = self.np.fromstring(' '.join(coeff), dtype=self.np.float64, sep=' ')
+			coeff_line = np.fromstring(' '.join(coeff), dtype=np.float64, sep=' ')
 			self.Coeff[i,:] = coeff_line
 
 
 		return self.Coeff
 
 
-	def get_Atoms(self):
+	def get_atoms(self):
 
 		if self.Atoms_R is not None and self.Atoms_Charge is not None and self.Atoms_Name is not None:
 			return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
-		self.Atoms_R = self.np.zeros([self.nAtoms, 3], dtype=self.np.float64)
-		self.Atoms_Charge = self.np.zeros(self.nAtoms, dtype=self.np.int64)
+		self.Atoms_R = np.zeros([self.nAtoms, 3], dtype=np.float64)
+		self.Atoms_Charge = np.zeros(self.nAtoms, dtype=np.int64)
 		self.Atoms_Name = []
 
 		_output = self.get_output()
@@ -196,12 +198,12 @@ class MolproInput(Input):
 			atom_split = atom.split()
 			self.Atoms_Name.append( atom_split[1] )
 			self.Atoms_Charge[i] = self.Atoms_Charge[i] = int( float(atom_split[2]) )
-			self.Atoms_R[i,:] = self.np.fromstring(' '.join(atom_split[3:]), dtype=self.np.float64, sep=' ')
+			self.Atoms_R[i,:] = np.fromstring(' '.join(atom_split[3:]), dtype=np.float64, sep=' ')
 
 		return self.Atoms_R, self.Atoms_Charge, self.Atoms_Name
 
 
-	def get_Bonds(self):
+	def get_bonds(self):
 
 		_bonds = []
 
@@ -281,7 +283,7 @@ class MolproInput(Input):
 		return _basis
 
 
-	def get_Basis(self):
+	def get_basis(self):
 		""" get basis for the molpro input """
 
 		_output = self.get_output()
@@ -322,10 +324,10 @@ class MolproInput(Input):
 
 						_orbital_exponent_set = _orbital_exponent_set.union( [ float( _orbital_entry[0] )] )
 
-				_orbital_type_basis_array = self.np.zeros( [len(_orbital_exponent_set) , _orbitals_count+1 ] ,dtype=self.np.float32)
+				_orbital_type_basis_array = np.zeros( [len(_orbital_exponent_set) , _orbitals_count+1 ] ,dtype=np.float32)
 				_atom_basis_process.append(_orbital_type_basis_array)
 
-				_orbital_type_basis_array[:,0] = self.np.sort(self.np.array( list( _orbital_exponent_set ) ))[::-1]
+				_orbital_type_basis_array[:,0] = np.sort(np.array( list( _orbital_exponent_set ) ))[::-1]
 
 				_processed_orbitals = 0
 				for _orbital_group in  _orbital_type_basis[0::(2*i+1) ]:
@@ -334,7 +336,7 @@ class MolproInput(Input):
 
 						_exponent_mask =_orbital_type_basis_array[:,0] == float( _orbital_entry[0] )
 						_number_of_coefficients = len(_orbital_entry) - 1
-						_exponent_line = self.np.array( [ float( coefficient ) for coefficient in _orbital_entry[1:] ]  ,dtype=self.np.float32)
+						_exponent_line = np.array( [ float( coefficient ) for coefficient in _orbital_entry[1:] ]  ,dtype=np.float32)
 
 						_orbital_type_basis_array[_exponent_mask, _processed_orbitals + 1:(_processed_orbitals + _number_of_coefficients + 1) ] = _exponent_line
 

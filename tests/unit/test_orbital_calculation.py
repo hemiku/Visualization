@@ -87,10 +87,10 @@ class TestAOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
+        vis.orbital_generator.init_aos()
 
         # Generate AOs
-        vis.generate_AO_orbitals()
+        vis.generate_ao_orbitals()
 
         # Verify AOs were generated
         assert vis.molecular_system.AOs is not None
@@ -111,8 +111,8 @@ class TestAOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
 
         expected_shape = (test_grid_small.x_n, test_grid_small.y_n, test_grid_small.z_n)
 
@@ -136,8 +136,8 @@ class TestAOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
 
         # Check first few AOs are not all zero
         for i in range(min(5, len(vis.molecular_system.AOs))):
@@ -160,8 +160,8 @@ class TestAOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
 
         # Number of AOs should equal number of basis functions
         assert len(vis.molecular_system.AOs) == vis.molecular_system.nb, \
@@ -188,11 +188,11 @@ class TestMOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
+        vis.orbital_generator.init_aos()
 
         # Generate AOs then MOs
-        vis.generate_AO_orbitals()
-        vis.generate_MO_orbitals()
+        vis.generate_ao_orbitals()
+        vis.generate_mo_orbitals()
 
         # Verify MOs were generated
         assert vis.molecular_system.MOs is not None
@@ -213,9 +213,9 @@ class TestMOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
-        vis.generate_MO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
+        vis.generate_mo_orbitals()
 
         expected_shape = (test_grid_small.x_n, test_grid_small.y_n, test_grid_small.z_n)
 
@@ -239,9 +239,9 @@ class TestMOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
-        vis.generate_MO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
+        vis.generate_mo_orbitals()
 
         # Check first few MOs are not all zero
         for i in range(min(5, len(vis.molecular_system.MOs))):
@@ -264,9 +264,9 @@ class TestMOGeneration:
         vis.get_orbital_data()
         vis.orbital_generator.grid = test_grid_small
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
-        vis.generate_MO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
+        vis.generate_mo_orbitals()
 
         # Number of MOs should equal number of AOs/basis functions
         assert len(vis.molecular_system.MOs) == len(vis.molecular_system.AOs), \
@@ -297,9 +297,9 @@ class TestOrbitalCalculationWorkflow:
         vis.get_orbital_data()
         vis.orbital_generator.grid = tiny_grid
         vis.orbital_generator.init_grid()
-        vis.orbital_generator.init_AOs()
-        vis.generate_AO_orbitals()
-        vis.generate_MO_orbitals()
+        vis.orbital_generator.init_aos()
+        vis.generate_ao_orbitals()
+        vis.generate_mo_orbitals()
 
         # Verify complete workflow succeeded
         assert vis.molecular_system.AOs is not None

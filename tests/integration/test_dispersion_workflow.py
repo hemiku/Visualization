@@ -55,7 +55,7 @@ class TestDispersionWorkflow:
         if not gammcor_file.exists():
             pytest.skip(f"GAMMCOR file not found: {gammcor_file}")
 
-        visualization.set_GAMMCOR_filename(filename=str(gammcor_file))
+        visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Calculate dispersion with small grid for speed
         visualization.get_dispersion_index(
@@ -90,7 +90,7 @@ class TestDispersionWorkflow:
         if not gammcor_file.exists():
             pytest.skip(f"GAMMCOR file not found: {gammcor_file}")
 
-        visualization.set_GAMMCOR_filename(filename=str(gammcor_file))
+        visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Calculate with medium grid (as in notebook: 50x50x50)
         visualization.get_dispersion_index(
@@ -144,7 +144,7 @@ class TestGeminalWorkflow:
         if not gammcor_file.exists():
             pytest.skip(f"GAMMCOR file not found: {gammcor_file}")
 
-        visualization.set_GAMMCOR_filename(filename=str(gammcor_file))
+        visualization.set_gammcor_filename(filename=str(gammcor_file))
 
         # Small grid for fast testing
         visualization.get_dispersion_index(
@@ -251,7 +251,7 @@ class TestSAPTWorkflow:
         vis_A.orbital_generator.grid.y_n = 10
         vis_A.orbital_generator.grid.z_n = 10
         vis_A.orbital_generator.init_grid()
-        vis_A.orbital_generator.init_AOs()
+        vis_A.orbital_generator.init_aos()
         vis_A.orbital_generator.spherical = 1
 
         # Verify grid initialized
@@ -315,7 +315,7 @@ class TestSAPTWorkflow:
             vis.orbital_generator.grid.y_n = 10
             vis.orbital_generator.grid.z_n = 10
             vis.orbital_generator.init_grid()
-            vis.orbital_generator.init_AOs()
+            vis.orbital_generator.init_aos()
             vis.orbital_generator.spherical = 1
 
         # Read SAPTVIS data

@@ -80,11 +80,11 @@ class MolecularSystem:
 	def set_electrons(self, electrons):
 		self.electrons = electrons
 
-	def set_Occ(self, Occ):
-		self.Occ = Occ
+	def set_occ(self, occ):
+		self.Occ = occ
 
-	def set_Coeff(self, Coeff):
-		self.Coeff = Coeff
+	def set_coeff(self, coeff):
+		self.Coeff = coeff
 
 	def set_atoms_R(self, atoms_R):
 		self.atoms_R = atoms_R
@@ -119,7 +119,7 @@ class MolecularSystem:
 	def get_electrons(self):
 		return self.electrons
 
-	def get_Occ(self):
+	def get_occ(self):
 		return self.Occ
 
 	def get_coeff(self):
