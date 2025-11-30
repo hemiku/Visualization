@@ -4,6 +4,9 @@ import numpy as np
 from numpy import float32
 
 from visualization.molecular_system import MolecularSystem
+from visualization.basis_normalization import (
+    norm_s, norm_p, norm_d, norm_f, norm_g, norm_h, calc_norm_from_basis as _calc_norm
+)
 
 
 class Input( ):
@@ -115,137 +118,9 @@ class Input( ):
 			return self.output
 
 	def calc_norm_from_basis(self, basis):
+		"""Calculate normalization factors for basis set."""
+		return _calc_norm(basis)
 
-		_basis_norm:list
-
-		if basis :
-
-			_basis_norm = []
-
-			# for n in range(self.nAtoms):
-
-			for n, atom_basis in enumerate( basis ):
-
-				_atom_basis_norm =[]
-				_basis_norm.append( _atom_basis_norm )
-
-				for j, orbital_type_basis in enumerate( atom_basis ):
-					if (j == 0):
-						_atom_basis_norm.append( self.Norm_S2( orbital_type_basis ) )
-					if (j == 1):
-						_atom_basis_norm.append( self.Norm_P2( orbital_type_basis ) )
-					if (j == 2):
-						_atom_basis_norm.append( self.Norm_D2( orbital_type_basis ) )
-					if (j == 3):
-						_atom_basis_norm.append( self.Norm_F2( orbital_type_basis ) )
-					if (j == 4):
-						_atom_basis_norm.append( self.Norm_G2( orbital_type_basis ) )
-
-		return _basis_norm
-
-
-	def normalization_summation(self, Data, pow_val):
-
-		if (len(np.shape(Data)) == 2):
-
-			NOrb = np.shape(Data)[-1] - 1
-			NExpans = np.shape(Data)[0]
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			for i in range(NExpans):
-				for j in range(NExpans):
-					Norm += Data[i, 1:] * Data[j, 1:] / (Data[i, 0] + Data[j, 0]) ** pow_val
-
-		else:
-
-			Norm = Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
-
-		return Norm
-
-	def normalization_summation_2(self, Data, pow_val):
-
-		Norm: np.ndarray
-
-		if (len(np.shape(Data)) == 2):
-
-			NOrb = np.shape(Data)[-1] - 1
-			NExpans = np.shape(Data)[0]
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			# exponents = Data[:,0]
-			# coefficents =  Data[:,1:]
-
-			for i in range(NExpans):
-				for j in range(NExpans):
-					Norm += Data[i, 1:] *Data[j, 1:]  / (Data[i, 0] + Data[j, 0]) ** pow_val
-
-		else:
-
-			Norm = Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
-
-		return Norm
-
-	def Norm_S2(self, Data):
-
-		pow_val = 3.0 / 2.0
-		fact = np.sqrt(2)/4
-		fact = 1.0
-
-		Norm = fact * np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val )
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_P2(self, Data):
-
-		pow_val = 5.0 / 2.0
-		fact = 1.0 / 2.0
-
-		Norm = fact * np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val )
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_D2(self, Data):
-
-		pow_val = 7.0 / 2.0
-		fact = 1.0 / 4.0
-
-		Norm = fact * np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val )
-
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_F2(self, Data):
-
-		pow_val = 9.0 / 2.0
-		fact = 15.0 / 8.0
-
-		Norm =  self.normalization_summation( Data, pow_val) * np.pi ** (3.0 / 2.0) * fact
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_G2(self, Data):
-
-		pow_val = 11.0 / 2.0
-		fact = 105.0 / 16.0
-
-		Norm =  self.normalization_summation( Data, pow_val) * np.pi ** (3.0 / 2.0) * fact
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_H2(self, Data):
-
-		pow_val = 13.0 / 2.0
-		fact = 945.0 / 32.0
-
-		Norm =  self.normalization_summation( Data, pow_val) * np.pi ** (3.0 / 2.0) * fact
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
 
 class DaltonInput(Input):
 
@@ -596,53 +471,16 @@ class DaltonInput(Input):
 
 				i += 1
 
-		if( len( self.basis )):
+		if len(self.basis):
+			norm_funcs = [norm_s, norm_p, norm_d, norm_f, norm_g, norm_h]
 			for n in range(self.nAtoms):
-
 				self.basis_norm.append([])
-
 				for j in range(len(self.basis[n])):
-					if (j == 0):
-						self.basis_norm[n].append( self.Norm_S2(self.basis[n][j]) )
-					if (j == 1):
-						self.basis_norm[n].append(self.Norm_P2(self.basis[n][j]))
-					if (j == 2):
-						self.basis_norm[n].append(self.Norm_D2(self.basis[n][j]))
-					if (j == 3):
-						self.basis_norm[n].append(self.Norm_F2(self.basis[n][j]))
-					if (j == 4):
-						self.basis_norm[n].append(self.Norm_G2(self.basis[n][j]))
+					if j < len(norm_funcs):
+						self.basis_norm[n].append(norm_funcs[j](self.basis[n][j]))
 
 
-	def calc_norm_from_basis(self, basis):
-
-		_basis_norm:list
-
-		if basis :
-
-			_basis_norm = []
-
-			for n, atom_basis in enumerate( basis ):
-
-				_atom_basis_norm =[]
-				_basis_norm.append( _atom_basis_norm )
-
-				for j, orbital_type_basis in enumerate( atom_basis ):
-					if (j == 0):
-						_atom_basis_norm.append( self.Norm_S2( orbital_type_basis ) )
-					if (j == 1):
-						_atom_basis_norm.append( self.Norm_P2( orbital_type_basis ) )
-					if (j == 2):
-						_atom_basis_norm.append( self.Norm_D2( orbital_type_basis ) )
-					if (j == 3):
-						_atom_basis_norm.append( self.Norm_F2( orbital_type_basis ) )
-					if (j == 4):
-						_atom_basis_norm.append( self.Norm_G2( orbital_type_basis ) )
-
-			return _basis_norm
-
-
-	def get_printout_of_final_geminals(self, dalton_output ):
+	def get_printout_of_final_geminals(self, dalton_output):
 
 		GEMINAL_PART_START = "Printout of final geminals"
 		WAWE_FUNCTION_SECTION_END = "| End of Wave Function Section (SIRIUS) |"
@@ -698,205 +536,6 @@ class DaltonInput(Input):
 
 		return self.Orb2Gem, self.nGeminal
 
-	def Norm_S(self, C):
-
-		NOrb = np.shape(C)[-1] - 1
-		NExpans = np.shape(C)[0]
-
-		Norm = np.zeros(NOrb, dtype=np.float64)
-
-		for n in range(NOrb):
-			for i in range(NExpans):
-				Norm[n] += np.sqrt(2.0) * np.pi ** (3.0 / 2.0) * C[i, n + 1] ** 2 / (
-							4.0 * C[i, 0] ** (3.0 / 2.0))
-				for j in range(i):
-					Norm[n] += 2.0 * np.pi ** (3.0 / 2.0) * C[i, n + 1] * C[j, n + 1] / (
-								C[i, 0] * np.sqrt(C[i, 0] + C[j, 0]) + C[j, 0] * np.sqrt(C[i, 0] + C[j, 0]))
-
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_P(self, Dane):
-
-		Norm:np.ndarray
-
-		if (len(np.shape(Dane)) == 2):
-
-			NOrb = np.shape(Dane)[-1] - 1
-			NExpans = np.shape(Dane)[0]
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			for n in range(NOrb):
-				for i in range(NExpans):
-
-					Norm[n] += np.sqrt(2.0) * np.pi ** (3.0 / 2.0) * Dane[i, n + 1] ** 2.0 / (
-								16.0 * Dane[i, 0] ** (5.0 / 2.0))
-					for j in range(i):
-						Norm[n] += np.pi ** (3.0 / 2.0) * Dane[i, n + 1] * Dane[j, n + 1] / (
-									Dane[i, 0] ** 2.0 * np.sqrt(Dane[i, 0] + Dane[j, 0]) + 2.0 * Dane[i, 0] * Dane[
-								j, 0] * np.sqrt(Dane[i, 0] + Dane[j, 0]) + Dane[j, 0] ** 2.0 * np.sqrt(
-								Dane[i, 0] + Dane[j, 0]))
-
-		else:
-
-			Norm = np.sqrt(2.0) * np.pi ** (3.0 / 2.0) * Dane[1] ** 2.0 / (16.0 * Dane[0] ** (5.0 / 2.0))
-
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_D(self, Dane):
-		if (len(np.shape(Dane)) == 2):
-
-			NOrb = np.shape(Dane)[-1] - 1
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			for n in range(NOrb):
-				Norm[n] = 2 ** (3.0 / 4.0) * np.sqrt(3.0) * Dane[0, n] ** (7.0 / 4.0) * np.sqrt(
-					Dane[n, n + 1] ** (-2)) / (3.0 * np.pi ** (3.0 / 4.0))
-		else:
-			Norm = 2 ** (3.0 / 4.0) * np.sqrt(3.0) * Dane[0] ** (7.0 / 4.0) * np.sqrt(Dane[1] ** (-2)) / (
-						3.0 * np.pi ** (3.0 / 4.0))
-
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_F(self, Dane):
-		if (len(np.shape(Dane)) == 2):
-
-			NOrb = np.shape(Dane)[-1] - 1
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			for n in range(NOrb):
-				Norm[n] = 2 ** (3.0 / 4.0) * np.sqrt(3.0) * Dane[0, n] ** (7.0 / 4.0) * np.sqrt(
-					Dane[n, n + 1] ** (-2)) / (3.0 * np.pi ** (3.0 / 4.0))
-		else:
-			Norm = 2 ** (3.0 / 4.0) * np.sqrt(3.0) * Dane[0] ** (7.0 / 4.0) * np.sqrt(Dane[1] ** (-2)) / (
-						3.0 * np.pi ** (3.0 / 4.0))
-
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm(self, Dane, Angular):
-
-		pow = (3.0 + 2.0 * Angular) / 4.0
-
-		if (len(np.shape(Dane)) == 2):
-
-			NOrb = np.shape(Dane)[-1] - 1
-			NExpans = np.shape(Dane)[0]
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			for n in range(NOrb):
-				Norm[n] = 2 ** (3.0 / 4.0) * np.sqrt(3.0) * Dane[0, n] ** (7.0 / 4.0) * np.sqrt(
-					Dane[n, n + 1] ** (-2)) / (3.0 * np.pi ** (3.0 / 4.0))
-
-
-
-	def normalization_summation(self, Data, pow_val):
-
-		if (len(np.shape(Data)) == 2):
-
-			NOrb = np.shape(Data)[-1] - 1
-			NExpans = np.shape(Data)[0]
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			for i in range(NExpans):
-				for j in range(NExpans):
-					Norm += Data[i, 1:] * Data[j, 1:] / (Data[i, 0] + Data[j, 0]) ** pow_val
-
-		else:
-
-			Norm = Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
-
-		return Norm
-
-
-	def normalization_summation_2(self, Data, pow_val):
-
-		if (len(np.shape(Data)) == 2):
-
-			NOrb = np.shape(Data)[-1] - 1
-			NExpans = np.shape(Data)[0]
-			Norm = np.zeros(NOrb, dtype=np.float64)
-
-			exponents = Data[:,0]
-			coefficents =  Data[:,1:]
-
-			for i in range(NExpans):
-				for j in range(NExpans):
-					Norm += Data[i, 1:] *Data[j, 1:]  / (Data[i, 0] + Data[j, 0]) ** pow_val
-
-		else:
-
-			Norm = Data[1] * Data[1] / (Data[0] + Data[0]) ** pow_val
-
-		return Norm
-
-	def Norm_S2(self, Data):
-
-		pow_val = 3.0 / 2.0
-		fact = np.sqrt(2)/4
-		fact = 1.0
-
-		Norm = fact * np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val)
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_P2(self, Data):
-
-		pow_val = 5.0 / 2.0
-		fact = 1.0 / 2.0
-
-		Norm = fact * np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val)
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_D2(self, Data):
-
-		pow_val = 7.0 / 2.0
-		fact = 1.0 / 4.0
-
-		Norm = fact * np.pi ** (3.0 / 2.0) * self.normalization_summation( Data, pow_val)
-
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_F2(self, Data):
-
-		pow_val = 9.0 / 2.0
-		fact = 15.0 / 8.0
-
-		Norm =  self.normalization_summation( Data, pow_val) * np.pi ** (3.0 / 2.0) * fact
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_G2(self, Data):
-
-		pow_val = 11.0 / 2.0
-		fact = 105.0 / 16.0
-
-		Norm =  self.normalization_summation( Data, pow_val) * np.pi ** (3.0 / 2.0) * fact
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
-
-	def Norm_H2(self, Data):
-
-		pow_val = 13.0 / 2.0
-		fact = 945.0 / 32.0
-
-		Norm =  self.normalization_summation( Data, pow_val) * np.pi ** (3.0 / 2.0) * fact
-		Norm = 1 / np.sqrt(Norm)
-
-		return Norm
 
 class MoldenInput(Input):
 
